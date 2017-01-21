@@ -48,5 +48,6 @@ public class FSM {
     	robot.vision.update();
         robot.dt.update();
         robot.nav.updatePosition();
+        robot.shooter.leftShooter.update();
     }
 }

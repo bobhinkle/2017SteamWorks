@@ -74,17 +74,23 @@ public class TeleController
         if(driver.backButton.isHeld()){ 
         	robot.dt._pidgey.SetFusedHeading(0.0);
         	robot.dt.setHeading(0.0);
+        	
         }
-        
+        if(driver.backButton.isPressed()){
+        	robot.shooter.setSpeed(0);
+        }
         if(driver.startButton.isPressed()){
         	
         }
         
         if(driver.rightCenterClick.isPressed()){
-        	
+        	robot.shooter.setSpeed(3300); //3475 far shot, 3000 closeshot
         }
         if(driver.getPOV() == 0){
-        	
+        	robot.shooter.bumpUp(100);
+        }
+        if(driver.getPOV() == 180){
+        	robot.shooter.bumpUp(100);
         }
         if(robotCentric)
         	SmartDashboard.putString("RobotControl", "ROBOT");

@@ -8,6 +8,7 @@ import Sensors.PigeonImu.PigeonState;
 import Utilities.Constants;
 import Utilities.Ports;
 import Utilities.Util;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Swerve{
@@ -30,12 +31,12 @@ public class Swerve{
 	double currentAngularRate = 0.0;
 	boolean tracking = false;
 	//Swerve Turning Gains
-	double kPgain = 0.01; /* percent throttle per degree of error */
-	double kDgain = 0.002; /* percent throttle per angular velocity dps */
-	double kPgainSmall = 0.035;
-	double kDgainSmall = 0.002;
-	double kMaxCorrectionRatioSmall = 0.2;
-	double kMaxCorrectionRatio = 0.35; /* cap corrective turning throttle to 30 percent of forward throttle */
+	double kPgain = 0.005; /* percent throttle per degree of error */
+	double kDgain = 0.004; /* percent throttle per angular velocity dps */
+	double kPgainSmall = 0.005;
+	double kDgainSmall = 0.004;
+	double kMaxCorrectionRatioSmall = 0.14;
+	double kMaxCorrectionRatio = 0.12; /* cap corrective turning throttle to 30 percent of forward throttle */
 	
 	double _targetAngle = 0.0;
 	double rotationCorrection;
@@ -167,7 +168,7 @@ public class Swerve{
 		private CANTalon rotationMotor;
 		public CANTalon driveMotor;
 		private int moduleID;
-		//private double goalPosition;
+		private Encoder encoder;
 		private int absolutePosition;
 		public void debugValues(){
 			//Note #3
@@ -178,15 +179,16 @@ public class Swerve{
 			rotationMotor = new CANTalon(rotationMotorPort);
 			driveMotor = new CANTalon(driveMotorPort);
 			loadProperties();
-			moduleID = moduleNum;
-           // goalPosition = getCurrentAngle();            
+			moduleID = moduleNum;           
 		}
 		
 		public void setGoal(double goalAngle)
 	    {
 			rotationMotor.set(continousAngle(goalAngle,rotationMotor.get()));
 	    }
-		
+		public double wheelError(){
+			return Math.abs(rotationMotor.getSetpoint() - rotationMotor.get());
+		}
 	    public final void loadProperties()
 	    {
 	    	absolutePosition = rotationMotor.getPulseWidthPosition() & 0xFFF;
@@ -205,8 +207,12 @@ public class Swerve{
 	    }
 	   
 	    public void setDriveSpeed(double power){
-	    	driveMotor.set(-power);	    		
-		}
+	    	if(wheelError() < 10)
+	    		driveMotor.set(-power);	    
+	   	}
+	    public void stopDriveMotor(){
+	    	driveMotor.set(0);
+	    }
 		public double getCurrentAngle(){
 			return rotationMotor.get();
 		}
@@ -222,10 +228,10 @@ public class Swerve{
 		SmartDashboard.putNumber("Target Heading", _targetAngle);
 		
 		if(xInput == 0 && yInput == 0 && rotateInput == 0){
-			frontLeft.setDriveSpeed(0.0);
-			frontRight.setDriveSpeed(0.0);
-			rearLeft.setDriveSpeed(0.0);
-			rearRight.setDriveSpeed(0.0);
+			frontLeft.stopDriveMotor();
+			frontRight.stopDriveMotor();
+			rearLeft.stopDriveMotor();
+			rearRight.stopDriveMotor();
 		}
 		
 		else{

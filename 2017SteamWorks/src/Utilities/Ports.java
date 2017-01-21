@@ -16,4 +16,15 @@ public class Ports {
     public static final int REAR_RIGHT_ROTATION = 7;
     public static final int REAR_RIGHT_DRIVE    = 8;
     
+    public static final int SHOOTER_MOTOR_1 = 9;
+    public static final int SHOOTER_MOTOR_2 = 10;
+    public static final int PRELOADER_MOTOR = 12;
+    
+    public static final int INTAKE_MOTOR    = 13;
+    
+    
+    
+    ///SOLENOIDS
+    
+    public static final int INTAKE_ARM  = 1;
 }
