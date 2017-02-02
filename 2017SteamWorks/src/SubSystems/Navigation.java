@@ -12,7 +12,7 @@ public class Navigation {
     private static Navigation instance;
     private double basicDistance = 0;
     private double angle = 0;
-    private double STARTING_ANGLE_OFFSET = 0.0;
+    private double STARTING_ANGLE_OFFSET = 0.0; //
     private Navigation()
     {        
         gyro = new GyroThread();
