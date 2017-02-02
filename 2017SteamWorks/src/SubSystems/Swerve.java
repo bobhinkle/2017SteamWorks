@@ -170,6 +170,19 @@ public class Swerve{
 		private int moduleID;
 		private Encoder encoder;
 		private int absolutePosition;
+		private double x = 0.0;
+		private double y = 0.0;
+		
+		
+		public void updateCoord(){
+		   //add two lines
+		}
+		public double getX(){
+			return x;
+		}
+		public double getY(){
+			return y;
+		}
 		public void debugValues(){
 			//Note #3
 			SmartDashboard.putNumber("ROT_" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(getCurrentAngle()));

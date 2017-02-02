@@ -13,10 +13,12 @@ public class Navigation {
     private double basicDistance = 0;
     private double angle = 0;
     private double STARTING_ANGLE_OFFSET = 0.0; //
+    private Swerve swerve;
     private Navigation()
     {        
         gyro = new GyroThread();
         gyro.start();
+        swerve = Swerve.getInstance();
     }
     public static Navigation getInstance()
     {
@@ -26,6 +28,7 @@ public class Navigation {
         }
         return instance;
     }
+    
     public void initGyro(){
         System.out.println("init");
         SmartDashboard.putString("GYRO_STATUS", "INITIALIZING");
@@ -75,6 +78,10 @@ public class Navigation {
         gyro.rezero();
     }
 
+    public void moduleCoords(){
+    	SmartDashboard.putNumber("LMOD_X", swerve.frontLeft.getX());
+    	SmartDashboard.putNumber("LMOD_Y", swerve.frontLeft.getY());
+    }
     public double getGyroRate(){
     	return gyro.getRate();
     }

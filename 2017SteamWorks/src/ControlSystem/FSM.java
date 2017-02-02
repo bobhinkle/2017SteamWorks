@@ -49,5 +49,6 @@ public class FSM {
         robot.dt.update();
         robot.nav.updatePosition();
         robot.shooter.leftShooter.update();
+        robot.dt.frontLeft.updateCoord();
     }
 }
