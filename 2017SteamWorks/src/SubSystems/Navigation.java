@@ -14,11 +14,12 @@ public class Navigation {
     private double angle = 0;
     private double STARTING_ANGLE_OFFSET = 0.0; //
     private Swerve swerve;
+    private Intake intake;
+    private double currentAngle = 0.0;
+    double currentAngularRate = 0.0;
     private Navigation()
     {        
-        gyro = new GyroThread();
-        gyro.start();
-        swerve = Swerve.getInstance();
+        intake = Intake.getInstance();		
     }
     public static Navigation getInstance()
     {
@@ -29,20 +30,18 @@ public class Navigation {
         return instance;
     }
     
-    public void initGyro(){
-        System.out.println("init");
-        SmartDashboard.putString("GYRO_STATUS", "INITIALIZING");
-        System.out.println("init done");
-        SmartDashboard.putString("GYRO_STATUS", "READY");
+    public double getCurrentAngle(){
+    	return currentAngle;
+    }
+    public double getCurrentAngularRate(){
+    	return currentAngularRate;
     }
     public synchronized void resetRobotPosition(double x, double y, double theta,boolean gyroReset)
     {
         this.x = x;
         this.y = y;
         
-        if(gyroReset){
-            gyro.reset();
-        }
+       
         basicDistance = 0;
         STARTING_ANGLE_OFFSET = 0;
     }
@@ -62,7 +61,7 @@ public class Navigation {
         return Util.boundAngle0to360Degrees(gyro.getAngleInDegrees());
     }
     public double getRawHeading(){
-        return gyro.getAngleInDegrees();
+        return 0;
     }
     public double getRawHeadingInDegrees(){
     	return Util.radsToDegrees(angle);
@@ -75,21 +74,20 @@ public class Navigation {
 
     public void resetPitch()
     {
-        gyro.rezero();
+        
     }
 
     public void moduleCoords(){
     	SmartDashboard.putNumber("LMOD_X", swerve.frontLeft.getX());
     	SmartDashboard.putNumber("LMOD_Y", swerve.frontLeft.getY());
     }
-    public double getGyroRate(){
-    	return gyro.getRate();
-    }
+    
     public double getDistance(){
         return basicDistance;
     }
     public void updatePosition()
     {
+//    	pigeonUpdate();
     	//angle = gyro.getAngleInDegrees() + STARTING_ANGLE_OFFSET;
     	//SmartDashboard.putNumber("GYRO_HEADING", gyro.getAngleInDegrees());
     }

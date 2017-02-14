@@ -66,8 +66,8 @@ public class Shooter {
     }
     public ShooterColumn leftShooter,rightShooter;
 	public Shooter(){
-		leftShooter = new ShooterColumn(Ports.SHOOTER_MOTOR_1,true);
-		rightShooter = new ShooterColumn(Ports.SHOOTER_MOTOR_2,false);
+		leftShooter = new ShooterColumn(Ports.SHOOTER_MOTOR_MASTER,true);
+		rightShooter = new ShooterColumn(Ports.SHOOTER_MOTOR_SLAVE,false);
 	}
 	public static Shooter getInstance()
     {

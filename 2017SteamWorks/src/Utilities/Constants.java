@@ -13,10 +13,13 @@ public class Constants {
     public static final int GYRO_INIT = 0;
     public static final int GYRO_READY  = 1;
     
-    public static final double WHEELBASE_LENGTH = 33.1625;
-    public static final double WHEELBASE_WIDTH  = 21.5;
+    public static final double WHEELBASE_LENGTH = 22.181;
+    public static final double WHEELBASE_WIDTH  = 15.681;
     
-    
+    public static final double FRONT_RIGHT_TURN_OFFSET = 90.0;
+    public static final double FRONT_LEFT_TURN_OFFSET  = 90.0;
+    public static final double REAR_LEFT_TURN_OFFSET   = 90.0;
+    public static final double REAR_RIGHT_TURN_OFFSET  = 90.0;
     
     
     public static final double TURN_KP = 0.02; //0.020

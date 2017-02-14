@@ -18,7 +18,7 @@ public class TeleController
         driver = new Xbox(0);
         driver.init();
         robot = RoboSystem.getInstance();
-        fsm = FSM.getInstance();
+//        fsm = FSM.getInstance();
     }
     public static TeleController getInstance(){
         if(instance == null){
@@ -31,20 +31,20 @@ public class TeleController
     public void driver() {
     	
     	if(driver.aButton.isPressed()){       
-    		robot.dt.setHeading(180);
+//    		robot.dt.setHeading(180);
         }
     	if(driver.bButton.isPressed()){  
-    		robot.dt.setHeading(90);
+//    		robot.dt.setHeading(90);
         }
     	if(driver.xButton.isPressed()){
-    		robot.dt.setHeading(270);
+//    		robot.dt.setHeading(270);
         }if(driver.yButton.isPressed()){
-        	robot.dt.setHeading(0);
+//        	robot.dt.setHeading(0);
         }
         if(driver.startButton.isHeld()){
         	robot.dt.swerveTrack();
         	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
-            		Util.controlSmoother(-driver.getButtonAxis(Xbox.LEFT_STICK_Y)), 
+            		Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_Y)), 
             		Util.turnControlSmoother(0),
             		Util.turnControlSmoother(0),
             		driver.leftTrigger.isHeld(),
@@ -72,25 +72,25 @@ public class TeleController
         }
         
         if(driver.backButton.isHeld()){ 
-        	robot.dt._pidgey.SetFusedHeading(0.0);
-        	robot.dt.setHeading(0.0);
+//        	robot.intake._pidgey.SetFusedHeading(0.0);
+//        	robot.dt.setHeading(0.0);
         	
         }
         if(driver.backButton.isPressed()){
-        	robot.shooter.setSpeed(0);
+//        	robot.shooter.setSpeed(0);
         }
         if(driver.startButton.isPressed()){
         	
         }
         
         if(driver.rightCenterClick.isPressed()){
-        	robot.shooter.setSpeed(3300); //3475 far shot, 3000 closeshot
+//        	robot.shooter.setSpeed(3300); //3475 far shot, 3000 closeshot
         }
         if(driver.getPOV() == 0){
-        	robot.shooter.bumpUp(100);
+//        	robot.shooter.bumpUp(100);
         }
         if(driver.getPOV() == 180){
-        	robot.shooter.bumpUp(100);
+//        	robot.shooter.bumpUp(100);
         }
         if(robotCentric)
         	SmartDashboard.putString("RobotControl", "ROBOT");

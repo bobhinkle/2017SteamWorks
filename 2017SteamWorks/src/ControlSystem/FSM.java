@@ -45,10 +45,11 @@ public class FSM {
     }
 
     public void update(){ 
-    	robot.vision.update();
-        robot.dt.update();
-        robot.nav.updatePosition();
-        robot.shooter.leftShooter.update();
-        robot.dt.frontLeft.updateCoord();
+//    	robot.vision.update();
+//        robot.dt.update();
+//        robot.intake.pigeonUpdate();
+//        robot.nav.updatePosition();
+//        robot.shooter.leftShooter.update();
+//        robot.dt.frontLeft.updateCoord();
     }
 }
