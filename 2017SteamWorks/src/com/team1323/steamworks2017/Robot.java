@@ -27,7 +27,7 @@ public class Robot extends SampleRobot {
         SmartDashboard.putData("Auto Select", autoSelect);  
         robot = RoboSystem.getInstance();
         controllers = TeleController.getInstance();
- //       fsm = FSM.getInstance();      
+        fsm = FSM.getInstance();      
     }
     public void autonomous() {
     	String autoSelected = (String) autoSelect.getSelected();
@@ -82,11 +82,11 @@ public class Robot extends SampleRobot {
     }
     
     public void operatorControl() {
-//    	robot.intake._pidgey.SetFusedHeading(0.0);
+    	robot.intake._pidgey.SetFusedHeading(0.0);
+    	robot.dt.setHeading(0);
         while (isOperatorControl() && isEnabled()) {        	
         	controllers.update();
-//        	robot.intake.pigeonUpdate();
-        	robot.dt.update();
+        	robot.intake.pigeonUpdate();
             Timer.delay(0.01);		//10ms Loop Rate
         }
     }

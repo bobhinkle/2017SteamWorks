@@ -16,12 +16,12 @@ public class Constants {
     public static final double WHEELBASE_LENGTH = 22.181;
     public static final double WHEELBASE_WIDTH  = 15.681;
     
-    public static final double FRONT_RIGHT_TURN_OFFSET = 90.0;
-    public static final double FRONT_LEFT_TURN_OFFSET  = 90.0;
-    public static final double REAR_LEFT_TURN_OFFSET   = 90.0;
-    public static final double REAR_RIGHT_TURN_OFFSET  = 90.0;
+    public static final double FRONT_RIGHT_TURN_OFFSET = 281.2;
+    public static final double FRONT_LEFT_TURN_OFFSET  = 171.2;
+    public static final double REAR_LEFT_TURN_OFFSET   = 289.3;
+    public static final double REAR_RIGHT_TURN_OFFSET  = 172.6;
     
-    
+    public static final double DRIVE_CLICKS_PER_INCH = 0.00150603674668734095803578302171;//60.0/40462.0; //
     public static final double TURN_KP = 0.02; //0.020
     public static final double TURN_KI = 0.00;
     public static final double TURN_KD = 0.02;//0.02

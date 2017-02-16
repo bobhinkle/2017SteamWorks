@@ -12,13 +12,24 @@ public class Shooter {
     public static enum Status{
 		OFF, FILLING_NO_BALL, FILLED, SHOOTING
 	}
+    public ShooterColumn leftShooter,rightShooter;
+	public Shooter(){
+		leftShooter = new ShooterColumn(Ports.SHOOTER_MOTOR_MASTER,true);
+		rightShooter = new ShooterColumn(Ports.SHOOTER_MOTOR_SLAVE,false);
+	}
+	public static Shooter getInstance()
+    {
+        if( instance == null )
+            instance = new Shooter();
+        return instance;
+    }
     public class ShooterColumn{
     	private CANTalon motor;
     	private int absolutePosition;
     	Shooter.Status status = Shooter.Status.OFF;
     	public ShooterColumn(int motor_id,boolean reversed){
     		motor = new CANTalon(motor_id);
-        	absolutePosition = motor.getPulseWidthPosition() & 0xFFF;
+/*        	absolutePosition = motor.getPulseWidthPosition() & 0xFFF;
         	motor.setEncPosition(absolutePosition);
         	motor.setFeedbackDevice(FeedbackDevice.QuadEncoder);
         	motor.reverseSensor(reversed);
@@ -30,7 +41,7 @@ public class Shooter {
         	motor.changeControlMode(TalonControlMode.Speed);
         	motor.set(0);        	
         	//motor1.setPID(0.1, 0.0, 0.4, 0.050, 0, 0.0, 0);
-        	//motor1.setPID(0.0, 0.0, 0.0, 0.05, 0, 0.0, 1);        	
+        	//motor1.setPID(0.0, 0.0, 0.0, 0.05, 0, 0.0, 1);   */     	
     	}
     	public void setSpeed(double speed){
     		motor.set(speed);
@@ -38,7 +49,7 @@ public class Shooter {
     	public void update(){
     		switch(status){
     		case SHOOTING:
-    			motor.set(1000);
+ //   			motor.set(1000);
     			break;  
     			default:
 //    				motor1.set(0);
@@ -54,7 +65,7 @@ public class Shooter {
     }
     public void setSpeed(double speed){
     	leftShooter.setSpeed(speed);
-    	rightShooter.setSpeed(speed);
+    	rightShooter.setSpeed(-speed);
     }
     public void bumpUp(double increase){
     	leftShooter.setSpeed(leftShooter.motor.get() + increase);
@@ -64,15 +75,5 @@ public class Shooter {
     	leftShooter.setSpeed(leftShooter.motor.get() - decrease);
     	rightShooter.setSpeed(leftShooter.motor.get() - decrease);
     }
-    public ShooterColumn leftShooter,rightShooter;
-	public Shooter(){
-		leftShooter = new ShooterColumn(Ports.SHOOTER_MOTOR_MASTER,true);
-		rightShooter = new ShooterColumn(Ports.SHOOTER_MOTOR_SLAVE,false);
-	}
-	public static Shooter getInstance()
-    {
-        if( instance == null )
-            instance = new Shooter();
-        return instance;
-    }
+    
 }

@@ -19,26 +19,26 @@ public class Swerve{
 	private double rotationScaleFactor = .225;
 	private double rotationScaleFactorFast = 0.35;
 	private double xInput,yInput,rotateInput = 0;
-	private Intake intake;
 	//Pigeon IMU Data
 	
 	boolean tracking = false;
 	//Swerve Turning Gains
-	double kPgain = 0.005; /* percent throttle per degree of error */
-	double kDgain = 0.004; /* percent throttle per angular velocity dps */
-	double kPgainSmall = 0.005;
-	double kDgainSmall = 0.004;
-	double kMaxCorrectionRatioSmall = 0.14;
-	double kMaxCorrectionRatio = 0.12; /* cap corrective turning throttle to 30 percent of forward throttle */
+	double kPgain = 0.02; /* percent throttle per degree of error */
+	double kDgain = 0.00425; /* percent throttle per angular velocity dps */
+	double kPgainSmall = 0.015;
+	double kDgainSmall = 0.002;
+	double kMaxCorrectionRatio = 0.75;
+	double kMaxCorrectionRatioSmall = 0.18;
+	 /* cap corrective turning throttle to 30 percent of forward throttle */
 	
 	double _targetAngle = 0.0;
 	double rotationCorrection;
 	int _printLoops = 0;
-	
+	private Intake intake;
 	public void setHeading(double goal){
-		_targetAngle = continousAngle(goal,intake.getCurrentAngle());		
+		_targetAngle = continousAngle2(goal,intake.getCurrentAngle());		
 	}
-	public double continousAngle(double goal, double current){
+	public double continousAngle2(double goal, double current){
 		double BGA = Util.boundAngle0to360Degrees(goal);			
 		double CA = current;
 		double BCA = Util.boundAngle0to360Degrees(CA);
@@ -59,12 +59,11 @@ public class Swerve{
 	public HeadingController headingController = HeadingController.Off;
 	
 	public Swerve(){
-		frontLeft  = new SwerveDriveModule(Ports.FRONT_LEFT_ROTATION,Ports.FRONT_LEFT_DRIVE,2);
-		frontRight = new SwerveDriveModule(Ports.FRONT_RIGHT_ROTATION,Ports.FRONT_RIGHT_DRIVE,1);
-		rearLeft   = new SwerveDriveModule(Ports.REAR_LEFT_ROTATION,Ports.REAR_LEFT_DRIVE,3);
-		rearRight  = new SwerveDriveModule(Ports.REAR_RIGHT_ROTATION,Ports.REAR_RIGHT_DRIVE,4);
-		intake = Intake.getInstance();
-		
+		frontLeft  = new SwerveDriveModule(Ports.FRONT_LEFT_ROTATION,Ports.FRONT_LEFT_DRIVE,2,Constants.FRONT_LEFT_TURN_OFFSET);
+		frontRight = new SwerveDriveModule(Ports.FRONT_RIGHT_ROTATION,Ports.FRONT_RIGHT_DRIVE,1,Constants.FRONT_RIGHT_TURN_OFFSET);
+		rearLeft   = new SwerveDriveModule(Ports.REAR_LEFT_ROTATION,Ports.REAR_LEFT_DRIVE,3,Constants.REAR_LEFT_TURN_OFFSET);
+		rearRight  = new SwerveDriveModule(Ports.REAR_RIGHT_ROTATION,Ports.REAR_RIGHT_DRIVE,4,Constants.REAR_RIGHT_TURN_OFFSET);
+		intake = Intake.getInstance();		
 	}
 	public static Swerve getInstance()
     {
@@ -104,12 +103,16 @@ public class Swerve{
 			double angle = intake.getCurrentAngle()/180.0*Math.PI;
 			if (headingController == HeadingController.On) {
 				double angleDiff = Math.abs(_targetAngle - intake.getCurrentAngle());
-				if(angleDiff < 5){
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * kPgainSmall - (intake.currentAngularRate) * kDgainSmall;
-					rotationCorrection = Cap(rotationCorrection, kMaxCorrectionRatioSmall);
+				if(angleDiff > 0.5){
+					if(angleDiff < 4){
+						rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * kPgainSmall - (intake.currentAngularRate) * kDgainSmall;
+						rotationCorrection = Cap(rotationCorrection, kMaxCorrectionRatioSmall);
+					}else{
+						rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * kPgain - (intake.currentAngularRate) * kDgain;
+						rotationCorrection = Cap(rotationCorrection, kMaxCorrectionRatio);
+					}
 				}else{
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * kPgain - (intake.currentAngularRate) * kDgain;
-					rotationCorrection = Cap(rotationCorrection, kMaxCorrectionRatio);
+					rotationCorrection = 0.0;
 				}
 			
 				SmartDashboard.putNumber("ROTATE_CORRECT", rotationCorrection);
@@ -150,26 +153,35 @@ public class Swerve{
 		private CANTalon rotationMotor;
 		public CANTalon driveMotor;
 		private int moduleID;
-		private int absolutePosition;
+		private int absolutePosition,absolutePosition2;
 		private double x = 0.0;
 		private double y = 0.0;
-		
-		
-		public double angleWithOffset(){
-			switch(moduleID){
-			case 1:
-				return(rotationMotor.get()-Constants.FRONT_RIGHT_TURN_OFFSET);
-			case 2:
-				return(rotationMotor.get()-Constants.FRONT_LEFT_TURN_OFFSET);
-			case 3:
-				return(rotationMotor.get()-Constants.REAR_LEFT_TURN_OFFSET);
-			case 4:
-				return(rotationMotor.get()-Constants.REAR_RIGHT_TURN_OFFSET);
+		private double offSet = 0.0;
+		private double lastDistance = 0.0;
+		public double continousAngle(double goal, double current){
+			double BGA = Util.boundAngle0to360Degrees(goal);			
+			double CA = current;
+			double BCA = Util.boundAngle0to360Degrees(CA);
+			double OA = BCA - 180.0;
+			double DA  = OA - BGA;
+			if(DA < -360){
+				DA = DA + 360;
 			}
-			return(rotationMotor.get());
+			if(DA > 0.0){
+				return CA + 180.0 - Math.abs(DA);
+			}else{
+				return CA - 180.0 + Math.abs(DA);
+			}
 		}
-		public void updateCoord(){
-		   //add two lines
+		public void updateCoord(){			 
+	        double distanceTravelled = -(driveMotor.getEncPosition()-lastDistance)*Constants.DRIVE_CLICKS_PER_INCH;
+	        SmartDashboard.putNumber("DRV_COS" + Integer.toString(moduleID), Math.cos(Math.toRadians(360-rotationMotor.get()+90)));
+	        SmartDashboard.putNumber("DRV_SIN" + Integer.toString(moduleID), Math.sin(Math.toRadians(360-rotationMotor.get()+90)));
+	        x += distanceTravelled * Math.cos(Math.toRadians(360-rotationMotor.get()+90));
+	        y += distanceTravelled * Math.sin(Math.toRadians(360-rotationMotor.get()+90));
+	        SmartDashboard.putNumber("DRV_X" + Integer.toString(moduleID), x);
+	        SmartDashboard.putNumber("DRV_Y" + Integer.toString(moduleID), y);
+	        lastDistance = driveMotor.getEncPosition();
 		}
 		public double getX(){
 			return x;
@@ -177,23 +189,42 @@ public class Swerve{
 		public double getY(){
 			return y;
 		}
+		public void resetCoord(){
+			x = 0;
+			y = 0;
+			driveMotor.setEncPosition(0);
+		}
 		public void debugValues(){
 			//Note #3
-			SmartDashboard.putNumber("ROT_" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(getCurrentAngle()));
-			SmartDashboard.putNumber("DRV_" + Integer.toString(moduleID), driveMotor.get());
-			SmartDashboard.putNumber("OFF " + Integer.toString(moduleID), angleWithOffset());
-			SmartDashboard.putNumber("GOAL " + Integer.toString(moduleID), rotationMotor.getSetpoint());
+			SmartDashboard.putNumber("ROT_" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(rotationMotor.get()));
+//			SmartDashboard.putNumber("DRV_" + Integer.toString(moduleID), driveMotor.get());
+//			SmartDashboard.putNumber("OFF " + Integer.toString(moduleID), rotationMotor.get()-(360-offSet));
+//			SmartDashboard.putNumber("GOAL " + Integer.toString(moduleID), rotationMotor.getSetpoint());
+			SmartDashboard.putNumber("W_ERR" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(wheelError()));
+			SmartDashboard.putNumber("DRV_DIST" + Integer.toString(moduleID), driveMotor.getEncPosition());
 		}
-		public SwerveDriveModule(int rotationMotorPort, int driveMotorPort,int moduleNum){
+		public SwerveDriveModule(int rotationMotorPort, int driveMotorPort,int moduleNum,double _offSet){
 			rotationMotor = new CANTalon(rotationMotorPort);
+			rotationMotor.setPID(4, 0.0, 20, 0.0, 0, 0.0, 0);
 			driveMotor = new CANTalon(driveMotorPort);
+			absolutePosition2 = driveMotor.getPulseWidthPosition() & 0xFFF;
+	    	driveMotor.setEncPosition(absolutePosition2);
+	    	driveMotor.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+	    	driveMotor.reverseSensor(false);
+	    	driveMotor.configEncoderCodesPerRev(360);
+	    	driveMotor.configNominalOutputVoltage(+0f, -0f);
+	    	driveMotor.configPeakOutputVoltage(+12f, 0);
+	    	driveMotor.setAllowableClosedLoopErr(0); 
+//	    	driveMotor.changeControlMode(TalonControlMode.);
+//	    	driveMotor.set(driveMotor.getPosition());
 			loadProperties();
-			moduleID = moduleNum;           
+			moduleID = moduleNum;        
+			offSet = _offSet;
 		}
 		
 		public void setGoal(double goalAngle)
 	    {
-			rotationMotor.set(continousAngle(goalAngle,getCurrentAngle()));
+			rotationMotor.set(continousAngle(goalAngle-(360-offSet),getCurrentAngle()));
 	    }
 		public double wheelError(){
 			return Math.abs(rotationMotor.getSetpoint() - getCurrentAngle());
@@ -233,8 +264,9 @@ public class Swerve{
 		frontLeft.debugValues();
 		rearRight.debugValues();
 		rearLeft.debugValues();
+		frontLeft.updateCoord();
 		SmartDashboard.putNumber("Target Heading", _targetAngle);
-		
+		SmartDashboard.putNumber("turnErr", Util.boundAngle0to360Degrees(intake.getCurrentAngle())-_targetAngle);
 		if(xInput == 0 && yInput == 0 && rotateInput == 0){
 			frontLeft.stopDriveMotor();
 			frontRight.stopDriveMotor();
@@ -302,6 +334,8 @@ public class Swerve{
 		kDgain = _spareTalon.getD();
 		kMaxCorrectionRatio = _spareTalon.getF();
 	}*/
-
+	public void resetCoord(){
+		frontLeft.resetCoord();
+	}
 	
 }

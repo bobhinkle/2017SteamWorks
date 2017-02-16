@@ -1,12 +1,10 @@
 package SubSystems;
 
-import Sensors.GyroThread;
 import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Navigation {
 	
-    protected GyroThread gyro;
     private double x = 0.0; // positive from driver facing center of the field
     private double y = 0.0; // positive from driver looking left
     private static Navigation instance;
@@ -58,7 +56,8 @@ public class Navigation {
 
     public double getHeadingInDegrees()
     {
-        return Util.boundAngle0to360Degrees(gyro.getAngleInDegrees());
+    	return 0;
+//        return Util.boundAngle0to360Degrees(gyro.getAngleInDegrees());
     }
     public double getRawHeading(){
         return 0;

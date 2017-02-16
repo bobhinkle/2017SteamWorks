@@ -12,7 +12,6 @@ public class FSM {
 	private RoboSystem robot;
 	private static FSM instance = null;
 	public partsUpdate pu;
-    public Navigation nav;
 	
     public static FSM getInstance()
     {
@@ -26,7 +25,6 @@ public class FSM {
         robot = RoboSystem.getInstance();
         pu = new partsUpdate();
     	pu.start();
-    	nav = Navigation.getInstance();
     }
    
     public class partsUpdate extends Thread{
@@ -35,7 +33,6 @@ public class FSM {
     		SmartDashboard.putString("FSM", "THREAD STARTED");
     		while(keepRunning){
 				update();
-				//nav.run();
 				Timer.delay(0.01); //10ms Loop Rate
     		} 
         }
@@ -46,8 +43,9 @@ public class FSM {
 
     public void update(){ 
 //    	robot.vision.update();
-//        robot.dt.update();
-//        robot.intake.pigeonUpdate();
+        robot.dt.update();
+        robot.intake.update();
+        robot.sweeper.SweeperDebug();
 //        robot.nav.updatePosition();
 //        robot.shooter.leftShooter.update();
 //        robot.dt.frontLeft.updateCoord();
