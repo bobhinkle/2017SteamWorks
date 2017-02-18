@@ -58,12 +58,12 @@ public class Intake {
 		return currentAngularRate;
 	}
 	public void intakeForward(){
-		intakeLeft.set(-.67);
-		intakeRight.set(.67);
+		intakeLeft.set(-1.0); 
+		intakeRight.set(1.0);
 	}
 	public void intakeReverse(){
-		intakeLeft.set(.67);
-		intakeRight.set(-.67);
+		intakeLeft.set(1.0);
+		intakeRight.set(-1.0);
 	}
 	public void intakeStop(){
 		intakeLeft.set(0);

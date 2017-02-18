@@ -46,6 +46,7 @@ public class FSM {
         robot.dt.update();
         robot.intake.update();
         robot.sweeper.SweeperDebug();
+        robot.turret.update();
 //        robot.nav.updatePosition();
 //        robot.shooter.leftShooter.update();
 //        robot.dt.frontLeft.updateCoord();

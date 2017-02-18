@@ -22,7 +22,7 @@ public class Sweeper {
 		return instance;
 	}
 	public void forwardSweeper(){
-		sweeper.set(-1);
+		sweeper.set(-1.0);
 	}
 	public void reverseSweeper(){
 		sweeper.set(1);

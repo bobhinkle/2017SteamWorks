@@ -37,4 +37,7 @@ public class Constants {
 	public static final double CAMERA_FOV = 60; //45.3
 	public static final double GRIP_X_OFFSET = -0.5; // negative to go left, positive to go right. 1.75
 	public static final double CAM_CALIBRATION = 1.0;
+	
+	public static final double TURRET_CLICKS_TO_ANGLE = 66.2252;
+	public static final double TURRET_MAX_ANGLE = 90;
 }

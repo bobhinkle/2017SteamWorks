@@ -46,13 +46,19 @@ public class TeleController
     		robot.shooter.setSpeed(0);
     	}
     	if(coDriver.rightTrigger.isPressed()){
-    		robot.shooter.setSpeed(0.75);
+    		robot.shooter.setSpeed(.75); //
     	}
     	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -STICK_DEAD_BAND){
-    		robot.turret.moveMotor(coDriver.getButtonAxis(Controller.RIGHT_STICK_X));
-    	}else{
-    		robot.turret.moveMotor(0.0);
+    		robot.turret.manualControl(coDriver.getButtonAxis(Controller.RIGHT_STICK_X));
     	}
+    	if(coDriver.getPOV() == 270)
+    		robot.turret.setAngle(-45);
+    	if(coDriver.getPOV() == 0)
+    		robot.turret.setAngle(0);
+    	if(coDriver.getPOV() == 90)
+    		robot.turret.setAngle(45);
+    	if(coDriver.rightCenterClick.isPressed())
+    		robot.turret.setAngle(0);    	
     }
     public void driver() {
     	
@@ -94,7 +100,7 @@ public class TeleController
         }
         
         if(driver.rightBumper.isPressed()){            
-        	robotCentric = true;
+        	//robotCentric = true;
         }
         
         if(driver.backButton.isHeld()){ 

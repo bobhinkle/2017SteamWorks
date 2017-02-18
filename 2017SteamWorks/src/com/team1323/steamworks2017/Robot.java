@@ -31,24 +31,51 @@ public class Robot extends SampleRobot {
     }
     public void autonomous() {
     	String autoSelected = (String) autoSelect.getSelected();
-//    	robot.intake._pidgey.SetFusedHeading(0.0);
-//    	robot.dt.setHeading(0.0);
+    	robot.intake._pidgey.SetFusedHeading(0.0);
+    	robot.dt.setHeading(0.0);
     	switch(autoSelected){
     	case one_gear:
     		executeAuto(AUTO.ONE_GEAR);
     		break;
 		case defaultAuto:
-			executeAuto(AUTO.OFF);
+			executeAuto(AUTO.ONE_GEAR);
 			break;
     	}
     }
+    private double time(){return System.currentTimeMillis();}
+    private void timedMotion(double seconds, double dx, double dy, double da){
+    	double timeout = time();
+    	while(timeout+(1000*seconds) > time() && isAutonomous()){
+    		robot.dt.sendInput(dx, dy, da, 0, false, false, false);
+    	}
+    	timeout = time();
+    	while(timeout+500 > time() && isAutonomous()){
+    		robot.dt.sendInput(0, 0, 0, 0, true, true, false);
+    	}
+    }
     public void executeAuto(AUTO autoSelect){
- /*   	    	
+    	    	
     	switch(autoSelect){
     	case ONE_GEAR:
+    		/**/
+ //   		robot.dt.setHeading(0);
+    		timedMotion(1.825, 0, 0.5, 0);
+//    		robot.dt.setHeading(0);
+    		timedMotion(1.7, 0, -0.5, 0);
+//    		robot.dt.setHeading(0);
+    		/*/
     		double timeout = System.currentTimeMillis();
+    		while(timeout+3000 > System.currentTimeMillis() && isAutonomous()){
+    			robot.dt.sendInput(0.0, 0.35, 0, 0, false, false, false);
+    		}	
+    		timeout = System.currentTimeMillis();
+    		while(timeout+1000 > System.currentTimeMillis()){
+    			robot.dt.sendInput(0, 0, 0, 0, true, true, false);
+    		}/**/
+    		/*/
+    		timeout = System.currentTimeMillis();
     		while(timeout+2000 > System.currentTimeMillis()){
-    			robot.dt.sendInput(0.0, 0.5, 0, 0, true, true, false);
+    			robot.dt.sendInput(0.0, -0.5, 0, 0, false, true, false);
     		}
     		timeout = System.currentTimeMillis();
     		while(timeout+1000 > System.currentTimeMillis()){
@@ -56,20 +83,12 @@ public class Robot extends SampleRobot {
     		}
     		timeout = System.currentTimeMillis();
     		while(timeout+2000 > System.currentTimeMillis()){
-    			robot.dt.sendInput(0.0, -0.5, 0, 0, true, true, false);
+    			robot.dt.sendInput(.35, 0.0, 0, 0, false, false, false);
     		}
     		timeout = System.currentTimeMillis();
     		while(timeout+1000 > System.currentTimeMillis()){
-    			robot.dt.sendInput(0, 0, 0, 0, true, true, false);
-    		}
-    		timeout = System.currentTimeMillis();
-    		while(timeout+2000 > System.currentTimeMillis()){
-    			robot.dt.sendInput(0, 1.0, -0.65, 0, false, false, true);
-    		}
-    		timeout = System.currentTimeMillis();
-    		while(timeout+1000 > System.currentTimeMillis()){
-    			robot.dt.sendInput(0, 0, 0, 0, true, true, false);
-    		}
+    			robot.dt.sendInput(0, 0, 0, 0, false, true, false);
+    		}/**/
     		break;
     		
     	case OFF:
@@ -78,7 +97,7 @@ public class Robot extends SampleRobot {
     	default:
     		
     		break;
-    }*/
+    }
     }
     
     public void operatorControl() {

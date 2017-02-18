@@ -23,12 +23,12 @@ public class Swerve{
 	
 	boolean tracking = false;
 	//Swerve Turning Gains
-	double kPgain = 0.02; /* percent throttle per degree of error */
-	double kDgain = 0.00425; /* percent throttle per angular velocity dps */
-	double kPgainSmall = 0.015;
-	double kDgainSmall = 0.002;
-	double kMaxCorrectionRatio = 0.75;
-	double kMaxCorrectionRatioSmall = 0.18;
+	double kPgain = 0.02; /* percent throttle per degree of error */ //0.02
+	double kDgain = 0.00425; /* percent throttle per angular velocity dps */ //0.00425
+	double kPgainSmall = 0.0175; //0.015
+	double kDgainSmall = 0.002; //0.002
+	double kMaxCorrectionRatio = 0.75; //0.75
+	double kMaxCorrectionRatioSmall = 0.18; //0.18
 	 /* cap corrective turning throttle to 30 percent of forward throttle */
 	
 	double _targetAngle = 0.0;
@@ -77,12 +77,12 @@ public class Swerve{
     	setHeading(adjust);
     	tracking = true;
 	}
-	public void sendInput(double x, double y, double rotateX,double rotateY,boolean halfPower,boolean robotCentric,boolean moonMenuever){
+	public void sendInput(double x, double y, double rotateX,double rotateY,boolean halfPower,boolean robotCentric,boolean moonManeuver){
 		
 		tracking = false;
 		SmartDashboard.putNumber("X Stick", rotateX);
 		SmartDashboard.putNumber("Y Stick", rotateY);
-		if(moonMenuever){
+		if(moonManeuver){
 			headingController = HeadingController.Off;
 			yInput = 0.0;
 			xInput = -(rotateX * 0.2) * ((Math.abs(y)*2)+1) ;
@@ -266,7 +266,7 @@ public class Swerve{
 		rearLeft.debugValues();
 		frontLeft.updateCoord();
 		SmartDashboard.putNumber("Target Heading", _targetAngle);
-		SmartDashboard.putNumber("turnErr", Util.boundAngle0to360Degrees(intake.getCurrentAngle())-_targetAngle);
+		SmartDashboard.putNumber("turnErr", Util.boundAngleNeg180to180Degrees(Util.boundAngle0to360Degrees(intake.getCurrentAngle())-_targetAngle)); // add bounding to [-180,180]
 		if(xInput == 0 && yInput == 0 && rotateInput == 0){
 			frontLeft.stopDriveMotor();
 			frontRight.stopDriveMotor();
