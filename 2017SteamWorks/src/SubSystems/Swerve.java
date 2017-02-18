@@ -25,7 +25,7 @@ public class Swerve{
 	//Swerve Turning Gains
 	double kPgain = 0.02; /* percent throttle per degree of error */ //0.02
 	double kDgain = 0.00425; /* percent throttle per angular velocity dps */ //0.00425
-	double kPgainSmall = 0.0175; //0.015
+	double kPgainSmall = 0.015; //0.015
 	double kDgainSmall = 0.002; //0.002
 	double kMaxCorrectionRatio = 0.75; //0.75
 	double kMaxCorrectionRatioSmall = 0.18; //0.18
@@ -158,6 +158,10 @@ public class Swerve{
 		private double y = 0.0;
 		private double offSet = 0.0;
 		private double lastDistance = 0.0;
+		
+		private boolean isRotating = false;
+		public boolean isRotating() {return isRotating;}
+		
 		public double continousAngle(double goal, double current){
 			double BGA = Util.boundAngle0to360Degrees(goal);			
 			double CA = current;
@@ -202,6 +206,7 @@ public class Swerve{
 //			SmartDashboard.putNumber("GOAL " + Integer.toString(moduleID), rotationMotor.getSetpoint());
 			SmartDashboard.putNumber("W_ERR" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(wheelError()));
 			SmartDashboard.putNumber("DRV_DIST" + Integer.toString(moduleID), driveMotor.getEncPosition());
+			SmartDashboard.putBoolean("isRotating:" + Integer.toString(moduleID), isRotating());
 		}
 		public SwerveDriveModule(int rotationMotorPort, int driveMotorPort,int moduleNum,double _offSet){
 			rotationMotor = new CANTalon(rotationMotorPort);
@@ -224,6 +229,7 @@ public class Swerve{
 		
 		public void setGoal(double goalAngle)
 	    {
+			if(wheelError() >= 3) {isRotating = true;} else {isRotating = false;}
 			rotationMotor.set(continousAngle(goalAngle-(360-offSet),getCurrentAngle()));
 	    }
 		public double wheelError(){
