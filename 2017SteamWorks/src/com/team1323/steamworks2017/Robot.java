@@ -59,9 +59,9 @@ public class Robot extends SampleRobot {
     	case ONE_GEAR:
     		/**/
  //   		robot.dt.setHeading(0);
-    		timedMotion(1.825, 0, 0.5, 0);
+    		timedMotion(Math.PI - 0.1415926535897932384626433832795 - 0.1, 0, 0.375, 0);		//	timedMotion(1.85, 0, 0.5, 0);
 //    		robot.dt.setHeading(0);
-    		timedMotion(1.7, 0, -0.5, 0);
+    		timedMotion(Math.PI - 0.1415926535897932384626433832795 - 0.1, 0, -0.375, 0);		//timedMotion(1.8, 0, -0.5, 0);
 //    		robot.dt.setHeading(0);
     		/*/
     		double timeout = System.currentTimeMillis();
