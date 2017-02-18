@@ -33,7 +33,7 @@ public class Robot extends SampleRobot {
     	String autoSelected = (String) autoSelect.getSelected();
     	robot.intake._pidgey.SetFusedHeading(0.0);
     	robot.dt.setHeading(0.0);
-    	/*if(false){		// set to false to disable execution of any auto
+    	if(true){		// set to false to disable execution of any auto
     		switch(autoSelected){
     			case one_gear:
     				executeAuto(AUTO.ONE_GEAR);
@@ -65,12 +65,14 @@ public class Robot extends SampleRobot {
     		 * 	Back up and rotate
     		 * 	Pick up gear
     		 * 	Rotate and forward
-    		 * 	Place gear */
+    		 * 	Place gear *//*
     		timedMotion(2.5, 0, 0.4, 0);
     		timedMotion(2.5, 0, -0.4, -0.25);
     		Timer.delay(1000);
     		timedMotion(2.5, 0, 0.4, 0.25);
     		
+    		/*/
+    		timedMotion(20,0,0.2,0);
     		/*/
     		timedMotion(Math.PI - 0.1415926535897932384626433832795 - 0.1, 0, 0.375, 0);		//	timedMotion(1.85, 0, 0.5, 0);
     		timedMotion(Math.PI - 0.1415926535897932384626433832795 - 0.1, 0, -0.375, 0);		//timedMotion(1.8, 0, -0.5, 0);
