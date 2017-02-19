@@ -32,9 +32,12 @@ public class Swerve{
 	 /* cap corrective turning throttle to 30 percent of forward throttle */
 	
 	double _targetAngle = 0.0;
+	private double allowableError = 2.0;
 	double rotationCorrection;
 	int _printLoops = 0;
 	private Intake intake;
+	private int onTargetThresh = 30;
+	private int onTarget = 0;
 	public void setHeading(double goal){
 		_targetAngle = continousAngle2(goal,intake.getCurrentAngle());
 	}
@@ -145,8 +148,6 @@ public class Swerve{
 				yInput = tmp;			
 			}
 		}
-		
-		update();
 	}
 	
 	public class SwerveDriveModule{
@@ -166,6 +167,10 @@ public class Swerve{
 		private int rotationOffsetClicks = 0;
 		public int getRotationOffsetClicks() {return rotationOffsetClicks;}
 		public void setRotationOffsetClicks(int offset) {rotationOffsetClicks = offset;}
+
+		private int robotRotationOffsetClicks = 0;
+		public int getRobotRotationOffsetClicks() {return robotRotationOffsetClicks;}
+		public void setRobotRotationOffsetClicks(int offset) {robotRotationOffsetClicks = offset;}
 		
 		private boolean isRotating = false;
 		public boolean isRotating() {return isRotating;}
@@ -187,10 +192,12 @@ public class Swerve{
 				return CA - 180.0 + Math.abs(DA);
 			}
 		}
-		public void updateCoord(){
+		public void updateCoord(){/**
 			if(isRotating()) {
 				rotationOffsetClicks += driveMotor.getEncPosition()-lastDistance; // clicks
-			} else {
+			} else if(intake.getCurrentAngularRate() >= Constants.ROBOT_ROTATING_DETECT_THRESHOLD) {
+				robotRotationOffsetClicks += driveMotor.getEncPosition()-lastDistance;
+			} else {/**/
 		        double distanceTravelled = -(driveMotor.getEncPosition()-lastDistance) * Constants.DRIVE_CLICKS_PER_INCH; //0.00180143;*Constants.DRIVE_CLICKS_PER_INCH; // inches
 		        totalDistanceTravelled -= distanceTravelled; // inches
 //		        if (Math.abs(distanceTravelled) < 0.0005) {isTravelling = false;} else {isTravelling = true;}
@@ -208,7 +215,7 @@ public class Swerve{
 		        SmartDashboard.putNumber(Integer.toString(moduleID) + " dY ", dy*1000);
 		        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (in) ", x);
 		        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", y);
-			}
+		//	}
 			lastDistance = driveMotor.getEncPosition();
 		}
 		public double getX(){
@@ -255,6 +262,7 @@ public class Swerve{
 			loadProperties();
 			moduleID = moduleNum;        
 			offSet = _offSet;
+			resetCoord();
 		}
 		
 		public void setGoal(double goalAngle)
@@ -372,5 +380,11 @@ public class Swerve{
 	public void resetCoord(){
 		frontLeft.resetCoord();
 	}
-	
+	public boolean headingOnTarget(){
+		if(Math.abs(_targetAngle - intake.getCurrentAngle()) < allowableError)
+			onTarget--;
+		else
+			onTarget = onTargetThresh;
+		return onTarget <= 0;
+	}
 }

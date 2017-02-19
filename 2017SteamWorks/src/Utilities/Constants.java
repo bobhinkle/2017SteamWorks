@@ -21,7 +21,7 @@ public class Constants {
     public static final double REAR_LEFT_TURN_OFFSET   = 289.3;
     public static final double REAR_RIGHT_TURN_OFFSET  = 172.6;
     
-    public static final double DRIVE_CLICKS_PER_INCH = 0.00150603674668734095803578302171;//60.0/40462.0; //
+    public static final double DRIVE_CLICKS_PER_INCH = 0.00163990667972621570986118595697; //0.00150603674668734095803578302171;//60.0/40462.0; //
     public static final double TURN_KP = 0.02; //0.020
     public static final double TURN_KI = 0.00;
     public static final double TURN_KD = 0.02;//0.02
@@ -34,7 +34,7 @@ public class Constants {
     public static final double TURN_KP_TURN = 0.08;
     public static final double TURNING_DETECT_THRESHOLD = 5; // 3
     public static final int DRIVING_DETECT_THRESHOLD = 1; // clicks
-    public static final double ROBOT_ROTATING_DETECT_THRESHOLD = 0.3;
+    public static final double ROBOT_ROTATING_DETECT_THRESHOLD = 15;
     
     public static final double CAMERA_PIXEL_WIDTH = 320.0;
 	public static final double CAMERA_FOV = 60; //45.3

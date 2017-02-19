@@ -1,6 +1,6 @@
 package ControlSystem;
 
-import SubSystems.Navigation;
+import SubSystems.DistanceController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -12,6 +12,7 @@ public class FSM {
 	private RoboSystem robot;
 	private static FSM instance = null;
 	public partsUpdate pu;
+	private DistanceController dist;
 	
     public static FSM getInstance()
     {
@@ -25,6 +26,7 @@ public class FSM {
         robot = RoboSystem.getInstance();
         pu = new partsUpdate();
     	pu.start();
+    	dist = DistanceController.getInstance();
     }
    
     public class partsUpdate extends Thread{
@@ -47,6 +49,7 @@ public class FSM {
         robot.intake.update();
         robot.sweeper.SweeperDebug();
         robot.turret.update();
+        dist.update();
 //        robot.nav.updatePosition();
 //        robot.shooter.leftShooter.update();
 //        robot.dt.frontLeft.updateCoord();

@@ -1,5 +1,6 @@
 package IO;import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
+import SubSystems.DistanceController;
 import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  
@@ -12,6 +13,7 @@ public class TeleController
     private RoboSystem robot;
     private static TeleController instance = null;
     private boolean robotCentric = false;
+    private DistanceController dist;
     
     public TeleController(){
         driver = new Controller(0);
@@ -20,6 +22,7 @@ public class TeleController
         coDriver.start();
         robot = RoboSystem.getInstance();
         fsm = FSM.getInstance();
+        dist = DistanceController.getInstance();
     }
     public static TeleController getInstance(){
         if(instance == null){
@@ -82,25 +85,30 @@ public class TeleController
             		driver.leftTrigger.isHeld(),
             		robotCentric,
             		 driver.rightTrigger.isHeld());
-        }else{        
-        robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
-        		Util.controlSmoother(-driver.getButtonAxis(Xbox.LEFT_STICK_Y)), 
-        		Util.turnControlSmoother(driver.getButtonAxis(Xbox.RIGHT_STICK_X)),
-        		Util.turnControlSmoother(driver.getButtonAxis(Xbox.RIGHT_STICK_Y)),
-        		driver.leftTrigger.isHeld(),
-        		robotCentric,
-        		 driver.rightTrigger.isHeld());
+        }else{ 
+        	if(!dist.isEnabled()){ 
+        		robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
+                		Util.controlSmoother(-driver.getButtonAxis(Xbox.LEFT_STICK_Y)), 
+                		Util.turnControlSmoother(driver.getButtonAxis(Xbox.RIGHT_STICK_X)),
+                		Util.turnControlSmoother(driver.getButtonAxis(Xbox.RIGHT_STICK_Y)),
+                		driver.leftTrigger.isHeld(),
+                		robotCentric,
+                		 driver.rightTrigger.isHeld());
+        	}
+        
         }
         if(driver.rightTrigger.isPressed()) {
         	
         }
         
         if(driver.leftBumper.isPressed()){
-        	robotCentric = false; 
+        	//robotCentric = false;
+        	//dist.setGoal(-30, DistanceController.Direction.X);
         }
         
         if(driver.rightBumper.isPressed()){            
         	//robotCentric = true;
+        	//dist.setGoal(30, DistanceController.Direction.X);
         }
         
         if(driver.backButton.isHeld()){ 
@@ -111,6 +119,7 @@ public class TeleController
         if(driver.backButton.isPressed()){
 //        	robot.shooter.setSpeed(0);
         	robot.dt.resetCoord();
+        	dist.disable();
         }
         if(driver.startButton.isPressed()){
         	
