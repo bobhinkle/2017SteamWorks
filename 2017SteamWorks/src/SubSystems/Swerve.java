@@ -91,7 +91,7 @@ public class Swerve{
 			SmartDashboard.putNumber("rMoon", rotateInput);
 		}
 		else{
-			if((rotateX > 0.1 || rotateX < -0.1)){
+			if(Math.abs(rotateX) > 0.1){
 				headingController = HeadingController.Off;
 				rotateInput = rotateX;
 			}else if(rotateX > -0.1 && rotateX < 0.1 && headingController == HeadingController.Off){
@@ -169,6 +169,8 @@ public class Swerve{
 		
 		private boolean isRotating = false;
 		public boolean isRotating() {return isRotating;}
+		private boolean isTravelling = false;
+		public boolean isTravelling() {return isTravelling;}
 		
 		public double continousAngle(double goal, double current){
 			double BGA = Util.boundAngle0to360Degrees(goal);			
@@ -189,8 +191,10 @@ public class Swerve{
 			if(isRotating()) {
 				rotationOffsetClicks += driveMotor.getEncPosition()-lastDistance; // clicks
 			} else {
-		        double distanceTravelled = -(driveMotor.getEncPosition()-lastDistance) * 0.00180143;//*Constants.DRIVE_CLICKS_PER_INCH; // inches
+		        double distanceTravelled = -(driveMotor.getEncPosition()-lastDistance) * Constants.DRIVE_CLICKS_PER_INCH; //0.00180143;*Constants.DRIVE_CLICKS_PER_INCH; // inches
 		        totalDistanceTravelled -= distanceTravelled; // inches
+//		        if (Math.abs(distanceTravelled) < 0.0005) {isTravelling = false;} else {isTravelling = true;}
+		        SmartDashboard.putBoolean(Integer.toString(moduleID) + " Travelling ", isTravelling());
 		        SmartDashboard.putNumber(Integer.toString(moduleID) + " Distance (in) ", totalDistanceTravelled);
 		        SmartDashboard.putNumber(Integer.toString(moduleID) + " cos = ", Math.cos(Math.toRadians(360-rotationMotor.get()+90)));
 		        SmartDashboard.putNumber(Integer.toString(moduleID) + " sin = ", Math.sin(Math.toRadians(360-rotationMotor.get()+90)));
@@ -200,8 +204,8 @@ public class Swerve{
 		        y += dy;
 //		        SmartDashboard.putNumber("DRV_X" + Integer.toString(moduleID), x);
 //		        SmartDashboard.putNumber("DRV_Y" + Integer.toString(moduleID), y);
-		        SmartDashboard.putNumber(Integer.toString(moduleID) + " dX ", x);
-		        SmartDashboard.putNumber(Integer.toString(moduleID) + " dY ", y);
+		        SmartDashboard.putNumber(Integer.toString(moduleID) + " dX ", dx*1000);
+		        SmartDashboard.putNumber(Integer.toString(moduleID) + " dY ", dy*1000);
 		        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (in) ", x);
 		        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", y);
 			}
@@ -221,15 +225,18 @@ public class Swerve{
 			setTotalDistanceTravelled(0);
 		}
 		public void debugValues(){
+			if(wheelError() >= Constants.TURNING_DETECT_THRESHOLD) {isRotating = true;} else {isRotating = false;}
+			if(isRotating || Math.abs(driveMotor.getEncPosition()-lastDistance) <= Constants.DRIVING_DETECT_THRESHOLD /*clicks*/) {isTravelling = false;} else {isTravelling = true;}
 			//Note #3
 			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Angle (deg) ", Util.boundAngle0to360Degrees(rotationMotor.get()));
 //			SmartDashboard.putNumber("DRV_" + Integer.toString(moduleID), driveMotor.get());
 //			SmartDashboard.putNumber("OFF " + Integer.toString(moduleID), rotationMotor.get()-(360-offSet));
 //			SmartDashboard.putNumber("GOAL " + Integer.toString(moduleID), rotationMotor.getSetpoint());
 			SmartDashboard.putNumber("W_ERR" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(wheelError()));
-			SmartDashboard.putNumber(Integer.toString(moduleID)+ " Total Clicks ", driveMotor.getEncPosition());
+			SmartDashboard.putNumber(Integer.toString(moduleID)+ " Raw Encoder Clicks ", driveMotor.getEncPosition());
 			SmartDashboard.putBoolean(Integer.toString(moduleID) + " Rotating ", isRotating());
 			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Clicks ", getRotationOffsetClicks());
+			SmartDashboard.putNumber(Integer.toString(moduleID) + " Driven Clicks ", driveMotor.getEncPosition() - getRotationOffsetClicks());
 		}
 		public SwerveDriveModule(int rotationMotorPort, int driveMotorPort,int moduleNum,double _offSet){
 			rotationMotor = new CANTalon(rotationMotorPort);
@@ -252,7 +259,6 @@ public class Swerve{
 		
 		public void setGoal(double goalAngle)
 	    {
-			if(wheelError() >= 3) {isRotating = true;} else {isRotating = false;}
 			rotationMotor.set(continousAngle(goalAngle-(360-offSet),getCurrentAngle()));
 	    }
 		public double wheelError(){

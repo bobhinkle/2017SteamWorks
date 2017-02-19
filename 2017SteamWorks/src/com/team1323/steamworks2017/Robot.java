@@ -33,7 +33,7 @@ public class Robot extends SampleRobot {
     	String autoSelected = (String) autoSelect.getSelected();
     	robot.intake._pidgey.SetFusedHeading(0.0);
     	robot.dt.setHeading(0.0);
-    	if(true){		// set to false to disable execution of any auto
+    	if(false){		// set to false to disable execution of any auto
     		switch(autoSelected){
     			case one_gear:
     				executeAuto(AUTO.ONE_GEAR);
@@ -55,6 +55,15 @@ public class Robot extends SampleRobot {
     		robot.dt.sendInput(0, 0, 0, 0, true, true, false);
     	}
     }
+    private void encoderMotion(double inches, double dx, double dy, double da){
+    	while(Math.abs(robot.dt.frontLeft.getY()) < Math.abs(inches) && isAutonomous()){
+    		robot.dt.sendInput(dx, dy, da, 0, false, false, false);
+    	}
+    	double timeout = time();
+    	while(timeout+1000 > time() && isAutonomous()){
+    		robot.dt.sendInput(0, 0, 0, 0, true, true, false);
+    	}
+    }
     public void executeAuto(AUTO autoSelect){
     	    	
     	switch(autoSelect){
@@ -72,7 +81,8 @@ public class Robot extends SampleRobot {
     		timedMotion(2.5, 0, 0.4, 0.25);
     		
     		/*/
-    		timedMotion(20,0,0.2,0);
+    		encoderMotion(100, 0, 0.3, 0);
+    		//timedMotion(8, 0, 0.3, 0);
     		/*/
     		timedMotion(Math.PI - 0.1415926535897932384626433832795 - 0.1, 0, 0.375, 0);		//	timedMotion(1.85, 0, 0.5, 0);
     		timedMotion(Math.PI - 0.1415926535897932384626433832795 - 0.1, 0, -0.375, 0);		//timedMotion(1.8, 0, -0.5, 0);

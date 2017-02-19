@@ -32,6 +32,9 @@ public class Constants {
     public static final double TURN_MAX_VEL = 600.0; //900
     public static final double MAX_ROTATION_ANGLE_PER_SEC = 2;
     public static final double TURN_KP_TURN = 0.08;
+    public static final double TURNING_DETECT_THRESHOLD = 5; // 3
+    public static final int DRIVING_DETECT_THRESHOLD = 1; // clicks
+    public static final double ROBOT_ROTATING_DETECT_THRESHOLD = 0.3;
     
     public static final double CAMERA_PIXEL_WIDTH = 320.0;
 	public static final double CAMERA_FOV = 60; //45.3

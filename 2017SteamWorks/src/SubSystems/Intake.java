@@ -46,7 +46,7 @@ public class Intake {
 			angleIsGood = (_pidgey.GetState() == PigeonState.Ready) ? true : false;
 			currentAngularRate = -xyz_dps[2];
 			SmartDashboard.putNumber("Pigeon_CA", currentAngle);
-			SmartDashboard.putNumber("PigeonRate", currentAngularRate);
+			SmartDashboard.putNumber(" Pigeon Rate ", currentAngularRate);
 			SmartDashboard.putBoolean("PigeonGood", angleIsGood);
 		}catch(Exception e){
 			System.out.println(e);
