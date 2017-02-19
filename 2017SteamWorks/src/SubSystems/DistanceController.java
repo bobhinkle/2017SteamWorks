@@ -69,7 +69,7 @@ public class DistanceController {
 	public boolean onTarget(){
 		return onTarget;
 	}
-	public void setGoal(double _goal, Direction _d, double error){
+	public void setGoal(double _goal, Direction _d, double error, double maxInput){
 		reset();
 		switch(axis){
 		case Y:
@@ -84,6 +84,7 @@ public class DistanceController {
 		}
 		allowableError = error;
 		axis = _d;
+		inputCap = maxInput;
 		enable();
 	}
 	public void reset(){

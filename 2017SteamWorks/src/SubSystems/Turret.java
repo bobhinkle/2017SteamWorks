@@ -38,7 +38,7 @@ public class Turret {
 	public void manualControl(double input){
 		double newAngle = (motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE) + (input * 4.5);
 		setAngle(newAngle);		
-//		SmartDashboard.putNumber("TURRET_C", motor.getOutputCurrent());
+		SmartDashboard.putNumber("TURRET_CURR", motor.getOutputCurrent());
 //		motor.set(-input *0.5);
 	}
 	public void setAngle(double angle){
@@ -49,7 +49,7 @@ public class Turret {
 		motor.set(angle/Constants.TURRET_CLICKS_TO_ANGLE);
 	}
 	public void update(){
-		SmartDashboard.putNumber("TURR_ANGLE", motor.getPosition() * Constants.TURRET_CLICKS_TO_ANGLE);
-		SmartDashboard.putNumber("TURR_GOAL", motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE);
+		SmartDashboard.putNumber("TURRET_ANGLE", motor.getPosition() * Constants.TURRET_CLICKS_TO_ANGLE);
+		SmartDashboard.putNumber("TURRET_GOAL", motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE);
 	}
 }
