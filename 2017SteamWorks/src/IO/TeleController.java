@@ -133,7 +133,7 @@ public class TeleController
         if(driver.getPOV() == 0){
 //        	robot.shooter.bumpUp(100);
         	// This button will now be used to test the distance controller's accuracy
-        	dist.setGoal(0, 40, 2, 5, 0.5);
+        	dist.setGoal(0, 40, 0, 5, 0.5);
         }
         if(driver.getPOV() == 90){
         	
@@ -143,7 +143,7 @@ public class TeleController
         	// This button will now be used to test starting orientations
  //       	robot.intake._pidgey.SetFusedHeading(180.0);
  //       	robot.dt.setHeading(0.0);
-        	dist.setGoal(0,-40, 2, 5, 0.5);
+        	dist.setGoal(0,/*-4*/0, 0, 5, 0.5);
         }
         if(robotCentric)
         	SmartDashboard.putString("RobotControl", "ROBOT");

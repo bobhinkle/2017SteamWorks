@@ -249,13 +249,14 @@ public class Swerve{
 			SmartDashboard.putString("updateCoord():setCurrentModule"+Integer.toString(moduleID)+"Angle", Double.toString(Util.boundAngle0to360Degrees(getCurrentModuleAngle()))+" / "+Double.toString(Util.boundAngle0to360Degrees(rotationMotor.get())));
 			double distanceTravelled = -(getCurrentEncPosition()-lastEncPosition) * Constants.DRIVE_INCHES_PER_CLICK; //0.00180143;*Constants.DRIVE_CLICKS_PER_INCH; // inches
 	        totalDistanceTravelled -= distanceTravelled; // inches
+	        SmartDashboard.putNumber("distanceTravelled"+Integer.toString(moduleID), distanceTravelled);
 //	        SmartDashboard.putBoolean(Integer.toString(moduleID) + " Travelling ", isTravelling());
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Distance (in) ", totalDistanceTravelled);
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " cos = ", Math.cos(Math.toRadians(360-rotationMotor.get()+90)));
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " sin = ", Math.sin(Math.toRadians(360-rotationMotor.get()+90)));
 	        if(!isRotating()){
-		        double dx = distanceTravelled * Math.cos(Math.toRadians(getCurrentIntakeAngle()/*-360/**/-getCurrentModuleAngle()+90));
-		        double dy = distanceTravelled * Math.sin(Math.toRadians(getCurrentIntakeAngle()/*-360/**/-getCurrentModuleAngle()+90));
+		        double dx = distanceTravelled * Math.cos(Math.toRadians(getCurrentIntakeAngle()/*-360/**/+getCurrentModuleAngle()+90));
+		        double dy = -distanceTravelled * Math.sin(Math.toRadians(getCurrentIntakeAngle()/*-360/**/+getCurrentModuleAngle()+90));
 		        x += dx;
 		        y += dy;
 	        }
@@ -338,6 +339,7 @@ public class Swerve{
 	    }
 	   
 	    public void setDriveSpeed(double power){
+	    	// This function determines whether we're close enough to a wheel's desired angle to start driving that wheel
 	    	if(wheelError() < Constants.TURNING_ADD_POWER_THRESHOLD)
 	    		driveMotor.set(-power);	    
 	   	}

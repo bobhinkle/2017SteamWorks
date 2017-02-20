@@ -36,12 +36,12 @@ public class Robot extends SampleRobot {
         fsm = FSM.getInstance(); 
         dist = DistanceController.getInstance();
 
-        SmartDashboard.putBoolean("Manual Wheel Headings?", true);
+/*        SmartDashboard.putBoolean("Manual Wheel Headings?", true);
 		SmartDashboard.putNumber("Manual Heading 1", 0); 
         SmartDashboard.putNumber("Manual Heading 2", 0);
         SmartDashboard.putNumber("Manual Heading 3", 0);
         SmartDashboard.putNumber("Manual Heading 4", 0);
-        
+/**/        
     }
     
 
@@ -103,7 +103,7 @@ public class Robot extends SampleRobot {
     		break;
     	case NEAR_HOPPER:
     		//Move in a positive x direction towards the gear peg
-    		dist.setGoal(robot.dt.frontLeft.getX(),97, 2.0,5.0, 0.7);
+    		dist.setGoal(97,robot.dt.frontLeft.getY(), 2.0,5.0, 0.7);
     		//Move backward just a bit to place the gear on the peg
     		dist.setGoal(robot.dt.frontLeft.getX(),-5, 2.0,5.0, 0.7);
     		//Turn on the intake so as to collect as many balls as possible throughout autonomous
@@ -111,7 +111,7 @@ public class Robot extends SampleRobot {
     		//Move forward and reach the hopper, deploying it in the process
     		dist.setGoal(robot.dt.frontLeft.getX(),120, 2.0,5.0, 0.7);
     		//Move in a positive x direction to fall in the path of the hopper's balls
-    		dist.setGoal(robot.dt.frontLeft.getX(),5, 2.0,5.0, 0.7);
+    		dist.setGoal(5,robot.dt.frontLeft.getY(), 2.0,5.0, 0.7);
     		
     		robot.intake.intakeStop();
     		break;

@@ -83,8 +83,8 @@ public class DistanceController {
     }/**/
 	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput){
 		reset();
-		targetY = _goalY + dt.frontLeft.getY();
-		targetX = _goalX + dt.frontLeft.getX();
+		targetY = _goalY;// + currentPositionY;//dt.frontLeft.getY();
+		targetX = _goalX;// + currentPositionX;//dt.frontLeft.getX();
 		
 		allowableError = error;
 		timeout = (timeLimit * 1000) + System.currentTimeMillis();
@@ -94,8 +94,13 @@ public class DistanceController {
 	public void reset(){
 		cyclesOnTarget = onTargetThresh;
 		onTarget = false;
+		/**/
+		updateCurrentPos();
+		/*/
 		currentPositionY = 0.0;
+		/**/
 		inputY = 0.0;
+		inputX = 0.0;
 	}
 	private void updateCurrentPos(){
 		currentPositionY = dt.frontLeft.getY();
@@ -112,7 +117,7 @@ public class DistanceController {
 	}
 	public void disable(){
 		isEnabled = false;
-		reset();
+		//reset();
 	}
 	private double inputCap(double value){
 		if(value > inputCap){
