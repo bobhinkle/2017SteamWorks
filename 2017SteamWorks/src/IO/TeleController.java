@@ -1,12 +1,13 @@
 package IO;import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
 import SubSystems.DistanceController;
+import Utilities.Constants;
 import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  
 public class TeleController
 {
-    public static final double STICK_DEAD_BAND = 0.2;
+    
 
     private Controller driver,coDriver;
     private FSM fsm;
@@ -51,7 +52,7 @@ public class TeleController
     	if(coDriver.rightTrigger.isPressed()){
     		robot.shooter.setSpeed(.75); //
     	}
-    	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -STICK_DEAD_BAND){
+    	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > Constants.STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -Constants.STICK_DEAD_BAND){
     		robot.turret.manualControl(coDriver.getButtonAxis(Controller.RIGHT_STICK_X));
     	}
     	if(coDriver.getPOV() == 270)
@@ -120,6 +121,7 @@ public class TeleController
 //        	robot.shooter.setSpeed(0);
         	robot.dt.resetCoord();
         	dist.disable();
+        	
         }
         if(driver.startButton.isPressed()){
         	
@@ -130,9 +132,18 @@ public class TeleController
         }
         if(driver.getPOV() == 0){
 //        	robot.shooter.bumpUp(100);
+        	// This button will now be used to test the distance controller's accuracy
+        	dist.setGoal(0, 40, 2, 5, 0.5);
+        }
+        if(driver.getPOV() == 90){
+        	
         }
         if(driver.getPOV() == 180){
 //        	robot.shooter.bumpUp(100);
+        	// This button will now be used to test starting orientations
+ //       	robot.intake._pidgey.SetFusedHeading(180.0);
+ //       	robot.dt.setHeading(0.0);
+        	dist.setGoal(0,-40, 2, 5, 0.5);
         }
         if(robotCentric)
         	SmartDashboard.putString("RobotControl", "ROBOT");
