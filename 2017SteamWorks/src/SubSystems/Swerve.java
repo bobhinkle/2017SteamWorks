@@ -94,17 +94,20 @@ public class Swerve{
 	public void sendInput(double x, double y, double rotateX,double rotateY,boolean halfPower,boolean robotCentric,boolean moonManeuver){
 		
 		tracking = false;
-		SmartDashboard.putNumber("X Stick", rotateX);
-		SmartDashboard.putNumber("Y Stick", rotateY);
+//		SmartDashboard.putNumber("X Stick", rotateX);
+//		SmartDashboard.putNumber("Y Stick", rotateY);
 		if(moonManeuver){
 			headingController = HeadingController.Off;
 			yInput = 0.0;
 			xInput = -(rotateX * 0.2) * ((Math.abs(y)*2)+1) ;
 			rotateInput = rotateX * 0.2;
-			SmartDashboard.putNumber("xMoon", xInput);
-			SmartDashboard.putNumber("rMoon", rotateInput);
+//			SmartDashboard.putNumber("xMoon", xInput);
+//			SmartDashboard.putNumber("rMoon", rotateInput);
 		}
 		else{
+			if(!intake.pidgeyGood()){
+				headingController = HeadingController.Off;
+			}
 			if(Math.abs(rotateX) >= Constants.STICK_DEAD_BAND){
 				headingController = HeadingController.Off;
 				rotateInput = rotateX;
@@ -155,7 +158,7 @@ public class Swerve{
 			}
 			if (headingController == HeadingController.Rotation) {
 				
-				SmartDashboard.putNumber("ROTATE_CORRECT", rotationCorrection);
+//				SmartDashboard.putNumber("ROTATE_CORRECT", rotationCorrection);
 			} else if (headingController == HeadingController.Off) {
 				rotationCorrection = 0;
 			} else {
@@ -225,6 +228,11 @@ public class Swerve{
 		private boolean isTravelling = false;
 		public boolean isTravelling() {return isTravelling;}
 		
+		private double relativeTickZero = 0;
+		private double relativeTickCount(){
+			return getCurrentEncPosition() - relativeTickZero;
+		}
+		
 	    
 		
 		public double continousAngle(double goal, double current){
@@ -246,10 +254,10 @@ public class Swerve{
 			setCurrentEncPosition(driveMotor.getEncPosition());
 			setCurrentIntakeAngle(intake.getCurrentAngle());
 			setCurrentModuleAngle(rotationMotor.get()-offSet);
-			SmartDashboard.putString("updateCoord():setCurrentModule"+Integer.toString(moduleID)+"Angle", Double.toString(Util.boundAngle0to360Degrees(getCurrentModuleAngle()))+" / "+Double.toString(Util.boundAngle0to360Degrees(rotationMotor.get())));
-			double distanceTravelled = -(getCurrentEncPosition()-lastEncPosition) * Constants.DRIVE_INCHES_PER_CLICK; //0.00180143;*Constants.DRIVE_CLICKS_PER_INCH; // inches
+//			SmartDashboard.putString("updateCoord():setCurrentModule"+Integer.toString(moduleID)+"Angle", Double.toString(Util.boundAngle0to360Degrees(getCurrentModuleAngle()))+" / "+Double.toString(Util.boundAngle0to360Degrees(rotationMotor.get())));
+			double distanceTravelled = -(getCurrentEncPosition()-lastEncPosition);// * Constants.DRIVE_INCHES_PER_CLICK; //0.00180143;*Constants.DRIVE_CLICKS_PER_INCH; // inches
 	        totalDistanceTravelled -= distanceTravelled; // inches
-	        SmartDashboard.putNumber("distanceTravelled"+Integer.toString(moduleID), distanceTravelled);
+//	        SmartDashboard.putNumber("distanceTravelled"+Integer.toString(moduleID), distanceTravelled);
 //	        SmartDashboard.putBoolean(Integer.toString(moduleID) + " Travelling ", isTravelling());
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Distance (in) ", totalDistanceTravelled);
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " cos = ", Math.cos(Math.toRadians(360-rotationMotor.get()+90)));
@@ -261,11 +269,11 @@ public class Swerve{
 		        y += dy;
 	        }
 //	        SmartDashboard.putNumber("DRV_X" + Integer.toString(moduleID), x);
-	        SmartDashboard.putNumber("DRV_Y" + Integer.toString(moduleID), y);
+//	        SmartDashboard.putNumber("DRV_Y" + Integer.toString(moduleID), y);
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " dX ", dx*1000);
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " dY ", dy*1000);
-	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (in) ", x);
-	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", y);
+	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (tick) ", x);
+	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (tick) ", y);
 			lastEncPosition = getCurrentEncPosition();
 		}
 		public double getX(){return x;}
@@ -278,20 +286,23 @@ public class Swerve{
 			setTotalDistanceTravelled(0);
 			lastEncPosition = 0;
 			setCurrentEncPosition(0);
+			relativeTickZero = getCurrentEncPosition();
+			
 		}
 		public void debugValues(){
 			if(wheelError() >= Constants.TURNING_DETECT_THRESHOLD) {isRotating = true;} else {isRotating = false;}
 			if(isRotating || Math.abs(getCurrentEncPosition()-lastEncPosition) <= Constants.DRIVING_DETECT_THRESHOLD /*clicks*/) {isTravelling = false;} else {isTravelling = true;}
 			//Note #3
-			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Angle (deg) ", Util.boundAngle0to360Degrees(getCurrentModuleAngle()));
+//			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Angle (deg) ", Util.boundAngle0to360Degrees(getCurrentModuleAngle()));
 //			SmartDashboard.putNumber("DRV_" + Integer.toString(moduleID), driveMotor.get());
-			SmartDashboard.putNumber("OFF_" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(getCurrentModuleAngle()/*-offSet*/));
-			SmartDashboard.putNumber("GOAL " + Integer.toString(moduleID), Util.boundAngle0to360Degrees(rotationMotor.getSetpoint()-(360-offSet)));
-			SmartDashboard.putNumber("W_ERR" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(wheelError()));
-			SmartDashboard.putNumber(Integer.toString(moduleID)+ " Raw Encoder Clicks ", getCurrentEncPosition());
-			SmartDashboard.putBoolean(Integer.toString(moduleID) + " Rotating ", isRotating());
-			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Clicks ", getRotationOffsetClicks());
-			SmartDashboard.putNumber(Integer.toString(moduleID) + " Driven Clicks ", getCurrentEncPosition() - getRotationOffsetClicks());
+			SmartDashboard.putNumber("OFF_" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(getCurrentAngle()/*-offSet*/));
+//			SmartDashboard.putNumber("GOAL " + Integer.toString(moduleID), Util.boundAngle0to360Degrees(rotationMotor.getSetpoint()-(360-offSet)));
+//			SmartDashboard.putNumber("W_ERR" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(wheelError()));
+			SmartDashboard.putNumber(Integer.toString(moduleID)+ " Raw Encoder Clicks ", relativeTickCount()/*getCurrentEncPosition()*/);
+//			SmartDashboard.putBoolean(Integer.toString(moduleID) + " Rotating ", isRotating());
+//			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Clicks ", getRotationOffsetClicks());
+//			SmartDashboard.putNumber(Integer.toString(moduleID) + " Driven Clicks ", getCurrentEncPosition() - getRotationOffsetClicks());
+			SmartDashboard.putNumber(Integer.toString(moduleID) + "Inches since last zero: ", getCurrentEncPosition()/Constants.DRIVE_TICKS_PER_INCH);//Constants.DRIVE_INCHES_PER_CLICK);
 		}
 		public SwerveDriveModule(int rotationMotorPort, int driveMotorPort,int moduleNum,double _offSet){
 			rotationMotor = new CANTalon(rotationMotorPort);
@@ -333,15 +344,15 @@ public class Swerve{
 	    	rotationMotor.configPeakOutputVoltage(+6f, -6f);
 	    	rotationMotor.setAllowableClosedLoopErr(0); 
 	    	rotationMotor.changeControlMode(TalonControlMode.Position);
-	    	rotationMotor.setPID(8, 0.0, 0.0, 0.00, 0, 0.0, 0);
+	    	rotationMotor.setPID(4, 0.0, 0.0, 0.00, 0, 0.0, 0);
 	    	rotationMotor.setProfile(0);
 	    	rotationMotor.set(rotationMotor.get());
 	    }
 	   
 	    public void setDriveSpeed(double power){
 	    	// This function determines whether we're close enough to a wheel's desired angle to start driving that wheel
-	    	if(wheelError() < Constants.TURNING_ADD_POWER_THRESHOLD)
-	    		driveMotor.set(-power);	    
+	    	if(wheelError() < Constants.TURNING_ADD_POWER_THRESHOLD) {
+	    		driveMotor.set(-power);}
 	   	}
 	    public void stopDriveMotor(){
 	    	driveMotor.set(0);
@@ -363,8 +374,8 @@ public class Swerve{
 		rearRight.updateCoord();
 		rearLeft.updateCoord();
 		
-		SmartDashboard.putNumber("Target Heading", _targetAngle);
-		SmartDashboard.putNumber("turnErr", Util.boundAngleNeg180to180Degrees(Util.boundAngle0to360Degrees(intake.getCurrentAngle())-_targetAngle)); // add bounding to [-180,180]
+//		SmartDashboard.putNumber("Target Heading", _targetAngle);
+//		SmartDashboard.putNumber("turnErr", Util.boundAngleNeg180to180Degrees(Util.boundAngle0to360Degrees(intake.getCurrentAngle())-_targetAngle)); // add bounding to [-180,180]
 		if(xInput == 0 && yInput == 0 && rotateInput == 0){
 			frontLeft.stopDriveMotor();
 			frontRight.stopDriveMotor();

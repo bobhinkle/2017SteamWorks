@@ -21,9 +21,11 @@ public class Intake {
 		intakeLeft = new CANTalon(Ports.INTAKE_MOTOR_L);
 		intakeLeft.configNominalOutputVoltage(12.0f, -12.0f);
 		intakeLeft.setVoltageRampRate(24);
+		intakeLeft.setCurrentLimit(25);
 		intakeRight = new CANTalon(Ports.INTAKE_MOTOR_R);
 		intakeRight.configNominalOutputVoltage(12.0f, -12.0f);
 		intakeRight.setVoltageRampRate(24);
+		intakeRight.setCurrentLimit(25);
 		try{
 			_pidgey = new PigeonImu(intakeLeft);
 		}catch(Exception e){
@@ -52,8 +54,12 @@ public class Intake {
 			System.out.println(e);
 		}
 	}
+	public boolean pidgeyGood(){
+		return angleIsGood;
+	}
 	public double getCurrentAngle(){
 		return currentAngle;
+		
 	}
 	public double getCurrentAngularRate(){
 		return currentAngularRate;

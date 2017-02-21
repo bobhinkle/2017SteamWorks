@@ -5,6 +5,7 @@ import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
 import IO.TeleController;
 import SubSystems.DistanceController;
+import Utilities.Util;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -48,8 +49,9 @@ public class Robot extends SampleRobot {
     
     public void autonomous() {
     	String autoSelected = (String) autoSelect.getSelected();
-    	robot.intake._pidgey.SetFusedHeading(0.0);
-    	robot.dt.setHeading(0.0);
+    	robot.dt.resetCoord();
+//    	robot.intake._pidgey.SetFusedHeading(0.0);
+//    	robot.dt.setHeading(0.0);
     		switch(autoSelected){
     			case one_gear:
     				executeAuto(AUTO.ONE_GEAR);
@@ -71,35 +73,53 @@ public class Robot extends SampleRobot {
     }
 
     public void rotate(double angle){
-    	int timeout = 0;
+    	long timeout = System.currentTimeMillis() + 2000;
     	robot.dt.setHeading(angle);
-		while(!robot.dt.headingOnTarget() && isAutonomous() && (timeout < 200)){
+		while(!robot.dt.headingOnTarget() && isAutonomous() && (timeout > System.currentTimeMillis())){
 			robot.dt.sendInput(0, 0, 0, 0, false, true, false);
 			Timer.delay(0.01);
-			timeout++;
 		}
     }
     
+    private void delay() {
+		while(!dist.onTarget() && isAutonomous()){
+			Timer.delay(0.01);
+		}
+    }
     public void executeAuto(AUTO autoSelect){
     	    	
     	switch(autoSelect){
     	case TWO_GEAR:
 //        	robot.intake._pidgey.SetFusedHeading(180.0);
-//        	robot.dt.setHeading(180.0);
+//        	robot.dt.setHeading(robot.intake.getCurrentAngle());
     		//Place the first gear
-    		dist.setGoal(robot.dt.frontLeft.getX(),-66, 2.0,5.0, 0.7);
+    		dist.setGoal(0, -57, 2.0, 2.5, 0.7);
+    		/**/
+    		delay();
+    		dist.setGoal(-12, -57, 2.0, 2.5, 0.7);
+    		delay();
+    		//robot.dt.setHeading(-90);
+    		/*/while(!dist.onTarget() && isAutonomous()){
+    			Timer.delay(0.01);
+    		}/**/
     		//Move back to pick up gear
-    		dist.setGoal(robot.dt.frontLeft.getX(),55, 2.0,5.0, 0.7);
+//    		dist.setGoal(0, -25, 2.0, 2.5, 0.7);
+//    		delay();
     		//Rotate to face second gear
-    		rotate(90);
+//    		rotate(-90);
     		//Move forward a bit to acquire the gear
-    		dist.setGoal(robot.dt.frontLeft.getX(),-10, 2.0,5.0, 0.7);
+//    		robot.dt.resetCoord();
+//    		dist.setOffsetGoal(0, -25, 2.0, 2.5, 0.7);
+//    		delay();
     		//Move back to original x position
-    		dist.setGoal(robot.dt.frontLeft.getX(),10, 2.0,5.0, 0.7);
+//    		dist.setOffsetGoal(0, -25, 2.0, 2.5, 0.7);
+//    		delay();
     		//Rotate back to face the gear peg
-    		rotate(180);
+//    		rotate(0);
     		//Move forward to place the second gear
-    		dist.setGoal(robot.dt.frontLeft.getX(),-66, 2.0,5.0, 0.7);
+//    		dist.setGoal(0,-57, 2.0,5.0, 0.7);
+ //   		delay();
+    		Timer.delay(15);
     		break;
     	case NEAR_HOPPER:
     		//Move in a positive x direction towards the gear peg

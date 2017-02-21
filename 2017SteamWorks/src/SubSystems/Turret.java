@@ -11,13 +11,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Turret {
 	private static Turret instance = null;
 	private CANTalon motor;
-	private int absolutePosition;
+//	private int absolutePosition;
 	public Turret(){
 		motor = new CANTalon(Ports.TURRET);
 		//motor.configPeakOutputVoltage(+6f, -6f);
 		//motor.setCurrentLimit(8);
-		absolutePosition = motor.getPulseWidthPosition() & 0xFFF;
-    	motor.setEncPosition(absolutePosition);
+//		absolutePosition = motor.getPulseWidthPosition() & 0xFFF;
+    	motor.setEncPosition(0);
     	motor.setFeedbackDevice(FeedbackDevice.QuadEncoder);
     	motor.reverseSensor(false);
     	motor.reverseOutput(true);
@@ -26,7 +26,7 @@ public class Turret {
     	motor.configPeakOutputVoltage(+3f, -3f);
     	motor.setAllowableClosedLoopErr(0); 
     	motor.changeControlMode(TalonControlMode.Position);
-    	motor.set(motor.getPosition());
+    	motor.set(0);
     	//motor.setPID(1.27, 0.0, 2, 0.0, 0, 0.0, 0);
 		
 	}

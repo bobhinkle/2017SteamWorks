@@ -49,6 +49,9 @@ public class TeleController
     		robot.intake.intakeStop();
     		robot.shooter.setSpeed(0);
     	}
+    	if(coDriver.rightCenterClick.isPressed()){
+    		robot.turret.setAngle(0);
+    	}
     	if(coDriver.rightTrigger.isPressed()){
     		robot.shooter.setSpeed(.75); //
     	}
@@ -72,9 +75,16 @@ public class TeleController
     	if(driver.bButton.isPressed()){  
     		robot.dt.setHeading(90);
         }
+    	if(driver.bButton.buttonHoldTime() > 2 && driver.bButton.isHeld()){
+    		robot.dt.setHeading(120);
+    	}
     	if(driver.xButton.isPressed()){
     		robot.dt.setHeading(270);
-        }if(driver.yButton.isPressed()){
+        }
+    	if(driver.xButton.buttonHoldTime() > 2 && driver.xButton.isHeld()){
+    		robot.dt.setHeading(240);
+    	}
+    	if(driver.yButton.isPressed()){
         	robot.dt.setHeading(0);
         }
         if(driver.startButton.isHeld()){
@@ -103,13 +113,15 @@ public class TeleController
         }
         
         if(driver.leftBumper.isPressed()){
-        	//robotCentric = false;
+        	robotCentric = false;
         	//dist.setGoal(-30, DistanceController.Direction.X);
+//        	dist.setGoal(0,/*-4*/0, 0, 10, 0.5);
         }
         
         if(driver.rightBumper.isPressed()){            
-        	//robotCentric = true;
+        	robotCentric = true;
         	//dist.setGoal(30, DistanceController.Direction.X);
+//        	dist.setGoal(0, 36, 0, 10, 0.5);
         }
         
         if(driver.backButton.isHeld()){ 
@@ -133,7 +145,7 @@ public class TeleController
         if(driver.getPOV() == 0){
 //        	robot.shooter.bumpUp(100);
         	// This button will now be used to test the distance controller's accuracy
-        	dist.setGoal(0, 40, 0, 5, 0.5);
+        	//dist.setGoal(0, 40, 0, 5, 0.5);
         }
         if(driver.getPOV() == 90){
         	
@@ -145,11 +157,11 @@ public class TeleController
  //       	robot.dt.setHeading(0.0);
         	dist.setGoal(0,/*-4*/0, 0, 5, 0.5);
         }
-        if(robotCentric)
+/**        if(robotCentric)
         	SmartDashboard.putString("RobotControl", "ROBOT");
         else
             SmartDashboard.putString("RobotControl","FIELD");
-    }
+/**/    }
     public void update(){	
     	driver();
     	coDriver();
