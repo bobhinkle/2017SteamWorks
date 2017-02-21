@@ -66,9 +66,10 @@ public class Swerve{
 	public void setHeading(double goal,boolean rotation){
 		if(rotation)
 			headingController = HeadingController.Rotation;
-		_targetAngle = continousAngle2(goal,intake.getCurrentAngle());
+		_targetAngle = continuousAngle(goal,intake.getCurrentAngle());
 	}
-	public double continousAngle2(double goal, double current){
+
+	public double continuousAngle(double goal, double current){
 		double BGA = Util.boundAngle0to360Degrees(goal);			
 		double CA = current;
 		double BCA = Util.boundAngle0to360Degrees(CA);
@@ -249,23 +250,6 @@ public class Swerve{
 			return getCurrentEncPosition() - relativeTickZero;
 		}
 		
-	    
-		
-		public double continousAngle(double goal, double current){
-			double BGA = Util.boundAngle0to360Degrees(goal);			
-			double CA = current;
-			double BCA = Util.boundAngle0to360Degrees(CA);
-			double OA = BCA - 180.0;
-			double DA  = OA - BGA;
-			if(DA < -360){
-				DA = DA + 360;
-			}
-			if(DA > 0.0){
-				return CA + 180.0 - Math.abs(DA);
-			}else{
-				return CA - 180.0 + Math.abs(DA);
-			}
-		}
 		public void updateCoord(){
 			setCurrentEncPosition(driveMotor.getEncPosition());
 			setCurrentIntakeAngle(intake.getCurrentAngle());
@@ -342,7 +326,7 @@ public class Swerve{
 		
 		public void setGoal(double goalAngle)
 	    {			
-			rotationMotor.set(continousAngle(goalAngle-(360-offSet),getCurrentAngle()));
+			rotationMotor.set(continuousAngle(goalAngle-(360-offSet),getCurrentAngle()));
 	    }
 		public double wheelError(){
 			return Math.abs(rotationMotor.getSetpoint() - getCurrentAngle());
