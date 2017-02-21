@@ -47,4 +47,10 @@ public class Constants {
 	public static final double TURRET_MAX_ANGLE = 90;
 	
 	public static final double STICK_DEAD_BAND = 0.2;
+	
+	public static final double SHOOTING_SPEED = 4000;
+	public static final double SHOOTER_ERROR  = 100;
+	
+	public static final double GEAR_INTAKE_POWER = 1.0;
+	public static final double GEAR_INTAKE_CURR_DETECT = 30;
 }

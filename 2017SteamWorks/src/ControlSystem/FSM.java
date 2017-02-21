@@ -1,19 +1,20 @@
 package ControlSystem;
 
 import SubSystems.DistanceController;
+import Utilities.Constants;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class FSM {
 
 	public enum State{
-    	DEFAULT, INIT
+    	DEFAULT, INIT,SHOOTER_STARTED,SHOOTER_WAITING,SHOOTER_READY,SHOOTER_SHOOTING, GEAR_GRAB, GEAR_SCORE, INTAKE_BALLS
     }
 	private RoboSystem robot;
 	private static FSM instance = null;
 	public partsUpdate pu;
 	private DistanceController dist;
-	
+	private State currentState = State.DEFAULT;
     public static FSM getInstance()
     {
         if( instance == null )
@@ -51,8 +52,11 @@ public class FSM {
         robot.turret.update();
         dist.update();
         robot.gearIntake.update();
-//        robot.nav.updatePosition();
-//        robot.shooter.leftShooter.update();
-//        robot.dt.frontLeft.updateCoord();
+        robot.shooter.update();
+        
+        switch(currentState){
+        
+        
+        }
     }
 }

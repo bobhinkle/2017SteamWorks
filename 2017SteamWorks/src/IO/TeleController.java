@@ -33,6 +33,20 @@ public class TeleController
     }    
    
     public void coDriver(){
+    	if(coDriver.aButton.isPressed() || coDriver.aButton.isHeld()){
+    		if(coDriver.aButton.isHeld() && coDriver.aButton.buttonHoldTime() > 3){
+        		robot.gearIntake.grabGear();
+        	}else{
+        		robot.gearIntake.extend();
+        	}    		
+    	}
+    	if(coDriver.bButton.isPressed() || coDriver.bButton.isHeld()){
+    		if(coDriver.bButton.isHeld() && coDriver.bButton.buttonHoldTime() > 3){
+        		robot.gearIntake.scoreGear();
+        	}else{
+        		robot.gearIntake.retract();
+        	}    
+    	}
     	if(coDriver.xButton.isPressed()){
     		robot.sweeper.forwardRoller();
     		robot.sweeper.forwardSweeper();
