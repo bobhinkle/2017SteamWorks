@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+//TODO Swerve:35
 
 public class Robot extends SampleRobot {
 	private RoboSystem robot;
@@ -74,7 +74,7 @@ public class Robot extends SampleRobot {
 
     public void rotate(double angle){
     	long timeout = System.currentTimeMillis() + 2000;
-    	robot.dt.setHeading(angle);
+    	robot.dt.setHeading(angle,true);
 		while(!robot.dt.headingOnTarget() && isAutonomous() && (timeout > System.currentTimeMillis())){
 			robot.dt.sendInput(0, 0, 0, 0, false, true, false);
 			Timer.delay(0.01);
@@ -144,7 +144,7 @@ public class Robot extends SampleRobot {
     	dist.disable();
     	robot.intake._pidgey.SetFusedHeading(0.0);
     	Timer.delay(0.2); 
-    	robot.dt.setHeading(0);
+    	robot.dt.setHeading(0,false);
         while (isOperatorControl() && isEnabled()) {        	
         	controllers.update();
         	robot.intake.pigeonUpdate();

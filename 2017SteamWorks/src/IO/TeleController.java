@@ -48,12 +48,19 @@ public class TeleController
     		robot.sweeper.stopSweeper();
     		robot.intake.intakeStop();
     		robot.shooter.setSpeed(0);
+    		robot.gearIntake.stop();
     	}
     	if(coDriver.rightCenterClick.isPressed()){
     		robot.turret.setAngle(0);
     	}
     	if(coDriver.rightTrigger.isPressed()){
     		robot.shooter.setSpeed(.75); //
+    	}
+    	if(coDriver.leftTrigger.isPressed()){
+    		robot.gearIntake.forward();
+    	}
+    	if(coDriver.startButton.isPressed()){
+    		robot.gearIntake.reverse();
     	}
     	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > Constants.STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -Constants.STICK_DEAD_BAND){
     		robot.turret.manualControl(coDriver.getButtonAxis(Controller.RIGHT_STICK_X));
@@ -70,22 +77,22 @@ public class TeleController
     public void driver() {
     	
     	if(driver.aButton.isPressed()){       
-    		robot.dt.setHeading(180);
+    		robot.dt.setHeading(180,true);
         }
     	if(driver.bButton.isPressed()){  
-    		robot.dt.setHeading(90);
+    		robot.dt.setHeading(90,true);
         }
     	if(driver.bButton.buttonHoldTime() > 2 && driver.bButton.isHeld()){
-    		robot.dt.setHeading(120);
+    		robot.dt.setHeading(120,true);
     	}
     	if(driver.xButton.isPressed()){
-    		robot.dt.setHeading(270);
+    		robot.dt.setHeading(270,true);
         }
     	if(driver.xButton.buttonHoldTime() > 2 && driver.xButton.isHeld()){
-    		robot.dt.setHeading(240);
+    		robot.dt.setHeading(240,true);
     	}
     	if(driver.yButton.isPressed()){
-        	robot.dt.setHeading(0);
+        	robot.dt.setHeading(0,true);
         }
         if(driver.startButton.isHeld()){
         	robot.dt.swerveTrack();
@@ -126,7 +133,7 @@ public class TeleController
         
         if(driver.backButton.isHeld()){ 
         	robot.intake._pidgey.SetFusedHeading(0.0);
-        	robot.dt.setHeading(0.0);
+        	robot.dt.setHeading(0.0,false);
         	
         }
         if(driver.backButton.isPressed()){

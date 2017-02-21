@@ -7,7 +7,7 @@ import Utilities.Constants;
 import Utilities.Ports;
 import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+// TODO Line 35
 public class Swerve{
 	private static Swerve instance = null;
 	
@@ -32,6 +32,7 @@ public class Swerve{
 	double kDgain = 0.00425; /* percent throttle per angular velocity dps */ //0.00425
 	double kPgainSmall = 0.008; //0.015
 	double kDgainSmall = 0.002; //0.002
+/* TODO Tune kPHeadingGain to prevent drift while driving */
 	double kPHeadingGain = 0.002;
 	double kDHeadingGain = 0.001;
 	double kMaxCorrectionRatio = 0.75; //0.75
@@ -42,6 +43,19 @@ public class Swerve{
 	double rotationOnTarget = 0;
 	 /* cap corrective turning throttle to 30 percent of forward throttle */
 	
+	/* Stuff for tracking robot center */
+	/*
+	 * Aight, here's the important math:
+	 * 
+	 *  a: heading of robot, as returned by pigeon
+	 *  g: angle between front face of robot and center of robot
+	 *  r: distance between module center and robot center
+	 *  
+	 *  
+	 * 
+	 */
+	/**/
+	
 	double _targetAngle = 0.0;
 	private double allowableError = 2.0;
 	double rotationCorrection;
@@ -49,7 +63,9 @@ public class Swerve{
 	private Intake intake;
 	private int onTargetThresh = 30;
 	private int onTarget = 0;
-	public void setHeading(double goal){
+	public void setHeading(double goal,boolean rotation){
+		if(rotation)
+			headingController = HeadingController.Rotation;
 		_targetAngle = continousAngle2(goal,intake.getCurrentAngle());
 	}
 	public double continousAngle2(double goal, double current){
@@ -88,7 +104,7 @@ public class Swerve{
 	
 	public void swerveTrack(){
 		double adjust = intake.getCurrentAngle() - Vision.getAngle();
-    	setHeading(adjust);
+    	setHeading(adjust,false);
     	tracking = true;
 	}
 	public void sendInput(double x, double y, double rotateX,double rotateY,boolean halfPower,boolean robotCentric,boolean moonManeuver){
@@ -325,8 +341,7 @@ public class Swerve{
 		}
 		
 		public void setGoal(double goalAngle)
-	    {
-			headingController = HeadingController.Rotation;
+	    {			
 			rotationMotor.set(continousAngle(goalAngle-(360-offSet),getCurrentAngle()));
 	    }
 		public double wheelError(){
