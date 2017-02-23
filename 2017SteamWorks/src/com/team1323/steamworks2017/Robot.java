@@ -11,15 +11,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends SampleRobot {
-	private RoboSystem			robot;
-	private TeleController		controllers;
-	private FSM					fsm;
-	final String				defaultAuto	= "off";
-	final String				one_gear	= "one_gear";
-	final String				two_gear	= "two_gear";
-	final String				near_hopper	= "near_hopper";
-	SendableChooser				autoSelect;
-	private DistanceController	dist;
+	private RoboSystem robot;
+	private TeleController controllers;
+	private FSM fsm;
+	final String defaultAuto = "off";
+	final String one_gear = "one_gear";
+	final String two_gear = "two_gear";
+	final String near_hopper = "near_hopper";
+	SendableChooser autoSelect;
+	private DistanceController dist;
 	public static enum AUTO {
 		OFF,
 		ONE_GEAR,
@@ -38,22 +38,16 @@ public class Robot extends SampleRobot {
 		controllers = TeleController.getInstance();
 		fsm = FSM.getInstance();
 		dist = DistanceController.getInstance();
-		/**
-		 * TODO The following two lines need to appear in the auto subroutines because they each need to set their own
-		 * start headings. Right?
-		 */
-		// robot.intake._pidgey.SetFusedHeading(90);
-		// robot.dt.resetCoord();
 
 /* SmartDashboard.putBoolean("Manual Wheel Headings?", true); SmartDashboard.putNumber("Manual Heading 1", 0);
  * SmartDashboard.putNumber("Manual Heading 2", 0); SmartDashboard.putNumber("Manual Heading 3", 0);
- * SmartDashboard.putNumber("Manual Heading 4", 0); / **/
+ * SmartDashboard.putNumber("Manual Heading 4", 0); /**/
 	}
 
 	public void autonomous() {
 		String autoSelected = (String)autoSelect.getSelected();
-// robot.intake._pidgey.SetFusedHeading(180.0);
-// robot.dt.resetCoord();
+		// robot.intake._pidgey.SetFusedHeading(180.0);
+		// robot.dt.resetCoord();
 		switch(autoSelected)
 			{
 				case one_gear:
@@ -114,7 +108,7 @@ public class Robot extends SampleRobot {
 				case TWO_GEAR:
 				//* This auto starts with the robot's front facing the driver station; id est, the robot is backward on the field.
 					initializeHeading(180); /*/
-					robot.intake._pidgey.SetFusedHeading(180.0);robot.dt. resetCoord(); /**/
+					robot.intake._pidgey.SetFusedHeading(180.0); robot.dt.resetCoord(); /**/
 
 				// TODO Adjust distances to be correct
 				// TODO Tune timeouts/thresholds/coefficients, et cetera
