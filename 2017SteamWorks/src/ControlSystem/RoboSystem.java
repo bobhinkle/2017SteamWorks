@@ -11,11 +11,11 @@ import Utilities.Ports;
 
 public class RoboSystem{
     private static RoboSystem instance = null;
+	public Intake intake;
     public Swerve dt;
 //    public Navigation nav;
 //	public Vision vision;
 	public Shooter shooter;
-	public Intake intake;
 	public Sweeper sweeper;
 	public Turret turret;
 	public GearIntake gearIntake;
@@ -28,11 +28,11 @@ public class RoboSystem{
     
     public RoboSystem(){
     	
+    	intake = Intake.getInstance();
     	dt = Swerve.getInstance();
 //    	nav = Navigation.getInstance();
 //    	vision = Vision.getInstance();
     	shooter = Shooter.getInstance();
-    	intake = Intake.getInstance();
     	sweeper = Sweeper.getInstance();
     	turret = Turret.getInstance();
     	gearIntake = new GearIntake(Ports.GEAR_HANG, Ports.INTAKE_ARM);

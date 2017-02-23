@@ -1,6 +1,7 @@
 package IO;import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
 import SubSystems.DistanceController;
+import SubSystems.Shooter;
 import Utilities.Constants;
 import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,7 +45,7 @@ public class TeleController
     		if(coDriver.bButton.isHeld() && coDriver.bButton.buttonHoldTime() > 3){
         		robot.gearIntake.scoreGear();
         	}else{
-        		robot.gearIntake.retract();
+//        		robot.gearIntake.retract();
         	}    
     	}
     	if(coDriver.xButton.isPressed()){
@@ -63,12 +64,13 @@ public class TeleController
     		robot.intake.intakeStop();
     		robot.shooter.setSpeed(0);
     		robot.gearIntake.stop();
+   
     	}
     	if(coDriver.rightCenterClick.isPressed()){
     		robot.turret.setAngle(0);
     	}
     	if(coDriver.rightTrigger.isPressed()){
-    		robot.shooter.setSpeed(.75); //
+    		robot.shooter.setState(Shooter.Status.STARTED);
     	}
     	if(coDriver.leftTrigger.isPressed()){
     		robot.gearIntake.forward();

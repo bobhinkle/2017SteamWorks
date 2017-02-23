@@ -10,13 +10,8 @@ public class DistanceController {
 	private double targetX = 0.0;
 	private double currentPositionY = 0.0;
 	private double currentPositionX = 0.0;
-	private double p = 0.000025;      //0.0555;
-	private double d = 0.00001;      //0.12;
-	private double smallP = 0.00001;
-	private double smallD = 0.0;
 	private double allowableError = 1.0;
 	private boolean onTarget = false;
-	private int onTargetThresh = 30;
 	private int cyclesOnTarget = 0;
 	private Swerve dt;
 	private double inputY = 0.0;
@@ -26,11 +21,6 @@ public class DistanceController {
 	private boolean isEnabled = false;
 	private double timeout = 0;
 	private double inputCap = 0.7;
-	private double inputCap2 = 0.3;
-	private double smallPIDThresh = 5.0;
-	public enum Direction{
-		X,Y,BOTH
-	}
 	public DistanceController(){
 		dt = Swerve.getInstance();
 	}
@@ -54,25 +44,25 @@ public class DistanceController {
 			updateCurrentPos();
 			if(timeout >= System.currentTimeMillis()){
 				if(!isOnTarget()){
-					cyclesOnTarget = onTargetThresh;	
-					if(Math.abs(targetY - currentPositionY) > smallPIDThresh * Constants.DRIVE_TICKS_PER_INCH){
-						inputY = (targetY - currentPositionY) * p - (yDistanceTravelled()) * d;
+					cyclesOnTarget = Constants.DIST_CONTROLLER_CYCLE_THRESH;	
+					if(Math.abs(targetY - currentPositionY) > Constants.DIST_CONTROLLER_PID_THRESH * Constants.DRIVE_TICKS_PER_INCH){
+						inputY = (targetY - currentPositionY) * Constants.DIST_CONTROLLER_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_D;
 					}else{
-						inputY = (targetY - currentPositionY) * smallP - (yDistanceTravelled()) * smallD;
+						inputY = (targetY - currentPositionY) * Constants.DIST_CONTROLLER_SMALL_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_D;
 					}
-					if(Math.abs(targetX - currentPositionX) > smallPIDThresh * Constants.DRIVE_TICKS_PER_INCH){
-						inputX = (targetX - currentPositionX) * p - (xDistanceTravelled()) * d;
+					if(Math.abs(targetX - currentPositionX) > Constants.DIST_CONTROLLER_PID_THRESH * Constants.DRIVE_TICKS_PER_INCH){
+						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_D;
 					}else{
-						inputX = (targetX - currentPositionX) * smallP - (xDistanceTravelled()) * smallD;
+						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_SMALL_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_D;
 					}
 					
 					SmartDashboard.putNumber("distInputY", inputY);
 					SmartDashboard.putNumber("distInputX", inputX);
-					dt.sendInput(inputCap(inputX),inputCap(inputY) , 0, 0, false, true, false);
+					dt.sendInput(inputCap(inputX),inputCap(inputY) , 0, 0, false, false, false); // second false was true
 					lastDistanceY = currentPositionY;
 					lastDistanceX = currentPositionX;
 				}else{
-					dt.sendInput(0, 0, 0, 0, false, true, false);
+					dt.sendInput(0, 0, 0, 0, false, false, false); // second false was true
 					if(cyclesOnTarget <= 0){
 						onTarget = true;
 						disable();
@@ -81,7 +71,7 @@ public class DistanceController {
 					}
 				}
 			}else{
-				dt.sendInput(0, 0, 0, 0, false, true, false);
+				dt.sendInput(0, 0, 0, 0, false, false, false); // second false was true
 				onTarget = true;
 				disable();
 			}
@@ -124,7 +114,7 @@ public class DistanceController {
 		enable();
 	}
 	public void reset(){
-		cyclesOnTarget = onTargetThresh;
+		cyclesOnTarget = Constants.DIST_CONTROLLER_CYCLE_THRESH;
 		onTarget = false;
 		/**/
 		updateCurrentPos();
@@ -135,8 +125,8 @@ public class DistanceController {
 		inputX = 0.0;
 	}
 	private void updateCurrentPos(){
-		currentPositionY = dt.frontLeft.getY();
-		currentPositionX = dt.frontLeft.getX();
+		currentPositionY = dt.getRobotY();
+		currentPositionX = dt.getRobotX();
 	}
 	private double yDistanceTravelled(){
 		return currentPositionY - lastDistanceY;

@@ -5,12 +5,11 @@ import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
 import IO.TeleController;
 import SubSystems.DistanceController;
-import Utilities.Util;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//TODO Swerve:35
+
 
 public class Robot extends SampleRobot {
 	private RoboSystem robot;
@@ -36,7 +35,9 @@ public class Robot extends SampleRobot {
         controllers = TeleController.getInstance();
         fsm = FSM.getInstance(); 
         dist = DistanceController.getInstance();
-
+        robot.intake._pidgey.SetFusedHeading(180);
+    	robot.dt.resetCoord();
+//        robot.intake._pidgey.
 /*        SmartDashboard.putBoolean("Manual Wheel Headings?", true);
 		SmartDashboard.putNumber("Manual Heading 1", 0); 
         SmartDashboard.putNumber("Manual Heading 2", 0);
@@ -49,8 +50,8 @@ public class Robot extends SampleRobot {
     
     public void autonomous() {
     	String autoSelected = (String) autoSelect.getSelected();
-    	robot.dt.resetCoord();
-//    	robot.intake._pidgey.SetFusedHeading(0.0);
+//    	robot.intake._pidgey.SetFusedHeading(180.0);
+//    	robot.dt.resetCoord();
 //    	robot.dt.setHeading(0.0);
     		switch(autoSelected){
     			case one_gear:
@@ -73,7 +74,7 @@ public class Robot extends SampleRobot {
     }
 
     public void rotate(double angle){
-    	long timeout = System.currentTimeMillis() + 2000;
+    	long timeout = System.currentTimeMillis() + 1000;
     	robot.dt.setHeading(angle,true);
 		while(!robot.dt.headingOnTarget() && isAutonomous() && (timeout > System.currentTimeMillis())){
 			robot.dt.sendInput(0, 0, 0, 0, false, true, false);
@@ -90,36 +91,34 @@ public class Robot extends SampleRobot {
     	    	
     	switch(autoSelect){
     	case TWO_GEAR:
-//        	robot.intake._pidgey.SetFusedHeading(180.0);
-//        	robot.dt.setHeading(robot.intake.getCurrentAngle());
-    		//Place the first gear
-    		dist.setGoal(0, -57, 2.0, 2.5, 0.7);
-    		/**/
+    		//robot.intake._pidgey.SetFusedHeading(0.0);
+        	//robot.dt.setHeading(0.0,false);    
+        	//rotate(180);
+    		robot.intake._pidgey.SetFusedHeading(180);
+    		// intake does something to get the gear?
+        	dist.setGoal(0, 57, 0.2, 1.5, 0.8);
     		delay();
-    		dist.setGoal(-12, -57, 2.0, 2.5, 0.7);
+    		// reverse gear intake to score
+    		// stop gear intake
+    		dist.setGoal(0, 30, 0.2, 1.2, 0.8);
     		delay();
-    		//robot.dt.setHeading(-90);
-    		/*/while(!dist.onTarget() && isAutonomous()){
-    			Timer.delay(0.01);
-    		}/**/
-    		//Move back to pick up gear
-//    		dist.setGoal(0, -25, 2.0, 2.5, 0.7);
-//    		delay();
-    		//Rotate to face second gear
-//    		rotate(-90);
-    		//Move forward a bit to acquire the gear
-//    		robot.dt.resetCoord();
-//    		dist.setOffsetGoal(0, -25, 2.0, 2.5, 0.7);
-//    		delay();
-    		//Move back to original x position
-//    		dist.setOffsetGoal(0, -25, 2.0, 2.5, 0.7);
-//    		delay();
-    		//Rotate back to face the gear peg
-//    		rotate(0);
-    		//Move forward to place the second gear
-//    		dist.setGoal(0,-57, 2.0,5.0, 0.7);
- //   		delay();
-    		Timer.delay(15);
+    		rotate(90);
+   		// move gear intake down
+    		// turn gear intake on
+    		dist.setGoal(-20, 30, 0.2, 1.0, 0.9);
+    		delay();
+    		// gear is taken in here
+    		// turn gear intake off?
+    		// move gear intake up
+    		dist.setGoal(0, 30, 0.2, 1.0, 0.9);
+    		delay();
+    		rotate(180);
+    		dist.setGoal(0, 57, 0.2, 1.5, 0.8);
+    		delay();
+    		// reverse gear intake to score
+    		// stop gear intake
+    		
+    		while(isAutonomous()){Timer.delay(1);}
     		break;
     	case NEAR_HOPPER:
     		//Move in a positive x direction towards the gear peg
@@ -142,12 +141,9 @@ public class Robot extends SampleRobot {
     
     public void operatorControl() {
     	dist.disable();
-    	robot.intake._pidgey.SetFusedHeading(0.0);
-    	Timer.delay(0.2); 
-    	robot.dt.setHeading(0,false);
+//    	robot.dt.setHeading(0,false);
         while (isOperatorControl() && isEnabled()) {        	
         	controllers.update();
-        	robot.intake.pigeonUpdate();
             Timer.delay(0.01);		//10ms Loop Rate
         }
     }

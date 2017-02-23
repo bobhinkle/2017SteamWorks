@@ -56,7 +56,7 @@ public class Shooter {
 		    	
 		    	break;
 		    case OFF:
-		    	motor1.set(0);
+		    	setSpeed(0);
 		    	break;
 		    default:
     	}
@@ -66,7 +66,13 @@ public class Shooter {
     }
     public void setSpeed(double speed){
     	motor1.set(speed);
-//    	motor2.set(-speed);
+    	motor2.set(-speed);
+    }
+    public void setState(Status newState){
+    	status = Status.STARTED;
+    }
+    public void stop(){
+    	status = Status.OFF;
     }
     /*
     public void bumpUp(double increase){

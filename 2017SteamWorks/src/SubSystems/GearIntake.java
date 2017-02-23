@@ -18,7 +18,7 @@ public class GearIntake {
 	
 	public GearIntake(int canPort, int solPort){
 		gear = new CANTalon(canPort);
-		gear.setCurrentLimit(40);
+		gear.setCurrentLimit(100);
 		gear.setVoltageRampRate(24);
 		shaft = new Solenoid(21,solPort);
 	}
@@ -51,8 +51,9 @@ public class GearIntake {
 			SmartDashboard.putString("GEAR_INTAKE", "GEAR DETECTED");
 			break;
 		case SCORE_GEAR_1:
-			timeout = System.currentTimeMillis() + solenoidTime;
-			shaft.set(true);
+//			timeout = System.currentTimeMillis() + solenoidTime;
+//			shaft.set(true);
+			gear.set(-Constants.GEAR_INTAKE_POWER);
 			break;
 		case SCORE_GEAR_2:
 			if(timeout < System.currentTimeMillis()){
@@ -72,12 +73,13 @@ public class GearIntake {
 		state  = State.INTAKE_RETRACTED;
 	}
 	public void grabGear(){
-		if(state == State.INTAKE_RETRACTED){
+		if(state != State.INTAKE_RETRACTED){
 			state = State.INTAKING;
 		}
 	}
 	public void scoreGear(){
-		state = State.SCORE_GEAR_1;
+		if(state != State.SCORE_GEAR_1)
+			state = State.SCORE_GEAR_1;
 	}
 	public void forward(){
 		gear.set(1);
@@ -86,6 +88,6 @@ public class GearIntake {
 		gear.set(-1);
 	}
 	public void stop(){
-		gear.set(0);
+		state = State.INTAKE_EXTENDED;
 	}
 }

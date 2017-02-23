@@ -1,4 +1,5 @@
 package SubSystems;
+
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
@@ -7,63 +8,38 @@ import Utilities.Constants;
 import Utilities.Ports;
 import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// TODO Line 35
+
 public class Swerve{
 	private static Swerve instance = null;
+	private double xInput;
+	private double yInput;
+	private double rotateInput;
+	
+	double rotationOnTarget = 0;
+
+	double _targetAngle = 0.0;
+	double rotationCorrection;
+	int _printLoops = 0;
+	private Intake intake;
+	private int onTarget = 0;
 	
 	public SwerveDriveModule frontLeft;
 	private SwerveDriveModule frontRight;
 	private SwerveDriveModule rearLeft;
 	private SwerveDriveModule rearRight;
-	private static double R = 27.16;
-	private double rotationScaleFactor = .225;
-	private double rotationScaleFactorFast = 0.35;
-	private double xInput,yInput,rotateInput = 0;
 	
-	private double x = 0.0;
-	private double y = 0.0;
-	private double xOffset = 8.0;
-	private double yOffset = 11.0;
+	
+	
+	/*
+	//private double x = 0.0;
+	//private double y = 0.0;
+	//private double xOffset = 8.0;
+	//private double yOffset = 11.0;
+	/**/
 	//Pigeon IMU Data
 	
-	boolean tracking = false;
-	//Swerve Turning Gains
-	double kPgain = 0.02; /* percent throttle per degree of error */ //0.02
-	double kDgain = 0.00425; /* percent throttle per angular velocity dps */ //0.00425
-	double kPgainSmall = 0.008; //0.015
-	double kDgainSmall = 0.002; //0.002
-/* TODO Tune kPHeadingGain to prevent drift while driving */
-	double kPHeadingGain = 0.002;
-	double kDHeadingGain = 0.001;
-	double kMaxCorrectionRatio = 0.75; //0.75
-	double kMaxCorrectionRatioSmall = 0.18; //0.18
-	double kMaxCorrectionHeading    = 0.12;
 	
-	double rotationThreshHold = 10;
-	double rotationOnTarget = 0;
-	 /* cap corrective turning throttle to 30 percent of forward throttle */
-	
-	/* Stuff for tracking robot center */
-	/*
-	 * Aight, here's the important math:
-	 * 
-	 *  a: heading of robot, as returned by pigeon
-	 *  g: angle between front face of robot and center of robot
-	 *  r: distance between module center and robot center
-	 *  
-	 *  
-	 * 
-	 */
-	/**/
-	
-	double _targetAngle = 0.0;
-	private double allowableError = 2.0;
-	double rotationCorrection;
-	int _printLoops = 0;
-	private Intake intake;
-	private int onTargetThresh = 30;
-	private int onTarget = 0;
-	public void setHeading(double goal,boolean rotation){
+	public void setHeading(double goal,boolean rotation){		
 		if(rotation)
 			headingController = HeadingController.Rotation;
 		_targetAngle = continousAngle2(goal,intake.getCurrentAngle());
@@ -89,11 +65,11 @@ public class Swerve{
 	public HeadingController headingController = HeadingController.Off;
 	
 	public Swerve(){
+		intake = Intake.getInstance();		
 		frontLeft  = new SwerveDriveModule(Ports.FRONT_LEFT_ROTATION,Ports.FRONT_LEFT_DRIVE,2,Constants.FRONT_LEFT_TURN_OFFSET);
 		frontRight = new SwerveDriveModule(Ports.FRONT_RIGHT_ROTATION,Ports.FRONT_RIGHT_DRIVE,1,Constants.FRONT_RIGHT_TURN_OFFSET);
 		rearLeft   = new SwerveDriveModule(Ports.REAR_LEFT_ROTATION,Ports.REAR_LEFT_DRIVE,3,Constants.REAR_LEFT_TURN_OFFSET);
 		rearRight  = new SwerveDriveModule(Ports.REAR_RIGHT_ROTATION,Ports.REAR_RIGHT_DRIVE,4,Constants.REAR_RIGHT_TURN_OFFSET);
-		intake = Intake.getInstance();		
 	}
 	public static Swerve getInstance()
     {
@@ -105,11 +81,27 @@ public class Swerve{
 	public void swerveTrack(){
 		double adjust = intake.getCurrentAngle() - Vision.getAngle();
     	setHeading(adjust,false);
-    	tracking = true;
 	}
+	
+	
+	 /* cap corrective turning throttle to 30 percent of forward throttle */
+	
+	private double a;// = intake.getCurrentAngle();
+	private double robotX;
+	private double robotY;
+	private void refreshRobotAngle() {a = Math.toRadians(intake.getCurrentAngle());}
+	private void findRobotX() {robotX = frontLeft.getX()+ (Constants.RADIUS_CENTER_TO_MODULE * Math.cos(a+Constants.ANGLE_FRONT_MODULE_CENTER));}
+	private void findRobotY() {robotY = frontLeft.getY()- (Constants.RADIUS_CENTER_TO_MODULE * Math.sin(a+Constants.ANGLE_FRONT_MODULE_CENTER));}
+	public double getRobotX() {return robotX;}
+	public double getRobotY() {return robotY;}
+	public double getRobotXInch() {return robotX/Constants.DRIVE_TICKS_PER_INCH;}
+	public double getRobotYInch() {return robotY/Constants.DRIVE_TICKS_PER_INCH;}
+	/**/
+	
+	
+	
 	public void sendInput(double x, double y, double rotateX,double rotateY,boolean halfPower,boolean robotCentric,boolean moonManeuver){
 		
-		tracking = false;
 //		SmartDashboard.putNumber("X Stick", rotateX);
 //		SmartDashboard.putNumber("Y Stick", rotateY);
 		if(moonManeuver){
@@ -134,7 +126,7 @@ public class Swerve{
 			}else{
 				rotateInput = 0.0;
 			}
-			double angle = intake.getCurrentAngle()/180.0*Math.PI;
+			double angle = intake.getCurrentAngle()/180.0*Math.PI; // radians
 			double angleDiff = Math.abs(_targetAngle - intake.getCurrentAngle());
 			switch(headingController){
 			case Off:
@@ -142,27 +134,27 @@ public class Swerve{
 				break;
 			case Heading:
 				if(angleDiff > 0.5){
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * kPHeadingGain - (intake.currentAngularRate) * kDHeadingGain;
-					rotationCorrection = Cap(rotationCorrection, kMaxCorrectionHeading);
+					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * Constants.SWERVE_HEADING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_HEADING_GAIN_D;
+					rotationCorrection = Cap(rotationCorrection, Constants.SWERVE_MAX_CORRECTION_HEADING);
 				}else{
 				rotationCorrection = 0.0;
 				}
 				break;
 			case Rotation:				
 				if(angleDiff < 8){
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * kPgainSmall - (intake.currentAngularRate) * kDgainSmall;
-					rotationCorrection = Cap(rotationCorrection, kMaxCorrectionRatioSmall);
+					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * Constants.SWERVE_SMALL_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_SMALL_TURNING_GAIN_D;
+					rotationCorrection = Cap(rotationCorrection, Constants.SWERVE_SMALL_HEADING_MAX_CORRECTION_RATIO);
 				}else{
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * kPgain - (intake.currentAngularRate) * kDgain;
-					rotationCorrection = Cap(rotationCorrection, kMaxCorrectionRatio);
+					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * Constants.SWERVE_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_TURNING_GAIN_D;
+					rotationCorrection = Cap(rotationCorrection, Constants.SWERVE_HEADING_MAX_CORRECTION_RATIO);
 				}
-				if(angleDiff < rotationThreshHold){
+				if(angleDiff < Constants.SWERVE_ROTATION_HEADING_ON_TARGET_THRESHOLD){
 					rotationOnTarget--;
-					if(onTarget <= 0){
+					if(rotationOnTarget <= 0){ // `rotationOnTarget' was `onTarget'
 						headingController = HeadingController.Heading;
 					}
 				}else{
-					rotationOnTarget = rotationThreshHold;
+					rotationOnTarget = Constants.MIN_CYCLES_HEADING_ON_TARGET;
 				}
 				break;
 			case Reset:
@@ -190,9 +182,9 @@ public class Swerve{
 				rotateInput = rotateInput + rotationCorrection;
 			}else{
 				if(halfPower)
-					rotateInput = (rotateInput * rotationScaleFactor) + rotationCorrection;
+					rotateInput = (rotateInput * Constants.SWERVE_ROTATION_SCALE_FACTOR) + rotationCorrection;
 				else
-					rotateInput = (rotateInput * rotationScaleFactorFast) + rotationCorrection;
+					rotateInput = (rotateInput * Constants.SWERVE_ROTATION_SCALE_FACTOR_FAST) + rotationCorrection;
 			}		
 			if(robotCentric){
 				xInput = x;
@@ -290,10 +282,15 @@ public class Swerve{
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " dY ", dy*1000);
 	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (tick) ", x);
 	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (tick) ", y);
+	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (in) ", x/Constants.DRIVE_TICKS_PER_INCH);
+	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", y/Constants.DRIVE_TICKS_PER_INCH);
+	        
 			lastEncPosition = getCurrentEncPosition();
 		}
 		public double getX(){return x;}
 		public double getY(){return y;}
+		public double getXInch(){return x/Constants.DRIVE_TICKS_PER_INCH;}
+		public double getYInch(){return y/Constants.DRIVE_TICKS_PER_INCH;}
 		public void resetCoord(){
 			x = 0;
 			y = 0;
@@ -303,7 +300,7 @@ public class Swerve{
 			lastEncPosition = 0;
 			setCurrentEncPosition(0);
 			relativeTickZero = getCurrentEncPosition();
-			
+			initModule();
 		}
 		public void debugValues(){
 			if(wheelError() >= Constants.TURNING_DETECT_THRESHOLD) {isRotating = true;} else {isRotating = false;}
@@ -375,7 +372,15 @@ public class Swerve{
 		public double getCurrentAngle(){
 			return rotationMotor.get();
 		}
-		
+		public void initModule(){
+			/**/
+			x = /*-*/Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+			y = -Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+			/*/
+			x = -(Constants.WHEELBASE_WIDTH/2)*Constants.DRIVE_TICKS_PER_INCH;
+			y =  (Constants.WHEELBASE_LENGTH/2)*Constants.DRIVE_TICKS_PER_INCH;
+			/**/
+		}
 	}
 	
 	public void update(){
@@ -389,6 +394,15 @@ public class Swerve{
 		rearRight.updateCoord();
 		rearLeft.updateCoord();
 		
+		refreshRobotAngle();
+		findRobotX();
+		findRobotY();
+		SmartDashboard.putNumber("Robot X", getRobotX());
+		SmartDashboard.putNumber("Robot Y", getRobotY());
+
+		SmartDashboard.putNumber("Robot X (in) ", getRobotXInch());
+		SmartDashboard.putNumber("Robot Y (in) ", getRobotYInch());
+		
 //		SmartDashboard.putNumber("Target Heading", _targetAngle);
 //		SmartDashboard.putNumber("turnErr", Util.boundAngleNeg180to180Degrees(Util.boundAngle0to360Degrees(intake.getCurrentAngle())-_targetAngle)); // add bounding to [-180,180]
 		if(xInput == 0 && yInput == 0 && rotateInput == 0){
@@ -399,10 +413,10 @@ public class Swerve{
 		}
 		
 		else{
-			double A = xInput - rotateInput * (Constants.WHEELBASE_LENGTH / R);
-	        double B = xInput + rotateInput * (Constants.WHEELBASE_LENGTH / R);
-	        double C = yInput - rotateInput * (Constants.WHEELBASE_WIDTH / R);
-	        double D = yInput + rotateInput * (Constants.WHEELBASE_WIDTH / R);
+			double A = xInput - rotateInput * (Constants.WHEELBASE_LENGTH / Constants.SWERVE_R);
+	        double B = xInput + rotateInput * (Constants.WHEELBASE_LENGTH / Constants.SWERVE_R);
+	        double C = yInput - rotateInput * (Constants.WHEELBASE_WIDTH / Constants.SWERVE_R);
+	        double D = yInput + rotateInput * (Constants.WHEELBASE_WIDTH / Constants.SWERVE_R);
 	        
 	        double frontRightWheelSpeed = Math.sqrt((B * B) + (C * C));
 	        double frontLeftWheelSpeed  = Math.sqrt((B * B) + (D * D));
@@ -467,12 +481,14 @@ public class Swerve{
 	}*/
 	public void resetCoord(){
 		frontLeft.resetCoord();
+		robotX = 0;
+		robotY = 0;
 	}
 	public boolean headingOnTarget(){
-		if(Math.abs(_targetAngle - intake.getCurrentAngle()) < allowableError)
+		if(Math.abs(_targetAngle - intake.getCurrentAngle()) < Constants.HEADING_MAX_ERROR)
 			onTarget--;
 		else
-			onTarget = onTargetThresh;
+			onTarget = Constants.MIN_CYCLES_HEADING_ON_TARGET;
 		return onTarget <= 0;
 	}
 	public void updateCoord(){
