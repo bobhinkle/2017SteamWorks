@@ -38,8 +38,8 @@ public class Robot extends SampleRobot {
 /*	TODO The following two lines need to appear in the auto subroutines because they
  * 			each need to set their own start headings. Right?
  * */
-        robot.intake._pidgey.SetFusedHeading(90);
-        robot.dt.resetCoord();
+//        robot.intake._pidgey.SetFusedHeading(90);
+//        robot.dt.resetCoord();
 //        robot.intake._pidgey.
 /*        SmartDashboard.putBoolean("Manual Wheel Headings?", true);
 		SmartDashboard.putNumber("Manual Heading 1", 0); 
@@ -95,7 +95,9 @@ public class Robot extends SampleRobot {
     	    	
     	switch(autoSelect){
     	case TWO_GEAR:
- //   		setStartHeading(180);
+        	robot.intake._pidgey.SetFusedHeading(180.0);
+        	robot.dt.resetCoord();
+
     		// intake does something to get the gear?
         	dist.setGoal(0, 57, 0.2, 1.5, 0.8);
     		delay();
@@ -121,8 +123,10 @@ public class Robot extends SampleRobot {
     		
     		while(isAutonomous()){Timer.delay(1);}
     		break;
-    	case NEAR_HOPPER:
-//    		setStartHeading(270);
+    	case NEAR_HOPPER:    	
+    		robot.intake._pidgey.SetFusedHeading(90.0);
+    		robot.dt.resetCoord();
+
     		//Move in a positive y direction towards the gear peg
     		dist.setGoal(0, 50, 2.0, 5.0, 0.7); // (0,102)
     		delay();
