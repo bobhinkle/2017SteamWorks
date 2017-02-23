@@ -35,8 +35,11 @@ public class Robot extends SampleRobot {
         controllers = TeleController.getInstance();
         fsm = FSM.getInstance(); 
         dist = DistanceController.getInstance();
-        robot.intake._pidgey.SetFusedHeading(180);
-    	robot.dt.resetCoord();
+/*	TODO The following two lines need to appear in the auto subroutines because they
+ * 			each need to set their own start headings. Right?
+ * */
+        robot.intake._pidgey.SetFusedHeading(90);
+        robot.dt.resetCoord();
 //        robot.intake._pidgey.
 /*        SmartDashboard.putBoolean("Manual Wheel Headings?", true);
 		SmartDashboard.putNumber("Manual Heading 1", 0); 
@@ -70,6 +73,7 @@ public class Robot extends SampleRobot {
     }
     private void setStartHeading(double angle) {
     	robot.intake._pidgey.SetFusedHeading(angle);
+    	robot.dt.resetCoord();
 //    	robot.dt.setHeading(angle);
     }
 
@@ -91,10 +95,7 @@ public class Robot extends SampleRobot {
     	    	
     	switch(autoSelect){
     	case TWO_GEAR:
-    		//robot.intake._pidgey.SetFusedHeading(0.0);
-        	//robot.dt.setHeading(0.0,false);    
-        	//rotate(180);
-    		robot.intake._pidgey.SetFusedHeading(180);
+ //   		setStartHeading(180);
     		// intake does something to get the gear?
         	dist.setGoal(0, 57, 0.2, 1.5, 0.8);
     		delay();
@@ -121,18 +122,23 @@ public class Robot extends SampleRobot {
     		while(isAutonomous()){Timer.delay(1);}
     		break;
     	case NEAR_HOPPER:
-    		//Move in a positive x direction towards the gear peg
-    		dist.setGoal(97,robot.dt.frontLeft.getY(), 2.0,5.0, 0.7);
-    		//Move backward just a bit to place the gear on the peg
-    		dist.setGoal(robot.dt.frontLeft.getX(),-5, 2.0,5.0, 0.7);
-    		//Turn on the intake so as to collect as many balls as possible throughout autonomous
-    		robot.intake.intakeForward();
+//    		setStartHeading(270);
+    		//Move in a positive y direction towards the gear peg
+    		dist.setGoal(0, 50, 2.0, 5.0, 0.7); // (0,102)
+    		delay();
+    		//Move right just a bit to place the gear on the peg
+    		dist.setGoal(20, 50, 2.0,5.0, 0.7); // (15,102)
+    		delay();
+//    		//Turn on the intake so as to collect as many balls as possible throughout autonomous
+//    		robot.intake.intakeForward();
     		//Move forward and reach the hopper, deploying it in the process
-    		dist.setGoal(robot.dt.frontLeft.getX(),120, 2.0,5.0, 0.7);
+    		dist.setGoal(-10, 50, 2.0, 5.0, 0.7); //(-15,102)
+    		delay();
     		//Move in a positive x direction to fall in the path of the hopper's balls
-    		dist.setGoal(5,robot.dt.frontLeft.getY(), 2.0,5.0, 0.7);
-    		
-    		robot.intake.intakeStop();
+    		dist.setGoal(-10, 70, 2.0, 5.0, 0.7); //(-15,110)
+    		delay();
+    		while(isAutonomous()){Timer.delay(1);}
+//    		robot.intake.intakeStop();
     		break;
     	case OFF: break;
     	default: break;
