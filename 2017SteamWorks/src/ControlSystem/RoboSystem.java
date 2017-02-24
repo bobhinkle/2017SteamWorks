@@ -29,6 +29,7 @@ public class RoboSystem{
     public RoboSystem(){
     	
     	intake = Intake.getInstance();
+//    	intake._pidgey.SetFusedHeading(-90);							// OVER HERE wasn't commented
     	dt = Swerve.getInstance();
 //    	nav = Navigation.getInstance();
 //    	vision = Vision.getInstance();

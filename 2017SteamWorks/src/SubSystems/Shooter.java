@@ -1,8 +1,10 @@
 package SubSystems;        
 
 import com.ctre.CANTalon;
+import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.CANTalon.StatusFrameRate;
+import com.ctre.CANTalon.TalonControlMode;
 
-import ControlSystem.FSM.State;
 import Utilities.Constants;
 import Utilities.Ports;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,23 +18,24 @@ public class Shooter {
     private CANTalon motor1,motor2;
 	public Shooter(){
 		motor1 = new CANTalon(Ports.SHOOTER_MOTOR_MASTER);
-		/*absolutePosition = motor.getPulseWidthPosition() & 0xFFF;
-    	motor1.setEncPosition(absolutePosition);
+    	motor1.setEncPosition(0);
     	motor1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-    	motor1.reverseSensor(reversed);
-    	motor1.reverseOutput(true);
-    	motor1.configEncoderCodesPerRev(360);
+    	motor1.reverseSensor(true);
+    	motor1.reverseOutput(false);
+    	motor1.configEncoderCodesPerRev(4096/4);
     	motor1.configNominalOutputVoltage(+0f, -0f);
-    	motor1.configPeakOutputVoltage(0, -12f);
+    	motor1.configPeakOutputVoltage(12f, 0);
     	motor1.setAllowableClosedLoopErr(0); 
     	motor1.changeControlMode(TalonControlMode.Speed);
-    	motor1.set(0);        	
-    	//motor1.setPID(0.1, 0.0, 0.4, 0.050, 0, 0.0, 0);
+    	motor1.set(0);        
+//    	motor1.setStatusFrameRateMs(StatusFrameRate.QuadEncoder, 10);
+    	motor1.setPID(0.08, 0.0, 0.0, 0.033, 0, 0.0, 0);
     	//motor1.setPID(0.0, 0.0, 0.0, 0.05, 0, 0.0, 1);   */    
 		motor2 = new CANTalon(Ports.SHOOTER_MOTOR_SLAVE);
-		/*
+		
         motor2.changeControlMode(TalonControlMode.Follower);
-        motor2.set(Ports.SHOOTER_MOTOR_MASTER);*/
+        motor2.set(Ports.SHOOTER_MOTOR_MASTER);
+        motor2.reverseOutput(true);
 	}
 	public static Shooter getInstance()
     {
@@ -45,6 +48,7 @@ public class Shooter {
     	switch(status){
 		    case STARTED:
 		    	setSpeed(Constants.SHOOTING_SPEED);
+//		    	setSpeed(.90);
 		    	status = Status.WAITING;
 		    	break;
 		    case WAITING:
@@ -61,18 +65,21 @@ public class Shooter {
 		    default:
     	}
     	
-    	SmartDashboard.putNumber("SHOOTER_SPEED", motor1.getSpeed());
+    	SmartDashboard.putNumber("SHOOTER_SPEED", getSpeed());
 		SmartDashboard.putNumber("SHOOTER_TARGET", motor1.getSetpoint());
     }
     public void setSpeed(double speed){
     	motor1.set(speed);
-    	motor2.set(-speed);
+//    	motor2.set(-speed);
     }
     public void setState(Status newState){
     	status = Status.STARTED;
     }
     public void stop(){
     	status = Status.OFF;
+    }
+    public double getSpeed(){
+    	return motor1.getSpeed();
     }
     /*
     public void bumpUp(double increase){

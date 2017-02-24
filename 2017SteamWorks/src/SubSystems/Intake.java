@@ -13,9 +13,12 @@ public class Intake {
 	public CANTalon intakeLeft;
 	public CANTalon intakeRight;
 	private double currentAngle = 0.0;
-    public PigeonImu _pidgey;
+    private PigeonImu _pidgey;
     boolean angleIsGood = false;
     double currentAngularRate = 0.0;
+    public enum AnglePresets{
+		ZERO,NINETY,ONE_EIGHTY, TWO_SEVENTY
+	}
 	public Intake(){
 		intakeLeft = new CANTalon(Ports.INTAKE_MOTOR_L);
 		intakeLeft.configNominalOutputVoltage(12.0f, -12.0f);
@@ -82,5 +85,21 @@ public class Intake {
 	public void update(){
 		pigeonUpdate();
 		debugValues();
+	}
+	public void setPresetAngles(AnglePresets i){
+		switch(i){
+		case ZERO:
+			_pidgey.SetFusedHeading(0);
+			break;
+		case ONE_EIGHTY:
+			_pidgey.SetFusedHeading(180);
+			break;
+		case NINETY:
+			_pidgey.SetFusedHeading(270);
+			break;
+		case TWO_SEVENTY:
+			_pidgey.SetFusedHeading(90);
+			break;
+		}
 	}
 }

@@ -1,7 +1,9 @@
 package IO;import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
 import SubSystems.DistanceController;
+import SubSystems.Intake;
 import SubSystems.Shooter;
+import SubSystems.Swerve;
 import Utilities.Constants;
 import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -148,13 +150,14 @@ public class TeleController
         }
         
         if(driver.backButton.isHeld()){ 
-        	robot.intake._pidgey.SetFusedHeading(0.0);
+        	robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
         	robot.dt.setHeading(0.0,false);
         	
         }
         if(driver.backButton.isPressed()){
 //        	robot.shooter.setSpeed(0);
-        	robot.dt.resetCoord();
+        	robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+        	robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
         	dist.disable();
         	
         }

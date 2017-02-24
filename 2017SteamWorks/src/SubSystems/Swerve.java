@@ -29,7 +29,9 @@ public class Swerve{
 	private SwerveDriveModule rearRight;
 	
 	
-	
+	public enum AnglePresets{
+		ZERO,NINETY,ONE_EIGHTY, TWO_SEVENTY
+	}
 	/*
 	//private double x = 0.0;
 	//private double y = 0.0;
@@ -104,6 +106,7 @@ public class Swerve{
 		
 //		SmartDashboard.putNumber("X Stick", rotateX);
 //		SmartDashboard.putNumber("Y Stick", rotateY);
+		
 		if(moonManeuver){
 			headingController = HeadingController.Off;
 			yInput = 0.0;
@@ -195,6 +198,24 @@ public class Swerve{
 				xInput = (-y * Math.sin(angle)) + (x * Math.cos(angle));
 				yInput = tmp;			
 			}
+		}
+		SmartDashboard.putNumber("Target Heading", _targetAngle);
+		switch(headingController){
+		case Off:
+			SmartDashboard.putString("Heading Controller Test", "OFF");
+			break;
+		case Rotation:
+			SmartDashboard.putString("Heading Controller Test", "rotation");
+			break;
+		case Heading:
+			SmartDashboard.putString("Heading Controller Test", "Heading");
+			break;
+		case Reset:
+			SmartDashboard.putString("Heading Controller Test", "reset");
+			break;
+			default:
+				SmartDashboard.putString("Heading Controller Test", "default");
+				break;
 		}
 	}
 	
@@ -291,7 +312,7 @@ public class Swerve{
 		public double getY(){return y;}
 		public double getXInch(){return x/Constants.DRIVE_TICKS_PER_INCH;}
 		public double getYInch(){return y/Constants.DRIVE_TICKS_PER_INCH;}
-		public void resetCoord(){
+		public void resetCoord(AnglePresets i){
 			x = 0;
 			y = 0;
 			driveMotor.setEncPosition(0);
@@ -300,7 +321,7 @@ public class Swerve{
 			lastEncPosition = 0;
 			setCurrentEncPosition(0);
 			relativeTickZero = getCurrentEncPosition();
-			initModule();
+			initModule(i);
 		}
 		public void debugValues(){
 			if(wheelError() >= Constants.TURNING_DETECT_THRESHOLD) {isRotating = true;} else {isRotating = false;}
@@ -334,7 +355,6 @@ public class Swerve{
 			loadProperties();
 			moduleID = moduleNum;        
 			offSet = _offSet;
-			resetCoord();
 		}
 		
 		public void setGoal(double goalAngle)
@@ -372,15 +392,40 @@ public class Swerve{
 		public double getCurrentAngle(){
 			return rotationMotor.get();
 		}
-		public void initModule(){
-			//*
-			x = Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
-			y = -Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+		public void initModule(AnglePresets i){
+			switch(i){
+			case ZERO: //0
+				x = -Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+				y = Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+				break;
+			case NINETY: //90
+				y = Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+				x = Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+				break;
+			case ONE_EIGHTY: //180
+				x = Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+				y = -Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+				break;
+			case TWO_SEVENTY: //270
+				y = -Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+				x = -Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+				break;
+			}
+	// Second and third lines were not commented
+			/**/
+//			x = Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
+//			y = Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
 			/*/
 			x = -(Constants.WHEELBASE_WIDTH/2)*Constants.DRIVE_TICKS_PER_INCH;
 			y =  (Constants.WHEELBASE_LENGTH/2)*Constants.DRIVE_TICKS_PER_INCH;
 			/**/
-		}
+			/*x = 0;
+			y = 0;
+			findRobotX();
+			findRobotY();
+			x = 0-getRobotX();
+			y = 0-getRobotY();
+		*/}
 	}
 	
 	public void update(){
@@ -479,8 +524,8 @@ public class Swerve{
 		kDgain = _spareTalon.getD();
 		kMaxCorrectionRatio = _spareTalon.getF();
 	}*/
-	public void resetCoord(){
-		frontLeft.resetCoord();
+	public void resetCoord(AnglePresets i){
+		frontLeft.resetCoord(i);
 		robotX = 0;
 		robotY = 0;
 	}

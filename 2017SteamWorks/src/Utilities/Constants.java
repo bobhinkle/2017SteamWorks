@@ -69,7 +69,7 @@ public class Constants {
 	
 	public static final double STICK_DEAD_BAND = 0.2;
 	
-	public static final double SHOOTING_SPEED = 4000;
+	public static final double SHOOTING_SPEED = 3750;
 	public static final double SHOOTER_ERROR  = 100;
 	
 	public static final double GEAR_INTAKE_POWER = 1.0;
@@ -78,12 +78,30 @@ public class Constants {
 	//Distance Controller
 	public static final double DIST_CONTROLLER_P = 0.000040; //0.0000[23]5
 	public static final double DIST_CONTROLLER_D = 0.00001;
-	public static final double DIST_CONTROLLER_SMALL_P = 0.00003; //0.00003
+	public static final double DIST_CONTROLLER_SMALL_P = 0.000032; //0.00003
 	public static final double DIST_CONTROLLER_SMALL_D = 0.00002; //0
 	public static final double DIST_CONTROLLER_PID_THRESH = 5.0;
 	public static final int DIST_CONTROLLER_CYCLE_THRESH = 15;
 
 	public static final double RADIUS_CENTER_TO_MODULE = Math.sqrt(Math.pow(WHEELBASE_LENGTH/2, 2)+Math.pow(WHEELBASE_WIDTH/2, 2))*DRIVE_TICKS_PER_INCH;
+	
+	//Two Gear Auto
+	public static final double TWO_G_PEG_Y = 58.0;
+	public static final double TWO_G_PEG_X = 0.0;
+	public static final double TWO_G_PICKUP_Y = 30.0;
+	public static final double TWO_G_PICKUP_X = -30.0;
+	public static final double TWO_G_RETURN_Y = 62.0;
+	public static final double TWO_G_RETURN_X = -5.0;
+	
+	//Near Hopper Auto
+	public static final double NEAR_HOPPER_FIRST_Y = 72.0;
+	public static final double NEAR_HOPPER_FIRST_X = 0.0;
+	public static final double NEAR_HOPPER_PEG_Y = 97.0;
+	public static final double NEAR_HOPPER_PEG_X = 27.0;
+	public static final double NEAR_HOPPER_DEPLOY_X = -36.0;
+	public static final double NEAR_HOPPER_DEPLOY_Y = 90.0;
+	public static final double NEAR_HOPPER_PICKUP_Y = 103.0;
+	
 	
 	
 }
