@@ -37,8 +37,8 @@ public class DistanceController {
 		SmartDashboard.putNumber("Dist Target Y (in)", targetY/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber("Dist Pos X", currentPositionX/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber("Dist Pos Y", currentPositionY/Constants.DRIVE_TICKS_PER_INCH);
-		SmartDashboard.putNumber("Dist Error X", targetX - currentPositionX);
-		SmartDashboard.putNumber("Dist Error Y", targetY - currentPositionY);
+		SmartDashboard.putNumber("Dist Error X", (targetX - currentPositionX)/Constants.DRIVE_TICKS_PER_INCH);
+		SmartDashboard.putNumber("Dist Error Y", (targetY - currentPositionY)/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putBoolean("Dist On Target", isOnTarget());
 		if(isEnabled){
 			updateCurrentPos();
@@ -100,6 +100,7 @@ public class DistanceController {
 		allowableError = error*Constants.DRIVE_TICKS_PER_INCH;
 		timeout = (timeLimit * 1000) + System.currentTimeMillis();
 		inputCap = maxInput;
+//		SmartDashboard.putString("Dist Goal", "("+targetX+", "+targetY+")");
 		enable();
 	}
 	public void setOffsetGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput){

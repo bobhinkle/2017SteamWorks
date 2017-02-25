@@ -173,4 +173,19 @@ public class Util {
      	   return 0;
     	
     }
+    public static double continousAngle(double goal, double current){
+		double BGA = Util.boundAngle0to360Degrees(goal);			
+		double CA = current;
+		double BCA = Util.boundAngle0to360Degrees(CA);
+		double OA = BCA - 180.0;
+		double DA  = OA - BGA;
+		if(DA < -360){
+			DA = DA + 360;
+		}
+		if(DA > 0.0){
+			return CA + 180.0 - Math.abs(DA);
+		}else{
+			return CA - 180.0 + Math.abs(DA);
+		}
+	}
 }

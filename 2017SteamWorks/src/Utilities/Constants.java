@@ -69,7 +69,7 @@ public class Constants {
 	
 	public static final double STICK_DEAD_BAND = 0.2;
 	
-	public static final double SHOOTING_SPEED = 3750;
+	public static final double SHOOTING_SPEED = 3850;
 	public static final double SHOOTER_ERROR  = 100;
 	
 	public static final double GEAR_INTAKE_POWER = 1.0;
@@ -102,6 +102,49 @@ public class Constants {
 	public static final double NEAR_HOPPER_DEPLOY_Y = 90.0;
 	public static final double NEAR_HOPPER_PICKUP_Y = 103.0;
 	
-	
+	// Pose of the camera frame w.r.t. the turret frame
+    public static double kCameraXOffset = -6.454;
+    public static double kCameraYOffset = 0.0;
+    public static double kCameraZOffset = 19.75;
+    public static double kCameraPitchAngleDegrees = 35.75; // calibrated 4/22
+    public static double kCameraYawAngleDegrees = -1.0;
+    public static double kCameraDeadband = 0.0;
+    
+    public static double kCenterOfTargetHeight = 89.0; // inches
+    
+ // Pose of the turret frame w.r.t. the vehicle frame
+    public static double kTurretXOffset = -7.376;
+    public static double kTurretYOffset = 0.0;
+    public static double kTurretAngleOffsetDegrees = 0.0;
+    
+ // Goal tracker constants
+    public static double kMaxGoalTrackAge = 0.3;
+    public static double kMaxTrackerDistance = 18.0;
+    public static double kCameraFrameRate = 30.0;
+    public static double kTrackReportComparatorStablityWeight = 1.0;
+    public static double kTrackReportComparatorAgeWeight = 1.0;
+    public static double kTrackReportComparatorSwitchingWeight = 3.0;
+    public static double kTrackReportComparatorDistanceWeight = 2.0; // Unused
+
+    public static int kAndroidAppTcpPort = 8254;
+
+    public static double kLooperDt = 0.01;
+    
+ // Auto aiming/shooter constants
+    public static double kAutoAimMinRange = 10.0;
+    public static double kAutoAimMaxRange = 220.0;
+    public static double kAutoShootMaxDriveSpeed = 18.0;
+    public static double kAutoAimPredictionTime = 0.25;
+    public static int kAutoAimMinConsecutiveCyclesOnTarget = 3;
+    public static double kShootActuationTime = 0.75;
+    public static double kHoodUnstowToFlywheelSpinTime = 0.4;
+    public static double kLoadingTime = 0.5;
+    public static double kStowingOverrideTime = 2.0;
+    
+    public static double kTrackLengthInches = 8.265;
+    public static double kTrackWidthInches = 23.8;
+    public static double kTrackEffectiveDiameter = (kTrackWidthInches * kTrackWidthInches
+            + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
+    public static double kTrackScrubFactor = 0.5;
 	
 }

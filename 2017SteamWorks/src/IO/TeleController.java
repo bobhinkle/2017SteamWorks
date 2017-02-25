@@ -134,7 +134,7 @@ public class TeleController
         
         }
         if(driver.rightTrigger.isPressed()) {
-        	
+        	dist.setGoal(0, 10, 0, 4, 0.7); // added this line to help with putting the robot back after testing
         }
         
         if(driver.leftBumper.isPressed()){

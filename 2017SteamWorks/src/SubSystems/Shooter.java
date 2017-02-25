@@ -2,8 +2,8 @@ package SubSystems;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
-import com.ctre.CANTalon.StatusFrameRate;
 import com.ctre.CANTalon.TalonControlMode;
+import com.ctre.CANTalon.VelocityMeasurementPeriod;
 
 import Utilities.Constants;
 import Utilities.Ports;
@@ -24,15 +24,15 @@ public class Shooter {
     	motor1.reverseOutput(false);
     	motor1.configEncoderCodesPerRev(4096/4);
     	motor1.configNominalOutputVoltage(+0f, -0f);
-    	motor1.configPeakOutputVoltage(12f, 0);
+    	motor1.configPeakOutputVoltage(12f, -0f);
     	motor1.setAllowableClosedLoopErr(0); 
     	motor1.changeControlMode(TalonControlMode.Speed);
     	motor1.set(0);        
-//    	motor1.setStatusFrameRateMs(StatusFrameRate.QuadEncoder, 10);
-    	motor1.setPID(0.08, 0.0, 0.0, 0.033, 0, 0.0, 0);
-    	//motor1.setPID(0.0, 0.0, 0.0, 0.05, 0, 0.0, 1);   */    
+    	motor1.setPID(2, 0.00, 30, 0.023, 0, 0.0, 0); //p at 0.25 originally, 2p and 30d works well
+    	motor1.SetVelocityMeasurementPeriod(VelocityMeasurementPeriod.Period_10Ms);
+    	motor1.SetVelocityMeasurementWindow(32);
+    	
 		motor2 = new CANTalon(Ports.SHOOTER_MOTOR_SLAVE);
-		
         motor2.changeControlMode(TalonControlMode.Follower);
         motor2.set(Ports.SHOOTER_MOTOR_MASTER);
         motor2.reverseOutput(true);

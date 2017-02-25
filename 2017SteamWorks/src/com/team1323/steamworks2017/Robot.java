@@ -18,28 +18,31 @@ public class Robot extends SampleRobot {
 	private RoboSystem robot;
 	private TeleController controllers;
 	private FSM fsm;
-	final String defaultAuto = "off";
+	final String off = "off";
 	final String one_gear    = "one_gear";
 	final String two_gear    = "two_gear";
 	final String near_hopper = "near_hopper";
+	final String far_hopper  = "far_hopper";
 	SendableChooser autoSelect;
 	private DistanceController dist;
 	public static enum AUTO{
-    	OFF,ONE_GEAR,TWO_GEAR,NEAR_HOPPER
+    	OFF,ONE_GEAR,TWO_GEAR,NEAR_HOPPER,FAR_HOPPER
     }
-    public Robot() {
+    @SuppressWarnings("unchecked")
+	public Robot() {
     	autoSelect = new SendableChooser();
-        autoSelect.addDefault("Off", defaultAuto);
+        autoSelect.addDefault("Off", off);
         autoSelect.addObject("One_Gear", one_gear);
         autoSelect.addObject("Two_Gear", two_gear);
         autoSelect.addObject("Near_Hopper", near_hopper);
+        autoSelect.addObject("Far_Hopper", far_hopper);
         SmartDashboard.putData("Select Auto", autoSelect);  
         robot = RoboSystem.getInstance();
         controllers = TeleController.getInstance();
         fsm = FSM.getInstance(); 
         dist = DistanceController.getInstance();
-        robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
-    	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
+        robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
+    	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
 //        robot.intake._pidgey.
 /*        SmartDashboard.putBoolean("Manual Wheel Headings?", true);
 		SmartDashboard.putNumber("Manual Heading 1", 0); 
@@ -66,8 +69,11 @@ public class Robot extends SampleRobot {
     			case near_hopper:
     				executeAuto(AUTO.NEAR_HOPPER);
     				break;
-    			case defaultAuto:
-    				executeAuto(AUTO.NEAR_HOPPER);
+    			case far_hopper:
+    				executeAuto(AUTO.FAR_HOPPER);
+    				break;
+    			case off:
+    				executeAuto(AUTO.OFF);
     				break;
     		}
     }
@@ -93,6 +99,19 @@ public class Robot extends SampleRobot {
     public void executeAuto(AUTO autoSelect){
     	    	
     	switch(autoSelect){
+    	case ONE_GEAR:
+    		dist.setGoal(Constants.TWO_G_PEG_X, Constants.TWO_G_PEG_Y, 1, 5, 0.5);
+        	robot.turret.setAngle(65);
+    		delay();
+    		robot.shooter.setState(Shooter.Status.STARTED);
+    		robot.sweeper.forwardRoller();
+    		robot.sweeper.forwardSweeper();
+    		Timer.delay(5);
+    		robot.sweeper.stopRoller();
+    		robot.sweeper.stopSweeper();
+    		Timer.delay(1);
+    		robot.shooter.setState(Shooter.Status.OFF);
+    		break;
     	case TWO_GEAR:
     		//robot.intake._pidgey.SetFusedHeading(0.0);
         	//robot.dt.setHeading(0.0,false);    
@@ -161,6 +180,30 @@ public class Robot extends SampleRobot {
     		//dist.setGoal(5,robot.dt.frontLeft.getY(), 2.0,5.0, 0.7);
     		
     		//robot.intake.intakeStop();
+    		break;
+    	case FAR_HOPPER:
+    	// Deploy the intakes
+    		robot.intake.intakeReverse();
+    		robot.dt.setHeading(240, true);
+    		robot.turret.setAngle(-80);
+    		dist.setGoal(Constants.NEAR_HOPPER_FIRST_X, Constants.NEAR_HOPPER_FIRST_Y, 4.0, 3.0, 0.8);    		
+    		delay();
+    		//Move backward just a bit to place the gear on the peg
+    		dist.setGoal(Constants.NEAR_HOPPER_PEG_X-5, Constants.NEAR_HOPPER_PEG_Y, 3.0, 1.8, 0.8);
+    		robot.intake.intakeStop();
+    		delay();
+    		robot.dt.setHeading(270, true);
+    		dist.setGoal(Constants.NEAR_HOPPER_DEPLOY_X-17, Constants.NEAR_HOPPER_DEPLOY_Y, 3.0, 1.8, 0.9);
+    		delay();
+    		dist.setGoal(Constants.NEAR_HOPPER_DEPLOY_X+2, Constants.NEAR_HOPPER_PICKUP_Y, 0.5, 1, 0.9); // Y was Near Hopper Deploy Y
+    		delay();
+//    		robot.shooter.setState(Shooter.Status.STARTED);
+    		dist.setGoal(Constants.NEAR_HOPPER_DEPLOY_X-17, Constants.NEAR_HOPPER_PICKUP_Y, 0.7, 1.5, 0.9);
+    		delay();
+    		Timer.delay(1.5);
+//    		robot.dt.setHeading(180, true);
+//    		dist.setGoal(52.5/*+50*/, 20, 3.0, 4.0, 0.9);
+//    		delay();
     		break;
     	case OFF: break;
     	default: break;
