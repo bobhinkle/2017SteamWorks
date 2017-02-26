@@ -2,11 +2,14 @@ package com.team1323.steamworks2017;
 
 import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
+import Helpers.Looper;
 import IO.TeleController;
 import SubSystems.DistanceController;
 import SubSystems.Intake;
 import SubSystems.Shooter;
 import SubSystems.Swerve;
+import SubSystems.VisionProcessor;
+import SubSystems.VisionServer;
 import Utilities.Constants;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -15,9 +18,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class Robot extends SampleRobot {
-	private RoboSystem robot;
+	private RoboSystem robot = RoboSystem.getInstance();
 	private TeleController controllers;
-	private FSM fsm;
+	private FSM fsm = FSM.getInstance();
 	final String off = "off";
 	final String one_gear    = "one_gear";
 	final String two_gear    = "two_gear";
@@ -25,6 +28,11 @@ public class Robot extends SampleRobot {
 	final String far_hopper  = "far_hopper";
 	SendableChooser autoSelect;
 	private DistanceController dist;
+	VisionServer mVisionServer = VisionServer.getInstance();
+	// Enabled looper is called at 100Hz whenever the robot is enabled
+    Looper mEnabledLooper = new Looper();
+    // Disabled looper is called at 100Hz whenever the robot is disabled
+    Looper mDisabledLooper = new Looper();
 	public static enum AUTO{
     	OFF,ONE_GEAR,TWO_GEAR,NEAR_HOPPER,FAR_HOPPER
     }
@@ -43,6 +51,31 @@ public class Robot extends SampleRobot {
         dist = DistanceController.getInstance();
         robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
     	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
+        
+    	String autoSelected = (String) autoSelect.getSelected();
+    	SmartDashboard.putString("AutoSelected", autoSelected);
+    		switch(autoSelected){
+    			case one_gear:
+    	            robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+    	        	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
+    				break;
+    			case two_gear:
+    	            robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+    	        	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
+    				break;
+    			case near_hopper:
+    	            robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
+    	        	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
+    				break;
+    			case far_hopper:
+    	            robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
+    	        	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
+    				break;
+    			case off:
+    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+    				robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
+    				break;
+    		}
 //        robot.intake._pidgey.
 /*        SmartDashboard.putBoolean("Manual Wheel Headings?", true);
 		SmartDashboard.putNumber("Manual Heading 1", 0); 
@@ -51,8 +84,14 @@ public class Robot extends SampleRobot {
         SmartDashboard.putNumber("Manual Heading 4", 0);
 /**/        
     }
-    
 
+	@Override
+	public void robotInit() {
+		mVisionServer.addVisionUpdateReceiver(VisionProcessor.getInstance());
+		mEnabledLooper.register(VisionProcessor.getInstance());
+		VisionServer.getInstance();
+		mEnabledLooper.start();
+	}
     
     public void autonomous() {
     	String autoSelected = (String) autoSelect.getSelected();
@@ -61,18 +100,28 @@ public class Robot extends SampleRobot {
 //    	robot.dt.setHeading(0.0);
     		switch(autoSelected){
     			case one_gear:
+    	            //robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+    	        	//robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
     				executeAuto(AUTO.ONE_GEAR);
     				break;
     			case two_gear:
+    	        //    robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+    	      //  	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
     				executeAuto(AUTO.TWO_GEAR);
     				break;
     			case near_hopper:
+    	    //        robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
+    	  //      	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
     				executeAuto(AUTO.NEAR_HOPPER);
     				break;
     			case far_hopper:
+    	//            robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
+    //	        	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
     				executeAuto(AUTO.FAR_HOPPER);
     				break;
     			case off:
+//    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+  //  				robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
     				executeAuto(AUTO.OFF);
     				break;
     		}
@@ -201,9 +250,11 @@ public class Robot extends SampleRobot {
     		dist.setGoal(Constants.NEAR_HOPPER_DEPLOY_X-17, Constants.NEAR_HOPPER_PICKUP_Y, 0.7, 1.5, 0.9);
     		delay();
     		Timer.delay(1.5);
-//    		robot.dt.setHeading(180, true);
-//    		dist.setGoal(52.5/*+50*/, 20, 3.0, 4.0, 0.9);
-//    		delay();
+    		robot.dt.setHeading(180, true);
+    		dist.setGoal(50, 10, 3.0, 1.5, 0.9);	// extra waypoint to keep from running into the hexagon thing
+    		delay();
+    		dist.setGoal(52.5/*+50*/, 20, 3.0, 4.0, 0.9);
+    		delay();
     		break;
     	case OFF: break;
     	default: break;

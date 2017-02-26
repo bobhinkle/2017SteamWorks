@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="NetworkTables">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/wpilib/java/current/lib/NetworkTables.jar!/" />
+      <root url="jar://$USER_HOME$/wpilib/java/current/lib/json-simple-1.1.1.jar!/" />
+      <root url="jar://$USER_HOME$/wpilib/java/current/lib/opencv.jar!/" />
+      <root url="jar://$USER_HOME$/wpilib/java/current/lib/WPILib.jar!/" />
+      <root url="jar://$USER_HOME$/wpilib/java/current/lib/cscore.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

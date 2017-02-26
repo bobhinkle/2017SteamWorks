@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import IO.Logger;
 import Utilities.Constants;
 import Utilities.CrashTrackingRunnable;
 import edu.wpi.first.wpilibj.Timer;
@@ -33,7 +34,7 @@ public class VisionServer extends CrashTrackingRunnable {
     AdbBridge adb = new AdbBridge();
     double lastMessageReceivedTime = 0;
     private boolean m_use_java_time = false;
-
+    private Logger logger = Logger.getInstance();
     private ArrayList<ServerThread> serverThreads = new ArrayList<>();
     private volatile boolean mWantsAppRestart = false;
 
@@ -135,19 +136,23 @@ public class VisionServer extends CrashTrackingRunnable {
      */
     private VisionServer(int port) {
         try {
+        	logger.writeToLog("Starting Vision");
             adb = new AdbBridge();
             m_port = port;
             m_server_socket = new ServerSocket(port);
             adb.start();
             adb.reversePortForward(port, port);
+            logger.writeToLog("Vision Started");
             try {
                 String useJavaTime = System.getenv("USE_JAVA_TIME");
                 m_use_java_time = "true".equals(useJavaTime);
             } catch (NullPointerException e) {
                 m_use_java_time = false;
+                logger.writeToLog(e.toString());
             }
         } catch (IOException e) {
             e.printStackTrace();
+            logger.writeToLog(e.toString());
         }
         new Thread(this).start();
         new Thread(new AppMaintainanceThread()).start();

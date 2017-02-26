@@ -66,8 +66,8 @@ public class Swerve{
     }
 	
 	public void swerveTrack(){
-		double adjust = intake.getCurrentAngle() - Vision.getAngle();
-    	setHeading(adjust,false);
+//		double adjust = intake.getCurrentAngle() - Vision.getAngle();
+//    	setHeading(adjust,false);
 	}
 	
 	

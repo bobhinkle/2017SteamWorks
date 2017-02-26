@@ -1,13 +1,7 @@
 
 package ControlSystem;
 
-import SubSystems.GearIntake;
-import SubSystems.Intake;
-import SubSystems.Shooter;
-import SubSystems.Sweeper;
-import SubSystems.Swerve;
-import SubSystems.Turret;
-import SubSystems.VisionServer;
+import SubSystems.*;
 import Utilities.Ports;
 
 public class RoboSystem{
@@ -18,7 +12,7 @@ public class RoboSystem{
 	public Sweeper sweeper;
 	public Turret turret;
 	public GearIntake gearIntake;
-	VisionServer mVisionServer = VisionServer.getInstance();
+
     public static RoboSystem getInstance()
     {
         if( instance == null )

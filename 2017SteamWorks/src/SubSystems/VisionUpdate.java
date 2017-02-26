@@ -9,6 +9,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import IO.Logger;
+
+
 /**
  * VisionUpdate contains the various attributes outputted by the vision system,
  * namely a list of targets and the timestamp at which it was captured.
@@ -18,7 +21,7 @@ public class VisionUpdate {
     protected long capturedAgoMs;
     protected List<TargetInfo> targets;
     protected double capturedAtTimestamp = 0;
-
+    
     private static long getOptLong(Object n, long defaultValue) {
         if (n == null) {
             return defaultValue;
