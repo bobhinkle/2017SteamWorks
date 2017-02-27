@@ -134,7 +134,7 @@ public class TeleController
         
         }
         if(driver.rightTrigger.isPressed()) {
-        	dist.setGoal(0, 10, 0, 4, 0.7); // added this line to help with putting the robot back after testing
+//        	dist.setGoal(0, 10, 0, 4, 0.7); // added this line to help with putting the robot back after testing
         }
         
         if(driver.leftBumper.isPressed()){
@@ -181,7 +181,7 @@ public class TeleController
         	// This button will now be used to test starting orientations
  //       	robot.intake._pidgey.SetFusedHeading(180.0);
  //       	robot.dt.setHeading(0.0);
-        	dist.setGoal(0,/*-4*/0, 0, 5, 0.5);
+ //       	dist.setGoal(0,/*-4*/0, 0, 5, 0.5);
         }
 /**        if(robotCentric)
         	SmartDashboard.putString("RobotControl", "ROBOT");

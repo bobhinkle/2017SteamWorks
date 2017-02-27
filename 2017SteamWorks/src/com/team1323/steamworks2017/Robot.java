@@ -49,8 +49,8 @@ public class Robot extends SampleRobot {
         controllers = TeleController.getInstance();
         fsm = FSM.getInstance(); 
         dist = DistanceController.getInstance();
-        robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
-    	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
+        robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+    	robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
         
     	String autoSelected = (String) autoSelect.getSelected();
     	SmartDashboard.putString("AutoSelected", autoSelected);
@@ -197,7 +197,7 @@ public class Robot extends SampleRobot {
     		
     		break;
     	case NEAR_HOPPER:
-    		//Move in a positive x direction towards the gear peg
+    		//Move in a positive y direction towards the gear peg
     		robot.intake.intakeReverse();
     		robot.dt.setHeading(240, true);
     		robot.turret.setAngle(-80);
@@ -255,6 +255,14 @@ public class Robot extends SampleRobot {
     		delay();
     		dist.setGoal(52.5/*+50*/, 20, 3.0, 4.0, 0.9);
     		delay();
+    		robot.shooter.setState(Shooter.Status.STARTED);
+    		robot.sweeper.forwardRoller();
+    		robot.sweeper.forwardSweeper();
+    		Timer.delay(5);
+    		robot.sweeper.stopRoller();
+    		robot.sweeper.stopSweeper();
+    		Timer.delay(1);
+    		robot.shooter.setState(Shooter.Status.OFF);
     		break;
     	case OFF: break;
     	default: break;

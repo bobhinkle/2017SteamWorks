@@ -5,7 +5,8 @@ package Utilities;
  * @author Rohi Zacharia
  */
 public class Constants {
-    
+    public static double kBlueSideHopperX = -156.0;
+    public static double kBlueSideHopperY = 10.0;
     public static final boolean LOW_GEAR  = true; //Drivetrain low gear
     public static final double MIN_DT_POWER = 0.2;
     public static final double STARTING_ANGLE_OFFSET = 0;
@@ -103,14 +104,14 @@ public class Constants {
 	public static final double NEAR_HOPPER_PICKUP_Y = 103.0;
 	
 	// Pose of the camera frame w.r.t. the turret frame
-    public static double kCameraXOffset = -6.454;
+    public static double kCameraXOffset = 0;
     public static double kCameraYOffset = 0.0;
-    public static double kCameraZOffset = 19.75;
-    public static double kCameraPitchAngleDegrees = 35.75; // calibrated 4/22
-    public static double kCameraYawAngleDegrees = -1.0;
+    public static double kCameraZOffset = 16;
+    public static double kCameraPitchAngleDegrees = 25.5; // calibrated 4/22  35.75
+    public static double kCameraYawAngleDegrees = 2.5;
     public static double kCameraDeadband = 0.0;
     
-    public static double kCenterOfTargetHeight = 89.0; // inches
+    public static double kCenterOfTargetHeight = 86.0; // inches
     
  // Pose of the turret frame w.r.t. the vehicle frame
     public static double kTurretXOffset = -7.376;

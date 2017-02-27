@@ -12,6 +12,7 @@ import IO.Logger;
 import SubSystems.DistanceController;
 import SubSystems.TargetInfo;
 import Utilities.Constants;
+import Utilities.Util;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -45,6 +46,7 @@ public class FSM {
         pu = new partsUpdate();
     	pu.start();
     	dist = DistanceController.getInstance();
+    	reset(0, new RigidTransform2d(), new Rotation2d());
     }
    
     public class partsUpdate extends Thread{
@@ -76,6 +78,18 @@ public class FSM {
         
         }
     }
+    public synchronized void reset(double start_time, RigidTransform2d initial_field_to_vehicle,
+            Rotation2d initial_turret_rotation) {
+//        field_to_vehicle_ = new InterpolatingTreeMap<>(kObservationBufferSize);
+//        field_to_vehicle_.put(new InterpolatingDouble(start_time), initial_field_to_vehicle);
+//        vehicle_velocity_ = new RigidTransform2d.Delta(0, 0, 0);
+//        turret_rotation_ = new InterpolatingTreeMap<>(kObservationBufferSize);
+ //       turret_rotation_.put(new InterpolatingDouble(start_time), initial_turret_rotation);
+//        goal_tracker_ = new GoalTracker();
+        camera_pitch_correction_ = Rotation2d.fromDegrees(-Constants.kCameraPitchAngleDegrees);
+        camera_yaw_correction_ = Rotation2d.fromDegrees(-Constants.kCameraYawAngleDegrees);
+        differential_height_ = Constants.kCenterOfTargetHeight - Constants.kCameraZOffset;
+    }
     public void addVisionUpdate(double timestamp, List<TargetInfo> vision_update) {
     	
         List<Translation2d> field_to_goals = new ArrayList<>();
@@ -83,6 +97,8 @@ public class FSM {
         if (!(vision_update == null || vision_update.isEmpty())) {
         	SmartDashboard.putBoolean("VisionUpdate", true);
             for (TargetInfo target : vision_update) {
+            	SmartDashboard.putNumber("TargetX", target.getX());
+                SmartDashboard.putNumber("TargetY", target.getY());
                 double ydeadband = (target.getY() > -Constants.kCameraDeadband
                         && target.getY() < Constants.kCameraDeadband) ? 0.0 : target.getY();
 
@@ -90,18 +106,24 @@ public class FSM {
                 double xyaw = target.getX() * camera_yaw_correction_.cos() + ydeadband * camera_yaw_correction_.sin();
                 double yyaw = ydeadband * camera_yaw_correction_.cos() - target.getX() * camera_yaw_correction_.sin();
                 double zyaw = target.getZ();
-                
+                SmartDashboard.putNumber("TargetX_yaw", xyaw);
+                SmartDashboard.putNumber("TargetY_yaw", yyaw);
+                SmartDashboard.putNumber("TargetZ_yaw", zyaw);
                 // Compensate for camera pitch
                 double xr = zyaw * camera_pitch_correction_.sin() + xyaw * camera_pitch_correction_.cos();
                 double yr = yyaw;
                 double zr = zyaw * camera_pitch_correction_.cos() - xyaw * camera_pitch_correction_.sin();
-                SmartDashboard.putNumber("TargetX", target.getX());
-                SmartDashboard.putNumber("TargetY", target.getY());
+                SmartDashboard.putNumber("TargetX_yaw_pitch", xr);
+                SmartDashboard.putNumber("TargetY_yaw_pitch", yr);
                 // find intersection with the goal
                 if (zr > 0) {
                     double scaling = differential_height_ / zr;
                     double distance = Math.hypot(xr, yr) * scaling;
                     Rotation2d angle = new Rotation2d(xr, yr, true);
+                    SmartDashboard.putNumber("Target_hypot", Math.hypot(xr, yr));
+                    SmartDashboard.putNumber("Target_Angle", angle.getDegrees());
+                    robot.turret.moveDegrees(angle.getDegrees());
+                    SmartDashboard.putNumber("Target_distance", distance);
 //                    field_to_goals.add(field_to_camera
  //                           .transformBy(RigidTransform2d
  //                                   .fromTranslation(new Translation2d(distance * angle.cos(), distance * angle.sin())))
@@ -112,7 +134,11 @@ public class FSM {
         	SmartDashboard.putNumber("TargetX", 0);
             SmartDashboard.putNumber("TargetY", 0);
             SmartDashboard.putBoolean("VisionUpdate", false);
-            logger.writeToLog("Vision Update Fail");
+            double calculatedAngle = Math.atan((robot.dt.getRobotXInch()-Constants.kBlueSideHopperX)/(robot.dt.getRobotYInch()-Constants.kBlueSideHopperY));
+            SmartDashboard.putNumber("Est_Angle_Target", Math.toDegrees(calculatedAngle));
+            double robotAdjustedAngle = -Util.boundAngleNeg180to180Degrees(robot.intake.getCurrentAngle()-180 - Math.toDegrees(calculatedAngle));
+            SmartDashboard.putNumber("RobAdjustAngle", robotAdjustedAngle);
+            robot.turret.setAngle(robotAdjustedAngle);
         }
         synchronized (this) {
 //            goal_tracker_.update(timestamp, field_to_goals);

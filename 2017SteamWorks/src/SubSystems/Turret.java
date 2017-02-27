@@ -23,7 +23,7 @@ public class Turret {
     	motor.reverseOutput(true);
     	motor.configEncoderCodesPerRev(360);
     	motor.configNominalOutputVoltage(+0f, -0f);
-    	motor.configPeakOutputVoltage(+3f, -3f);
+    	motor.configPeakOutputVoltage(+6f, -6f);
     	motor.setAllowableClosedLoopErr(0); 
     	motor.changeControlMode(TalonControlMode.Position);
     	motor.set(0);
@@ -47,6 +47,13 @@ public class Turret {
 		if(angle < -Constants.TURRET_MAX_ANGLE)
 			angle = -Constants.TURRET_MAX_ANGLE;
 		motor.set(angle/Constants.TURRET_CLICKS_TO_ANGLE);
+	}
+	public void moveDegrees(double degree){
+		double newAngle = getAngle() - degree;
+		setAngle(newAngle);
+	}
+	public double getAngle(){
+		return motor.getPosition() * Constants.TURRET_CLICKS_TO_ANGLE;
 	}
 	public void update(){
 		SmartDashboard.putNumber("TURRET_ANGLE", motor.getPosition() * Constants.TURRET_CLICKS_TO_ANGLE);
