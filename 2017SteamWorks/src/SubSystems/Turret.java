@@ -23,7 +23,7 @@ public class Turret {
     	motor.reverseOutput(true);
     	motor.configEncoderCodesPerRev(360);
     	motor.configNominalOutputVoltage(+0f, -0f);
-    	motor.configPeakOutputVoltage(+6f, -6f);
+    	motor.configPeakOutputVoltage(+3f, -3f);
     	motor.setAllowableClosedLoopErr(0); 
     	motor.changeControlMode(TalonControlMode.Position);
     	motor.set(0);

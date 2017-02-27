@@ -16,26 +16,38 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
+/**
+ * The Robot class is based on the {@link SampleRobot}.
+ * */
 public class Robot extends SampleRobot {
 	private RoboSystem robot = RoboSystem.getInstance();
 	private TeleController controllers;
 	private FSM fsm = FSM.getInstance();
+	
 	final String off = "off";
 	final String one_gear    = "one_gear";
 	final String two_gear    = "two_gear";
 	final String near_hopper = "near_hopper";
 	final String far_hopper  = "far_hopper";
+	/** {@link SmartDashboard} field for selecting an autonomous subroutine to run */
 	SendableChooser autoSelect;
+	
+	/** {@link DistanceController} for sending autonomous or other pre-programmed
+	 * waypoints to the {@link Swerve drivetrain} */
 	private DistanceController dist;
+	
+	
 	VisionServer mVisionServer = VisionServer.getInstance();
-	// Enabled looper is called at 100Hz whenever the robot is enabled
+	/** Enabled looper is called at 100Hz whenever the robot is enabled */
     Looper mEnabledLooper = new Looper();
-    // Disabled looper is called at 100Hz whenever the robot is disabled
+    /** Disabled looper is called at 100Hz whenever the robot is disabled */
     Looper mDisabledLooper = new Looper();
+    
+    
 	public static enum AUTO{
     	OFF,ONE_GEAR,TWO_GEAR,NEAR_HOPPER,FAR_HOPPER
     }
+	
     @SuppressWarnings("unchecked")
 	public Robot() {
     	autoSelect = new SendableChooser();
@@ -44,7 +56,8 @@ public class Robot extends SampleRobot {
         autoSelect.addObject("Two_Gear", two_gear);
         autoSelect.addObject("Near_Hopper", near_hopper);
         autoSelect.addObject("Far_Hopper", far_hopper);
-        SmartDashboard.putData("Select Auto", autoSelect);  
+        SmartDashboard.putData("Select Auto", autoSelect);
+        
         robot = RoboSystem.getInstance();
         controllers = TeleController.getInstance();
         fsm = FSM.getInstance(); 
@@ -52,6 +65,7 @@ public class Robot extends SampleRobot {
         robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
     	robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
         
+    	/** Autonomous subroutine that the user has selected to run */
     	String autoSelected = (String) autoSelect.getSelected();
     	SmartDashboard.putString("AutoSelected", autoSelected);
     		switch(autoSelected){
@@ -92,7 +106,7 @@ public class Robot extends SampleRobot {
 		VisionServer.getInstance();
 		mEnabledLooper.start();
 	}
-    
+    /** The autonomous routine, which calls the selected autonomous subroutine */
     public void autonomous() {
     	String autoSelected = (String) autoSelect.getSelected();
 //    	robot.intake._pidgey.SetFusedHeading(180.0);

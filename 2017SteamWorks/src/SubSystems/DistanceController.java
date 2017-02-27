@@ -31,14 +31,14 @@ public class DistanceController {
 	}
 	public void update(){
 		SmartDashboard.putBoolean("Dist_Enabled", isEnabled);
-		SmartDashboard.putNumber("Dist Target X", targetX);
-		SmartDashboard.putNumber("Dist Target Y", targetY);
 		SmartDashboard.putNumber("Dist Target X (in)", targetX/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber("Dist Target Y (in)", targetY/Constants.DRIVE_TICKS_PER_INCH);
-		SmartDashboard.putNumber("Dist Pos X", currentPositionX/Constants.DRIVE_TICKS_PER_INCH);
-		SmartDashboard.putNumber("Dist Pos Y", currentPositionY/Constants.DRIVE_TICKS_PER_INCH);
-		SmartDashboard.putNumber("Dist Error X", (targetX - currentPositionX)/Constants.DRIVE_TICKS_PER_INCH);
-		SmartDashboard.putNumber("Dist Error Y", (targetY - currentPositionY)/Constants.DRIVE_TICKS_PER_INCH);
+		SmartDashboard.putNumber("Dist Pos X (in)", currentPositionX/Constants.DRIVE_TICKS_PER_INCH);
+		SmartDashboard.putNumber("Dist Pos Y (in)", currentPositionY/Constants.DRIVE_TICKS_PER_INCH);
+		SmartDashboard.putNumber("Dist Error X (in)", (targetX - currentPositionX)/Constants.DRIVE_TICKS_PER_INCH);
+		SmartDashboard.putNumber("Dist Error Y (in)", (targetY - currentPositionY)/Constants.DRIVE_TICKS_PER_INCH);
+		SmartDashboard.putNumber("distInputY", inputY); // this and next line were around line 60 or so,
+		SmartDashboard.putNumber("distInputX", inputX); //  after an else block
 		SmartDashboard.putBoolean("Dist On Target", isOnTarget());
 		if(isEnabled){
 			updateCurrentPos();
@@ -56,8 +56,7 @@ public class DistanceController {
 						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_SMALL_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_D;
 					}
 					
-					SmartDashboard.putNumber("distInputY", inputY);
-					SmartDashboard.putNumber("distInputX", inputX);
+
 					dt.sendInput(inputCap(inputX),inputCap(inputY) , 0, 0, false, false, false); // second false was true
 					lastDistanceY = currentPositionY;
 					lastDistanceX = currentPositionX;
@@ -83,32 +82,20 @@ public class DistanceController {
 	public boolean onTarget(){
 		return onTarget;
 	}
-/**	public void linearMotion(double goal, DistanceController.Direction direction, double error, double inputCap){
-    	int timeout = 0;
-    	dist.setGoal(goal, direction, error, inputCap);
-		while(!dist.onTarget() && (timeout < 300)){
-			Timer.delay(0.01);
-			timeout++;
-		}
-    }/**/
+
 	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput){
 		reset();
 		targetY = _goalY*Constants.DRIVE_TICKS_PER_INCH;// + currentPositionY;//dt.frontLeft.getY();
 		targetX = _goalX*Constants.DRIVE_TICKS_PER_INCH;// + currentPositionX;//dt.frontLeft.getX();
-		//targetY = (int) targetY;	// cast these doubles as ints because they're now in ticks or whatever
-		//targetX = (int) targetX;
 		allowableError = error*Constants.DRIVE_TICKS_PER_INCH;
 		timeout = (timeLimit * 1000) + System.currentTimeMillis();
 		inputCap = maxInput;
-//		SmartDashboard.putString("Dist Goal", "("+targetX+", "+targetY+")");
 		enable();
 	}
 	public void setOffsetGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput){
 		reset();
-		targetY = _goalY*Constants.DRIVE_TICKS_PER_INCH + dt.frontLeft.getY();// + currentPositionY;//dt.frontLeft.getY();
-		targetX = _goalX*Constants.DRIVE_TICKS_PER_INCH + dt.frontLeft.getX();// + currentPositionX;//dt.frontLeft.getX();
-		//targetY = (int) targetY;	// cast these doubles as ints because they're now in ticks or whatever
-		//targetX = (int) targetX;
+		targetY = _goalY*Constants.DRIVE_TICKS_PER_INCH + dt.getRobotY();//frontLeft.getY();// + currentPositionY;//dt.frontLeft.getY();
+		targetX = _goalX*Constants.DRIVE_TICKS_PER_INCH + dt.getRobotX();//frontLeft.getX();// + currentPositionX;//dt.frontLeft.getX();
 		allowableError = error*Constants.DRIVE_TICKS_PER_INCH;
 		timeout = (timeLimit * 1000) + System.currentTimeMillis();
 		inputCap = maxInput;

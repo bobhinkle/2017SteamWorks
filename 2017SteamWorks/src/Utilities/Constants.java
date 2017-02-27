@@ -70,7 +70,7 @@ public class Constants {
 	
 	public static final double STICK_DEAD_BAND = 0.2;
 	
-	public static final double SHOOTING_SPEED = 3500;
+	public static final double SHOOTING_SPEED = 3000;
 	public static final double SHOOTER_ERROR  = 100;
 	
 	public static final double GEAR_INTAKE_POWER = 1.0;

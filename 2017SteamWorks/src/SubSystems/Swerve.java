@@ -186,21 +186,11 @@ public class Swerve{
 		}
 		SmartDashboard.putNumber("Target Heading", _targetAngle);
 		switch(headingController){
-		case Off:
-			SmartDashboard.putString("Heading Controller Test", "OFF");
-			break;
-		case Rotation:
-			SmartDashboard.putString("Heading Controller Test", "rotation");
-			break;
-		case Heading:
-			SmartDashboard.putString("Heading Controller Test", "Heading");
-			break;
-		case Reset:
-			SmartDashboard.putString("Heading Controller Test", "reset");
-			break;
-			default:
-				SmartDashboard.putString("Heading Controller Test", "default");
-				break;
+			case Off: SmartDashboard.putString("Heading Controller Mode", "OFF"); break;
+			case Rotation: SmartDashboard.putString("Heading Controller Mode", "rotation"); break;
+			case Heading: SmartDashboard.putString("Heading Controller Mode", "Heading"); break;
+			case Reset: SmartDashboard.putString("Heading Controller Mode", "reset"); break;
+			default: SmartDashboard.putString("Heading Controller Mode", "default"); break;
 		}
 	}
 	
@@ -300,14 +290,14 @@ public class Swerve{
 			//Note #3
 //			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Angle (deg) ", Util.boundAngle0to360Degrees(getCurrentModuleAngle()));
 //			SmartDashboard.putNumber("DRV_" + Integer.toString(moduleID), driveMotor.get());
-			SmartDashboard.putNumber("OFF_" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(getCurrentAngle()/*-offSet*/));
+//			SmartDashboard.putNumber(Integer.toString(moduleID) + " Bearing ", Util.boundAngle0to360Degrees(getCurrentAngle()-offSet)); // `-offSet' was commented out
 //			SmartDashboard.putNumber("GOAL " + Integer.toString(moduleID), Util.boundAngle0to360Degrees(rotationMotor.getSetpoint()-(360-offSet)));
 //			SmartDashboard.putNumber("W_ERR" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(wheelError()));
-			SmartDashboard.putNumber(Integer.toString(moduleID)+ " Raw Encoder Clicks ", relativeTickCount()/*getCurrentEncPosition()*/);
+//			SmartDashboard.putNumber(Integer.toString(moduleID)+ " Raw Encoder Clicks ", relativeTickCount()/*getCurrentEncPosition()*/);
 //			SmartDashboard.putBoolean(Integer.toString(moduleID) + " Rotating ", isRotating());
 //			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Clicks ", getRotationOffsetClicks());
 //			SmartDashboard.putNumber(Integer.toString(moduleID) + " Driven Clicks ", getCurrentEncPosition() - getRotationOffsetClicks());
-			SmartDashboard.putNumber(Integer.toString(moduleID) + "Inches since last zero: ", getCurrentEncPosition()/Constants.DRIVE_TICKS_PER_INCH);//Constants.DRIVE_INCHES_PER_CLICK);
+//			SmartDashboard.putNumber(Integer.toString(moduleID) + "Inches since last zero: ", getCurrentEncPosition()/Constants.DRIVE_TICKS_PER_INCH);//Constants.DRIVE_INCHES_PER_CLICK);
 		}
 		public SwerveDriveModule(int rotationMotorPort, int driveMotorPort,int moduleNum,double _offSet){
 			rotationMotor = new CANTalon(rotationMotorPort);

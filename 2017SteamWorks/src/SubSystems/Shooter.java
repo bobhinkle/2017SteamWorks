@@ -27,8 +27,9 @@ public class Shooter {
     	motor1.configPeakOutputVoltage(12f, -0f);
     	motor1.setAllowableClosedLoopErr(0); 
     	motor1.changeControlMode(TalonControlMode.Speed);
-    	motor1.set(0);        
-    	motor1.setPID(2, 0.00, 30, 0.023, 0, 0.0, 0); //p at 0.25 originally, 2p and 30d works well
+    	motor1.set(0);    
+    	motor1.setPID(1.5, 0.00, 20, 0.032, 0, 0.0, 0);
+    	//motor1.setPID(2, 0.00, 30, 0.023, 0, 0.0, 0); //p at 0.25 originally, 2p and 30d works well
     	motor1.SetVelocityMeasurementPeriod(VelocityMeasurementPeriod.Period_10Ms);
     	motor1.SetVelocityMeasurementWindow(32);
     	

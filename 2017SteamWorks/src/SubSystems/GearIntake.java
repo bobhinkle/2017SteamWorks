@@ -38,7 +38,7 @@ public class GearIntake {
 		case INTAKE_EXTENDED:
 			gear.set(0);
 			shaft.set(true);
-			SmartDashboard.putString("GEAR_INTAKE", "INTAKE EXTENDED");
+			SmartDashboard.putString("GEAR_INTAKE", "EXTENDED");
 			break;
 		case GEAR_DETECT:
 			if(gear.getOutputCurrent() > Constants.GEAR_INTAKE_CURR_DETECT){
