@@ -11,6 +11,7 @@ import Helpers.Translation2d;
 import IO.Logger;
 import SubSystems.DistanceController;
 import SubSystems.TargetInfo;
+import SubSystems.Turret;
 import Utilities.Constants;
 import Utilities.Util;
 import edu.wpi.first.wpilibj.Timer;
@@ -68,7 +69,7 @@ public class FSM {
         robot.dt.update();
         robot.intake.update();
         robot.sweeper.SweeperDebug();
-        robot.turret.update();
+        robot.turret.update(robot.intake.getCurrentAngle());
         dist.update();
         robot.gearIntake.update();
         robot.shooter.update();
@@ -106,15 +107,10 @@ public class FSM {
                 double xyaw = target.getX() * camera_yaw_correction_.cos() + ydeadband * camera_yaw_correction_.sin();
                 double yyaw = ydeadband * camera_yaw_correction_.cos() - target.getX() * camera_yaw_correction_.sin();
                 double zyaw = target.getZ();
-                SmartDashboard.putNumber("TargetX_yaw", xyaw);
-                SmartDashboard.putNumber("TargetY_yaw", yyaw);
-                SmartDashboard.putNumber("TargetZ_yaw", zyaw);
                 // Compensate for camera pitch
                 double xr = zyaw * camera_pitch_correction_.sin() + xyaw * camera_pitch_correction_.cos();
                 double yr = yyaw;
                 double zr = zyaw * camera_pitch_correction_.cos() - xyaw * camera_pitch_correction_.sin();
-                SmartDashboard.putNumber("TargetX_yaw_pitch", xr);
-                SmartDashboard.putNumber("TargetY_yaw_pitch", yr);
                 // find intersection with the goal
                 if (zr > 0) {
                     double scaling = differential_height_ / zr;
@@ -122,8 +118,34 @@ public class FSM {
                     Rotation2d angle = new Rotation2d(xr, yr, true);
                     SmartDashboard.putNumber("Target_hypot", Math.hypot(xr, yr));
                     SmartDashboard.putNumber("Target_Angle", angle.getDegrees());
-                    robot.turret.moveDegrees(angle.getDegrees());
+                    double targetDirection = robot.turret.getAngle()-angle.getDegrees();
+                    SmartDashboard.putNumber("Angle to Target", targetDirection);
+                    double sine = Math.sin(Math.toRadians(270-targetDirection));
+                    SmartDashboard.putNumber("Target Sine", sine);
+                    double cosine = Math.cos(Math.toRadians(270-targetDirection));
+                    SmartDashboard.putNumber("Target Cosine", cosine);
+                    double Dx = cosine * distance;
+                    SmartDashboard.putNumber("Dx",Dx);
+                    double Dy = sine * distance;
+                    SmartDashboard.putNumber("Dy", Dy);
+                    double x_offset = Constants.kBlueSideHopperX - (Dx);
+                    double y_offset = Constants.kBlueSideHopperY - (Dy);
+                    SmartDashboard.putNumber("Target_offset_x", x_offset);
+                    SmartDashboard.putNumber("Target_offset_y", y_offset);
+                    if(robot.turret.getCurrentState() == Turret.State.VisionTracking){
+                    	robot.turret.moveDegrees(angle.getDegrees());
+             //       	robot.dt.setOffsets(x_offset, y_offset);
+                    }
+                    else if(robot.turret.getCurrentState() == Turret.State.CalculatedTracking){
+                    	double calculatedAngle = Math.atan((robot.dt.getRobotXInch()-Constants.kBlueSideHopperX)/(robot.dt.getRobotYInch()-Constants.kBlueSideHopperY));
+                        SmartDashboard.putNumber("Est_Angle_Target", Math.toDegrees(calculatedAngle));
+                        double robotAdjustedAngle = -Util.boundAngleNeg180to180Degrees(robot.intake.getCurrentAngle()-180 - Math.toDegrees(calculatedAngle));
+                        SmartDashboard.putNumber("RobAdjustAngle", robotAdjustedAngle);
+                        if(robot.turret.getCurrentState() == Turret.State.CalculatedTracking)
+                        	robot.turret.setAngle(robotAdjustedAngle);
+                    }
                     SmartDashboard.putNumber("Target_distance", distance);
+                    
 //                    field_to_goals.add(field_to_camera
  //                           .transformBy(RigidTransform2d
  //                                   .fromTranslation(new Translation2d(distance * angle.cos(), distance * angle.sin())))
@@ -138,7 +160,8 @@ public class FSM {
             SmartDashboard.putNumber("Est_Angle_Target", Math.toDegrees(calculatedAngle));
             double robotAdjustedAngle = -Util.boundAngleNeg180to180Degrees(robot.intake.getCurrentAngle()-180 - Math.toDegrees(calculatedAngle));
             SmartDashboard.putNumber("RobAdjustAngle", robotAdjustedAngle);
-            robot.turret.setAngle(robotAdjustedAngle);
+            if(robot.turret.getCurrentState() == Turret.State.CalculatedTracking)
+            	robot.turret.setAngle(robotAdjustedAngle);
         }
         synchronized (this) {
 //            goal_tracker_.update(timestamp, field_to_goals);

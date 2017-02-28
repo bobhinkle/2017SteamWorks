@@ -208,7 +208,6 @@ public class Robot extends SampleRobot {
     		robot.sweeper.stopSweeper();
     		Timer.delay(1);
     		robot.shooter.setState(Shooter.Status.OFF);
-    		
     		break;
     	case NEAR_HOPPER:
     		//Move in a positive y direction towards the gear peg

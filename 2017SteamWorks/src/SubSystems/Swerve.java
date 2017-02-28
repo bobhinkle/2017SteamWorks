@@ -76,6 +76,9 @@ public class Swerve{
 	private double a;// = intake.getCurrentAngle();
 	private double robotX;
 	private double robotY;
+
+	private double x_offset = 0.0;
+	private double y_offset = 0.0;
 	private void refreshRobotAngle() {a = Math.toRadians(intake.getCurrentAngle());}
 	private void findRobotX() {robotX = frontLeft.getX()+ (Constants.RADIUS_CENTER_TO_MODULE * Math.cos(a+Constants.ANGLE_FRONT_MODULE_CENTER));}
 	private void findRobotY() {robotY = frontLeft.getY()- (Constants.RADIUS_CENTER_TO_MODULE * Math.sin(a+Constants.ANGLE_FRONT_MODULE_CENTER));}
@@ -83,6 +86,11 @@ public class Swerve{
 	public double getRobotY() {return robotY;}
 	public double getRobotXInch() {return robotX/Constants.DRIVE_TICKS_PER_INCH;}
 	public double getRobotYInch() {return robotY/Constants.DRIVE_TICKS_PER_INCH;}
+	public double getX(){return getRobotXInch()+x_offset;}
+	public double getY(){return getRobotYInch()+y_offset;}
+	public void setOffsets(double _x, double _y){
+		x_offset = _x; y_offset = _y;
+	}
 	/**/
 	
 	

@@ -4,6 +4,7 @@ import SubSystems.DistanceController;
 import SubSystems.Intake;
 import SubSystems.Shooter;
 import SubSystems.Swerve;
+import SubSystems.Turret;
 import Utilities.Constants;
 import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -72,6 +73,8 @@ public class TeleController
     		robot.turret.setAngle(0);
     	}
     	if(coDriver.rightTrigger.isPressed()){
+    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
+    		robot.turret.setState(Turret.State.GyroComp);
     		robot.shooter.setState(Shooter.Status.STARTED);
     	}
     	if(coDriver.leftTrigger.isPressed()){
@@ -81,7 +84,11 @@ public class TeleController
     		robot.gearIntake.reverse();
     	}
     	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > Constants.STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -Constants.STICK_DEAD_BAND){
+    		robot.turret.setState(Turret.State.Manual);
     		robot.turret.manualControl(coDriver.getButtonAxis(Controller.RIGHT_STICK_X));
+    	}
+    	if(coDriver.yButton.buttonHoldTime() > 3){
+    		robot.turret.setState(Turret.State.VisionTracking);
     	}
     	if(coDriver.getPOV() == 270)
     		robot.turret.setAngle(-45);

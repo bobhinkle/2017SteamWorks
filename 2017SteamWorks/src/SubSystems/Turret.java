@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Turret {
 	private static Turret instance = null;
 	private CANTalon motor;
+	private double lockedAngle = 0.0;
+	private double lockedTurretAngle = 0.0;
 //	private int absolutePosition;
 	public Turret(){
 		motor = new CANTalon(Ports.TURRET);
@@ -30,11 +32,26 @@ public class Turret {
     	//motor.setPID(1.27, 0.0, 2, 0.0, 0, 0.0, 0);
 		
 	}
+	public enum State{
+		Off, VisionTracking,CalculatedTracking, Manual,GyroComp
+	}
+	public State currentState = State.Manual;
 	public static Turret getInstance(){
 		if(instance == null)
 			instance = new Turret();
 		return instance;
 	}	
+	public void setState(State newState){
+		currentState = newState;
+	}
+	public State getCurrentState(){
+		return currentState;
+	}
+	public void lockAngle(double newAngle){
+		lockedAngle = newAngle;
+		lockedTurretAngle = getAngle();
+	}
+	
 	public void manualControl(double input){
 		double newAngle = (motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE) + (input * 3.5);
 		setAngle(newAngle);		
@@ -55,8 +72,18 @@ public class Turret {
 	public double getAngle(){
 		return motor.getPosition() * Constants.TURRET_CLICKS_TO_ANGLE;
 	}
-	public void update(){
-		SmartDashboard.putNumber("TURRET_ANGLE", motor.getPosition() * Constants.TURRET_CLICKS_TO_ANGLE);
-		SmartDashboard.putNumber("TURRET_GOAL", motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE);
+	public double getGoal(){
+		return motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE;
+	}
+	public void update(double heading){
+		switch(currentState){
+		case GyroComp:
+			setAngle(lockedTurretAngle + (lockedAngle - heading));
+			break;
+		}
+		SmartDashboard.putNumber("Turret_LockedAngle", lockedTurretAngle);
+		SmartDashboard.putNumber("TurretLockedHeading", lockedAngle);
+		SmartDashboard.putNumber("TURRET_ANGLE1", getAngle());
+		SmartDashboard.putNumber("TURRET_GOAL", getGoal());
 	}
 }

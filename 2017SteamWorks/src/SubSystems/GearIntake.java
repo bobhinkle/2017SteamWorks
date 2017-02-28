@@ -19,7 +19,8 @@ public class GearIntake {
 	public GearIntake(int canPort, int solPort){
 		gear = new CANTalon(canPort);
 		gear.setCurrentLimit(100);
-		gear.setVoltageRampRate(24);
+		gear.setVoltageRampRate(36);
+		gear.enableBrakeMode(true);
 		shaft = new Solenoid(21,solPort);
 	}
 	public void update(){
@@ -42,7 +43,7 @@ public class GearIntake {
 			break;
 		case GEAR_DETECT:
 			if(gear.getOutputCurrent() > Constants.GEAR_INTAKE_CURR_DETECT){
-				gear.set(0.0);
+				gear.set(-0.2);
 				state = State.GEAR_DETECTED;
 			}
 			SmartDashboard.putString("GEAR_INTAKE", "WAITING FOR GEAR");

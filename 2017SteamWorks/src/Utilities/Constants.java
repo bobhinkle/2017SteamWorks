@@ -39,13 +39,13 @@ public class Constants {
     public static final double TURN_KP_TURN = 0.08;
     
 	//Swerve Turning Gains
-	public static final double SWERVE_TURNING_GAIN_P = 0.02; // percent throttle per degree of error 0.02
-	public static final double SWERVE_TURNING_GAIN_D = 0.00425; // percent throttle per angular velocity dps 0.00425
-	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.009; //0.015
+	public static final double SWERVE_TURNING_GAIN_P = 0.02; // 0.02 percent throttle per degree of error 0.02
+	public static final double SWERVE_TURNING_GAIN_D = 0.00425; // 0.00425percent throttle per angular velocity dps 0.00425
+	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.009; // 0.009; 0.015
 	public static final double SWERVE_SMALL_TURNING_GAIN_D = 0.002; //0.002
 	// TODO Tune kPHeadingGain (now SWERVE_HEADING_GAIN_P) to prevent drift while driving
-	public static final double SWERVE_HEADING_GAIN_P = 0.003; //0.002
-	public static final double SWERVE_HEADING_GAIN_D = 0.001;
+	public static final double SWERVE_HEADING_GAIN_P = 0.003; // 0.003; 0.002
+	public static final double SWERVE_HEADING_GAIN_D = 0.001; // 0.001
 	public static final double SWERVE_HEADING_MAX_CORRECTION_RATIO = 0.75; //0.75
 	public static final double SWERVE_SMALL_HEADING_MAX_CORRECTION_RATIO = 0.18; //0.18
 	public static final double SWERVE_MAX_CORRECTION_HEADING = 0.12;
@@ -70,11 +70,11 @@ public class Constants {
 	
 	public static final double STICK_DEAD_BAND = 0.2;
 	
-	public static final double SHOOTING_SPEED = 3000;
+	public static final double SHOOTING_SPEED = 3050;
 	public static final double SHOOTER_ERROR  = 100;
 	
-	public static final double GEAR_INTAKE_POWER = 1.0;
-	public static final double GEAR_INTAKE_CURR_DETECT = 50;
+	public static final double GEAR_INTAKE_POWER = -.75;
+	public static final double GEAR_INTAKE_CURR_DETECT = 30;
 	
 	//Distance Controller
 	public static final double DIST_CONTROLLER_P = 0.000040; //0.0000[23]5

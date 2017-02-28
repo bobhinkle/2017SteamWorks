@@ -19,24 +19,32 @@ public class Shooter {
 	public Shooter(){
 		motor1 = new CANTalon(Ports.SHOOTER_MOTOR_MASTER);
     	motor1.setEncPosition(0);
-    	motor1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+    	motor1.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
     	motor1.reverseSensor(true);
     	motor1.reverseOutput(false);
-    	motor1.configEncoderCodesPerRev(4096/4);
+//    	motor1.configEncoderCodesPerRev(4096/4);
     	motor1.configNominalOutputVoltage(+0f, -0f);
     	motor1.configPeakOutputVoltage(12f, -0f);
     	motor1.setAllowableClosedLoopErr(0); 
     	motor1.changeControlMode(TalonControlMode.Speed);
     	motor1.set(0);    
-    	motor1.setPID(1.5, 0.00, 20, 0.032, 0, 0.0, 0);
+    	motor1.setPID(4.0, 0.00, 40, 0.027, 0, 0.0, 0);
     	//motor1.setPID(2, 0.00, 30, 0.023, 0, 0.0, 0); //p at 0.25 originally, 2p and 30d works well
-    	motor1.SetVelocityMeasurementPeriod(VelocityMeasurementPeriod.Period_10Ms);
+    	
+    	motor1.setStatusFrameRateMs(CANTalon.StatusFrameRate.General,2);
+    	motor1.SetVelocityMeasurementPeriod(CANTalon.VelocityMeasurementPeriod.Period_10Ms);
     	motor1.SetVelocityMeasurementWindow(32);
+    	motor1.setNominalClosedLoopVoltage(12);
     	
 		motor2 = new CANTalon(Ports.SHOOTER_MOTOR_SLAVE);
         motor2.changeControlMode(TalonControlMode.Follower);
         motor2.set(Ports.SHOOTER_MOTOR_MASTER);
         motor2.reverseOutput(true);
+        
+        motor2.setStatusFrameRateMs(CANTalon.StatusFrameRate.General,2);
+    	motor2.SetVelocityMeasurementPeriod(CANTalon.VelocityMeasurementPeriod.Period_10Ms);
+    	motor2.SetVelocityMeasurementWindow(32);
+    	motor2.setNominalClosedLoopVoltage(12);
 	}
 	public static Shooter getInstance()
     {
