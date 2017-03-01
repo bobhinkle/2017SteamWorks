@@ -38,22 +38,20 @@ public class TeleController
    
     public void coDriver(){
     	if(coDriver.aButton.isPressed() || coDriver.aButton.isHeld()){
-    		if(coDriver.aButton.isHeld() && coDriver.aButton.buttonHoldTime() > 3){
+    		if(coDriver.aButton.isHeld() && coDriver.aButton.buttonHoldTime() > 1.5){
         		robot.gearIntake.grabGear();
         	}else{
         		robot.gearIntake.extend();
         	}    		
     	}
     	if(coDriver.bButton.isPressed() || coDriver.bButton.isHeld()){
-    		if(coDriver.bButton.isHeld() && coDriver.bButton.buttonHoldTime() > 3){
-        		robot.gearIntake.scoreGear();
-        	}else{
-//        		robot.gearIntake.retract();
-        	}    
+    		robot.gearIntake.retract();
     	}
     	if(coDriver.xButton.isPressed()){
-    		robot.sweeper.forwardRoller();
-    		robot.sweeper.forwardSweeper();
+    		robot.gearIntake.scoreGear();
+    	}
+    	if(coDriver.yButton.isPressed()){
+    		
     	}
     	if(coDriver.rightBumper.isPressed()){
     		robot.intake.intakeForward();
@@ -62,34 +60,38 @@ public class TeleController
     		robot.intake.intakeReverse();
     	}
     	if(coDriver.backButton.isPressed()){
-    		robot.sweeper.stopRoller();
-    		robot.sweeper.stopSweeper();
     		robot.intake.intakeStop();
-    		robot.shooter.setSpeed(0);
-    		robot.gearIntake.stop();
-   
+    		robot.shooter.stop();  		
+    		robot.turret.setState(Turret.State.VisionTracking);
+    		robot.gearIntake.retract();
     	}
     	if(coDriver.rightCenterClick.isPressed()){
     		robot.turret.setAngle(0);
     	}
-    	if(coDriver.rightTrigger.isPressed()){
-    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
-    		robot.turret.setState(Turret.State.GyroComp);
-    		robot.shooter.setState(Shooter.Status.STARTED);
+    	if(coDriver.rightTrigger.isHeld()){
+    		robot.intake.intakeStop();
+    		if(robot.shooter.getStatus() == Shooter.Status.READY){
+	    		robot.sweeper.forwardRoller();
+	    		robot.sweeper.forwardSweeper();
+    		}
+    	}else{
+    		robot.sweeper.stopRoller();
+    		robot.sweeper.stopSweeper();
     	}
     	if(coDriver.leftTrigger.isPressed()){
-    		robot.gearIntake.forward();
+    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
+    		robot.turret.setState(Turret.State.GyroComp);
+    		robot.shooter.setGoal(Constants.SHOOTING_SPEED);
+    		robot.shooter.setState(Shooter.Status.STARTED);
     	}
     	if(coDriver.startButton.isPressed()){
-    		robot.gearIntake.reverse();
+    		
     	}
     	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > Constants.STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -Constants.STICK_DEAD_BAND){
     		robot.turret.setState(Turret.State.Manual);
     		robot.turret.manualControl(coDriver.getButtonAxis(Controller.RIGHT_STICK_X));
     	}
-    	if(coDriver.yButton.buttonHoldTime() > 3){
-    		robot.turret.setState(Turret.State.VisionTracking);
-    	}
+    	
     	if(coDriver.getPOV() == 270)
     		robot.turret.setAngle(-45);
     	if(coDriver.getPOV() == 0)
@@ -145,31 +147,30 @@ public class TeleController
         }
         
         if(driver.leftBumper.isPressed()){
-        	robotCentric = false;
+//        	robotCentric = false;
         	//dist.setGoal(-30, DistanceController.Direction.X);
 //        	dist.setGoal(0,/*-4*/0, 0, 10, 0.5);
         }
         
         if(driver.rightBumper.isPressed()){            
-        	robotCentric = true;
+//        	robotCentric = true;
         	//dist.setGoal(30, DistanceController.Direction.X);
 //        	dist.setGoal(0, 36, 0, 10, 0.5);
         }
         
         if(driver.backButton.isHeld()){ 
         	robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
-        	robot.dt.setHeading(0.0,false);
-        	
+        	robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
+        	dist.disable();    
+        	robot.dt.setHeading(0, false);
         }
         if(driver.backButton.isPressed()){
 //        	robot.shooter.setSpeed(0);
-        	robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
-        	robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
-        	dist.disable();
-        	
+        	    	
         }
         if(driver.startButton.isPressed()){
-        	
+        	robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+        	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
         }
         
         if(driver.rightCenterClick.isPressed()){

@@ -16,6 +16,10 @@ public class Shooter {
 	}
     private Status status = Status.OFF;
     private CANTalon motor1,motor2;
+    double shooterGoal = 0.0;
+    public void setGoal(double goal){
+    	shooterGoal = goal;
+    }
 	public Shooter(){
 		motor1 = new CANTalon(Ports.SHOOTER_MOTOR_MASTER);
     	motor1.setEncPosition(0);
@@ -29,7 +33,7 @@ public class Shooter {
     	motor1.changeControlMode(TalonControlMode.Speed);
     	motor1.set(0);    
     	motor1.setPID(4.0, 0.00, 40, 0.027, 0, 0.0, 0);
-    	//motor1.setPID(2, 0.00, 30, 0.023, 0, 0.0, 0); //p at 0.25 originally, 2p and 30d works well
+    	//motor1.setPID(0, 0.00, 0, 0.0, 0, 0.0, 0); //p at 0.25 originally, 2p and 30d works well
     	
     	motor1.setStatusFrameRateMs(CANTalon.StatusFrameRate.General,2);
     	motor1.SetVelocityMeasurementPeriod(CANTalon.VelocityMeasurementPeriod.Period_10Ms);
@@ -56,7 +60,7 @@ public class Shooter {
     public void update(){
     	switch(status){
 		    case STARTED:
-		    	setSpeed(Constants.SHOOTING_SPEED);
+		    	setSpeed(shooterGoal);
 //		    	setSpeed(.90);
 		    	status = Status.WAITING;
 		    	break;
@@ -84,6 +88,10 @@ public class Shooter {
     public void setState(Status newState){
     	status = Status.STARTED;
     }
+    public Status getStatus(){
+    	return status;
+    }
+  
     public void stop(){
     	status = Status.OFF;
     }

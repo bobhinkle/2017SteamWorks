@@ -6,6 +6,7 @@ import com.ctre.CANTalon.TalonControlMode;
 
 import Utilities.Constants;
 import Utilities.Ports;
+import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Turret {
@@ -16,24 +17,22 @@ public class Turret {
 //	private int absolutePosition;
 	public Turret(){
 		motor = new CANTalon(Ports.TURRET);
-		//motor.configPeakOutputVoltage(+6f, -6f);
-		//motor.setCurrentLimit(8);
-//		absolutePosition = motor.getPulseWidthPosition() & 0xFFF;
     	motor.setEncPosition(0);
     	motor.setFeedbackDevice(FeedbackDevice.QuadEncoder);
     	motor.reverseSensor(false);
     	motor.reverseOutput(true);
     	motor.configEncoderCodesPerRev(360);
     	motor.configNominalOutputVoltage(+0f, -0f);
-    	motor.configPeakOutputVoltage(+3f, -3f);
+    	motor.configPeakOutputVoltage(+5f, -5f);
     	motor.setAllowableClosedLoopErr(0); 
     	motor.changeControlMode(TalonControlMode.Position);
     	motor.set(0);
-    	//motor.setPID(1.27, 0.0, 2, 0.0, 0, 0.0, 0);
-		
+    	motor.setPID(1.75, 0, 25, 0.0, 0, 0.0, 0);			//practice bot pid tuning
+		motor.enableBrakeMode(true);
+		motor.setNominalClosedLoopVoltage(12);
 	}
 	public enum State{
-		Off, VisionTracking,CalculatedTracking, Manual,GyroComp
+		Off, VisionTracking, CalculatedTracking, Manual, GyroComp
 	}
 	public State currentState = State.Manual;
 	public static Turret getInstance(){
@@ -81,9 +80,10 @@ public class Turret {
 			setAngle(lockedTurretAngle + (lockedAngle - heading));
 			break;
 		}
-		SmartDashboard.putNumber("Turret_LockedAngle", lockedTurretAngle);
-		SmartDashboard.putNumber("TurretLockedHeading", lockedAngle);
-		SmartDashboard.putNumber("TURRET_ANGLE1", getAngle());
+//		SmartDashboard.putNumber("Turret_LockedAngle", lockedTurretAngle);
+//		SmartDashboard.putNumber("TurretLockedHeading", lockedAngle);
+		SmartDashboard.putNumber("TURRET_ANGLE", getAngle());
 		SmartDashboard.putNumber("TURRET_GOAL", getGoal());
+		SmartDashboard.putNumber("TURRET_ERROR", getGoal()-getAngle());
 	}
 }

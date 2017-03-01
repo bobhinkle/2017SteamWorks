@@ -8,6 +8,8 @@ import SubSystems.DistanceController;
 import SubSystems.Intake;
 import SubSystems.Shooter;
 import SubSystems.Swerve;
+import SubSystems.Swerve.AnglePresets;
+import SubSystems.Turret;
 import SubSystems.VisionProcessor;
 import SubSystems.VisionServer;
 import Utilities.Constants;
@@ -63,12 +65,14 @@ public class Robot extends SampleRobot {
         fsm = FSM.getInstance(); 
         dist = DistanceController.getInstance();
         robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
-    	robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
+        Timer.delay(0.1);
+        robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
+    	
         
     	/** Autonomous subroutine that the user has selected to run */
     	String autoSelected = (String) autoSelect.getSelected();
     	SmartDashboard.putString("AutoSelected", autoSelected);
-    		switch(autoSelected){
+/*    		switch(autoSelected){
     			case one_gear:
     	            robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
     	        	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
@@ -89,7 +93,8 @@ public class Robot extends SampleRobot {
     				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
     				robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
     				break;
-    		}
+    	*///	}
+    	
 //        robot.intake._pidgey.
 /*        SmartDashboard.putBoolean("Manual Wheel Headings?", true);
 		SmartDashboard.putNumber("Manual Heading 1", 0); 
@@ -110,12 +115,18 @@ public class Robot extends SampleRobot {
     public void autonomous() {
     	String autoSelected = (String) autoSelect.getSelected();
 //    	robot.intake._pidgey.SetFusedHeading(180.0);
-//    	robot.dt.resetCoord();
+//    	robot.dt.resetCoord(AnglePresets.ONE_EIGHTY);
 //    	robot.dt.setHeading(0.0);
     		switch(autoSelected){
     			case one_gear:
-    	            //robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
-    	        	//robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
+    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+    		        Timer.delay(0.1);
+    		        robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
+    	            Timer.delay(0.1);
+    	            robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+    	            Timer.delay(0.1);
+    	            robot.dt.setHeading(180, true);
+    	        	robot.turret.setState(Turret.State.VisionTracking);
     				executeAuto(AUTO.ONE_GEAR);
     				break;
     			case two_gear:
@@ -140,19 +151,19 @@ public class Robot extends SampleRobot {
     				break;
     		}
     }
-    private void setStartHeading(double angle) {
+//    private void setStartHeading(double angle) {
  //   	robot.intake._pidgey.SetFusedHeading(angle);
 //    	robot.dt.setHeading(angle);
-    }
+//    }
 
-    public void rotate(double angle){
+/*    public void rotate(double angle){
     	long timeout = System.currentTimeMillis() + 1000;
     	robot.dt.setHeading(angle,true);
 		while(!robot.dt.headingOnTarget() && isAutonomous() && (timeout > System.currentTimeMillis())){
 			robot.dt.sendInput(0, 0, 0, 0, false, true, false);
 			Timer.delay(0.01);
 		}
-    }
+    }*/
     
     private void delay() {
 		while(!dist.onTarget() && isAutonomous()){
@@ -163,26 +174,37 @@ public class Robot extends SampleRobot {
     	    	
     	switch(autoSelect){
     	case ONE_GEAR:
-    		dist.setGoal(Constants.TWO_G_PEG_X, Constants.TWO_G_PEG_Y, 1, 5, 0.5);
-        	robot.turret.setAngle(65);
+    		robot.turret.setState(Turret.State.CalculatedTracking);
+    		dist.setGoal(Constants.TWO_G_PEG_X+1, Constants.TWO_G_PEG_Y + 6, 1, 5, 0.5);
+//        	robot.turret.setAngle(65);
     		delay();
+    		robot.turret.setState(Turret.State.VisionTracking);
+    		Timer.delay(1.5);
+    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
+    		robot.turret.setState(Turret.State.GyroComp);
+    		robot.shooter.setGoal(Constants.SHOOTING_SPEED_AUTO_MIDDLE);
     		robot.shooter.setState(Shooter.Status.STARTED);
+    		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
+    			Timer.delay(.01);
+    		}
     		robot.sweeper.forwardRoller();
     		robot.sweeper.forwardSweeper();
-    		Timer.delay(5);
+    		Timer.delay(3);
     		robot.sweeper.stopRoller();
     		robot.sweeper.stopSweeper();
     		Timer.delay(1);
-    		robot.shooter.setState(Shooter.Status.OFF);
+    		robot.shooter.stop();
     		break;
     	case TWO_GEAR:
     		//robot.intake._pidgey.SetFusedHeading(0.0);
         	//robot.dt.setHeading(0.0,false);    
         	//rotate(180);
     		// intake does something to get the gear?
+    		robot.turret.setState(Turret.State.CalculatedTracking);
         	dist.setGoal(Constants.TWO_G_PEG_X, Constants.TWO_G_PEG_Y, 1, 2, 0.9);
         	robot.turret.setAngle(65);
     		delay();
+    		robot.turret.setState(Turret.State.VisionTracking);
     		// reverse gear intake to score
     		// stop gear intake
     		robot.dt.setHeading(90, true);
@@ -197,8 +219,11 @@ public class Robot extends SampleRobot {
     		// move gear intake up
     		robot.dt.setHeading(180, true);
     		dist.setGoal(Constants.TWO_G_RETURN_X, Constants.TWO_G_RETURN_Y, 2, 3, 0.9);
+    		robot.turret.setState(Turret.State.GyroComp);
     		robot.shooter.setState(Shooter.Status.STARTED);
-    		delay();
+    		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
+    			Timer.delay(.01);
+    		}
     		// reverse gear intake to score
     		// stop gear intake
     		robot.sweeper.forwardRoller();
@@ -211,6 +236,7 @@ public class Robot extends SampleRobot {
     		break;
     	case NEAR_HOPPER:
     		//Move in a positive y direction towards the gear peg
+    		robot.turret.setState(Turret.State.CalculatedTracking);
     		robot.intake.intakeReverse();
     		robot.dt.setHeading(240, true);
     		robot.turret.setAngle(-80);
@@ -221,9 +247,14 @@ public class Robot extends SampleRobot {
     		robot.intake.intakeStop();
     		delay();
     		robot.dt.setHeading(270, true);
+    		robot.turret.setState(Turret.State.VisionTracking);
     		dist.setGoal(Constants.NEAR_HOPPER_DEPLOY_X, Constants.NEAR_HOPPER_DEPLOY_Y, 3.0, 4.0, 0.9);
     		delay();
+    		robot.turret.setState(Turret.State.GyroComp);
     		robot.shooter.setState(Shooter.Status.STARTED);
+    		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
+    			Timer.delay(.01);
+    		}
     		dist.setGoal(Constants.NEAR_HOPPER_DEPLOY_X, Constants.NEAR_HOPPER_PICKUP_Y, 3.0, 4.0, 0.9);
     		delay();
     		robot.sweeper.forwardRoller();
@@ -245,6 +276,7 @@ public class Robot extends SampleRobot {
     		break;
     	case FAR_HOPPER:
     	// Deploy the intakes
+    		robot.turret.setState(Turret.State.CalculatedTracking);
     		robot.intake.intakeReverse();
     		robot.dt.setHeading(240, true);
     		robot.turret.setAngle(-80);
@@ -255,6 +287,7 @@ public class Robot extends SampleRobot {
     		robot.intake.intakeStop();
     		delay();
     		robot.dt.setHeading(270, true);
+    		robot.turret.setState(Turret.State.VisionTracking);
     		dist.setGoal(Constants.NEAR_HOPPER_DEPLOY_X-17, Constants.NEAR_HOPPER_DEPLOY_Y, 3.0, 1.8, 0.9);
     		delay();
     		dist.setGoal(Constants.NEAR_HOPPER_DEPLOY_X+2, Constants.NEAR_HOPPER_PICKUP_Y, 0.5, 1, 0.9); // Y was Near Hopper Deploy Y
@@ -268,14 +301,18 @@ public class Robot extends SampleRobot {
     		delay();
     		dist.setGoal(52.5/*+50*/, 20, 3.0, 4.0, 0.9);
     		delay();
+    		robot.turret.setState(Turret.State.GyroComp);
     		robot.shooter.setState(Shooter.Status.STARTED);
+    		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
+    			Timer.delay(.01);
+    		}
     		robot.sweeper.forwardRoller();
     		robot.sweeper.forwardSweeper();
     		Timer.delay(5);
     		robot.sweeper.stopRoller();
     		robot.sweeper.stopSweeper();
     		Timer.delay(1);
-    		robot.shooter.setState(Shooter.Status.OFF);
+    		robot.shooter.stop();
     		break;
     	case OFF: break;
     	default: break;
@@ -284,7 +321,7 @@ public class Robot extends SampleRobot {
     
     public void operatorControl() {
     	dist.disable();
-//    	robot.dt.setHeading(0,false);
+    	robot.shooter.stop();
         while (isOperatorControl() && isEnabled()) {        	
         	controllers.update();
             Timer.delay(0.01);		//10ms Loop Rate

@@ -63,9 +63,16 @@ public class FSM {
         	keepRunning = false;
         }
     }
-
+    /** Calls the update functions in each of the following parts:
+     * <li>{@link SubSystems.Swerve#update() Swerve Drivetrain}</li>
+     * <li>{@link SubSystems.Intake#update() Ball Intakes and Pigeon}</li>
+     * <li>{@link SubSystems.Sweeper#SweeperDebug() Sweeper}</li>
+     * <li>{@link SubSystems.Turret#update(double) Turret}</li>
+     * <li>{@link SubSystems.DistanceController#update() Distance Controller}</li>
+     * <li>{@link SubSystems.GearIntake#update() Gear Intake}</li>
+     * <li>{@link SubSystems.Shooter#update() Shooter} (fly wheel)</li>
+     *  */
     public void update(){ 
-//    	robot.vision.update();
         robot.dt.update();
         robot.intake.update();
         robot.sweeper.SweeperDebug();
@@ -98,8 +105,8 @@ public class FSM {
         if (!(vision_update == null || vision_update.isEmpty())) {
         	SmartDashboard.putBoolean("VisionUpdate", true);
             for (TargetInfo target : vision_update) {
-            	SmartDashboard.putNumber("TargetX", target.getX());
-                SmartDashboard.putNumber("TargetY", target.getY());
+            	//SmartDashboard.putNumber("TargetX", target.getX());
+                //SmartDashboard.putNumber("TargetY", target.getY());
                 double ydeadband = (target.getY() > -Constants.kCameraDeadband
                         && target.getY() < Constants.kCameraDeadband) ? 0.0 : target.getY();
 
@@ -116,31 +123,32 @@ public class FSM {
                     double scaling = differential_height_ / zr;
                     double distance = Math.hypot(xr, yr) * scaling;
                     Rotation2d angle = new Rotation2d(xr, yr, true);
-                    SmartDashboard.putNumber("Target_hypot", Math.hypot(xr, yr));
-                    SmartDashboard.putNumber("Target_Angle", angle.getDegrees());
+//                    SmartDashboard.putNumber("Target_hypot", Math.hypot(xr, yr));
+//                    SmartDashboard.putNumber("Target_Angle", angle.getDegrees());
+                    /** The angle between the negative y-axis and a line connecting the turret to the goal */
                     double targetDirection = robot.turret.getAngle()-angle.getDegrees();
-                    SmartDashboard.putNumber("Angle to Target", targetDirection);
                     double sine = Math.sin(Math.toRadians(270-targetDirection));
-                    SmartDashboard.putNumber("Target Sine", sine);
                     double cosine = Math.cos(Math.toRadians(270-targetDirection));
-                    SmartDashboard.putNumber("Target Cosine", cosine);
                     double Dx = cosine * distance;
-                    SmartDashboard.putNumber("Dx",Dx);
                     double Dy = sine * distance;
-                    SmartDashboard.putNumber("Dy", Dy);
                     double x_offset = Constants.kBlueSideHopperX - (Dx);
                     double y_offset = Constants.kBlueSideHopperY - (Dy);
-                    SmartDashboard.putNumber("Target_offset_x", x_offset);
-                    SmartDashboard.putNumber("Target_offset_y", y_offset);
+//                    SmartDashboard.putNumber("Target_offset_x", x_offset);
+//                    SmartDashboard.putNumber("Target_offset_y", y_offset);
+//                    SmartDashboard.putNumber("Angle to Target", targetDirection);
+//                    SmartDashboard.putNumber("Target Sine", sine);
+//                    SmartDashboard.putNumber("Target Cosine", cosine);
+//                    SmartDashboard.putNumber("Dx",Dx);
+//                    SmartDashboard.putNumber("Dy", Dy);
                     if(robot.turret.getCurrentState() == Turret.State.VisionTracking){
                     	robot.turret.moveDegrees(angle.getDegrees());
-             //       	robot.dt.setOffsets(x_offset, y_offset);
+                    	robot.dt.setOffsets(x_offset, y_offset);
                     }
                     else if(robot.turret.getCurrentState() == Turret.State.CalculatedTracking){
                     	double calculatedAngle = Math.atan((robot.dt.getRobotXInch()-Constants.kBlueSideHopperX)/(robot.dt.getRobotYInch()-Constants.kBlueSideHopperY));
-                        SmartDashboard.putNumber("Est_Angle_Target", Math.toDegrees(calculatedAngle));
+//                        SmartDashboard.putNumber("Est_Angle_Target", Math.toDegrees(calculatedAngle));
                         double robotAdjustedAngle = -Util.boundAngleNeg180to180Degrees(robot.intake.getCurrentAngle()-180 - Math.toDegrees(calculatedAngle));
-                        SmartDashboard.putNumber("RobAdjustAngle", robotAdjustedAngle);
+//                        SmartDashboard.putNumber("RobAdjustAngle", robotAdjustedAngle);
                         if(robot.turret.getCurrentState() == Turret.State.CalculatedTracking)
                         	robot.turret.setAngle(robotAdjustedAngle);
                     }
@@ -153,15 +161,16 @@ public class FSM {
                 }
             }
         }else{
-        	SmartDashboard.putNumber("TargetX", 0);
-            SmartDashboard.putNumber("TargetY", 0);
+//        	SmartDashboard.putNumber("TargetX", 0);
+//           SmartDashboard.putNumber("TargetY", 0);
             SmartDashboard.putBoolean("VisionUpdate", false);
             double calculatedAngle = Math.atan((robot.dt.getRobotXInch()-Constants.kBlueSideHopperX)/(robot.dt.getRobotYInch()-Constants.kBlueSideHopperY));
-            SmartDashboard.putNumber("Est_Angle_Target", Math.toDegrees(calculatedAngle));
+//            SmartDashboard.putNumber("Est_Angle_Target", Math.toDegrees(calculatedAngle));
             double robotAdjustedAngle = -Util.boundAngleNeg180to180Degrees(robot.intake.getCurrentAngle()-180 - Math.toDegrees(calculatedAngle));
-            SmartDashboard.putNumber("RobAdjustAngle", robotAdjustedAngle);
+//            SmartDashboard.putNumber("RobAdjustAngle", robotAdjustedAngle);
             if(robot.turret.getCurrentState() == Turret.State.CalculatedTracking)
             	robot.turret.setAngle(robotAdjustedAngle);
+            SmartDashboard.putNumber("Target_distance",0);
         }
         synchronized (this) {
 //            goal_tracker_.update(timestamp, field_to_goals);

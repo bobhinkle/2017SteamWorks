@@ -41,7 +41,7 @@ public class Constants {
 	//Swerve Turning Gains
 	public static final double SWERVE_TURNING_GAIN_P = 0.02; // 0.02 percent throttle per degree of error 0.02
 	public static final double SWERVE_TURNING_GAIN_D = 0.00425; // 0.00425percent throttle per angular velocity dps 0.00425
-	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.009; // 0.009; 0.015
+	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.012; // 0.009; 0.015
 	public static final double SWERVE_SMALL_TURNING_GAIN_D = 0.002; //0.002
 	// TODO Tune kPHeadingGain (now SWERVE_HEADING_GAIN_P) to prevent drift while driving
 	public static final double SWERVE_HEADING_GAIN_P = 0.003; // 0.003; 0.002
@@ -71,10 +71,11 @@ public class Constants {
 	public static final double STICK_DEAD_BAND = 0.2;
 	
 	public static final double SHOOTING_SPEED = 3050;
+	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 100;
 	
-	public static final double GEAR_INTAKE_POWER = -.75;
-	public static final double GEAR_INTAKE_CURR_DETECT = 30;
+	public static final double GEAR_INTAKE_POWER = -.85;
+	public static final double GEAR_INTAKE_CURR_DETECT = 40;
 	
 	//Distance Controller
 	public static final double DIST_CONTROLLER_P = 0.000040; //0.0000[23]5
@@ -83,7 +84,7 @@ public class Constants {
 	public static final double DIST_CONTROLLER_SMALL_D = 0.00002; //0
 	public static final double DIST_CONTROLLER_PID_THRESH = 5.0;
 	public static final int DIST_CONTROLLER_CYCLE_THRESH = 15;
-
+/** Distance from the robot's center to each wheel module */
 	public static final double RADIUS_CENTER_TO_MODULE = Math.sqrt(Math.pow(WHEELBASE_LENGTH/2, 2)+Math.pow(WHEELBASE_WIDTH/2, 2))*DRIVE_TICKS_PER_INCH;
 	
 	//Two Gear Auto
@@ -108,7 +109,7 @@ public class Constants {
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 16;
     public static double kCameraPitchAngleDegrees = 25.5; // calibrated 4/22  35.75
-    public static double kCameraYawAngleDegrees = 2.5;
+    public static double kCameraYawAngleDegrees = 3;  //2.5
     public static double kCameraDeadband = 0.0;
     
     public static double kCenterOfTargetHeight = 86.0; // inches

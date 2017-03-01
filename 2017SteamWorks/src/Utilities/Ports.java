@@ -32,5 +32,5 @@ public class Ports {
     
     ///SOLENOIDS
     
-    public static final int INTAKE_ARM  		= 1;
+    public static final int INTAKE_ARM  		= 0;
 }
