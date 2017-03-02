@@ -49,9 +49,9 @@ public class Intake {
 			_pidgey.GetRawGyro(xyz_dps);
 			angleIsGood = (_pidgey.GetState() == PigeonState.Ready) ? true : false;
 			currentAngularRate = -xyz_dps[2];
-			SmartDashboard.putNumber("Pigeon_CA", currentAngle);
-			SmartDashboard.putNumber(" Pigeon Rate ", currentAngularRate);
-			SmartDashboard.putBoolean("PigeonGood", angleIsGood);
+//			SmartDashboard.putNumber(" Heading Angle ", currentAngle); // moved to Swerve.update()
+//			SmartDashboard.putNumber(" Pigeon Rate ", currentAngularRate);
+			SmartDashboard.putBoolean(" Pigeon Good ", angleIsGood);
 		}catch(Exception e){
 			System.out.println(e);
 		}
@@ -79,8 +79,8 @@ public class Intake {
 		intakeRight.set(0);
 	}
 	public void debugValues(){
-		SmartDashboard.putNumber("INTAKE_L_C", intakeLeft.getOutputCurrent());
-		SmartDashboard.putNumber("INTAKE_R_C", intakeRight.getOutputCurrent());
+		SmartDashboard.putNumber(" Intake Left Current ", intakeLeft.getOutputCurrent());
+		SmartDashboard.putNumber(" Intake Right Current ", intakeRight.getOutputCurrent());
 	}
 	public void update(){
 		pigeonUpdate();

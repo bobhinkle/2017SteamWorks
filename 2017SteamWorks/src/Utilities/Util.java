@@ -1,6 +1,7 @@
 package Utilities;
 
 import java.util.List;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class Util {
@@ -188,4 +189,36 @@ public class Util {
 			return CA - 180.0 + Math.abs(DA);
 		}
 	}
+    
+    
+    public static void sdClosedLoop(String subSystem, String varType, double processVariable, double setPoint, boolean showGraph, boolean showCurrent, double current) { // *** NEW! ***
+    	/*if(showGraph) SmartDashboard.putNumber(subSystem+" "+varType+" Graph", processVariable);
+    	SmartDashboard.putNumber(" "+subSystem+" "+varType+" ", processVariable);
+       	SmartDashboard.putNumber(" "+subSystem+" Set Point ", setPoint);
+    	SmartDashboard.putNumber(" "+subSystem+" Error ",setPoint-processVariable);
+    	if(showCurrent) SmartDashboard.putNumber(" "+subSystem+" Current ", current);*/
+    }
+    public static void sdSimpleClosedLoop(String subSystem, String varType, double processVariable, double setPoint) {
+    	sdClosedLoop(subSystem,varType,processVariable,setPoint,false,false,0);
+    }
+    /**
+     * For a closed-loop system, posts a given process variable, set point, and error to the {@link SmartDashboard}.
+     *  The process variable is posted twice: once for a text/formatted field, once for a graph.
+     *  
+     *  @param subSystem name of the closed loop
+     *  @param varType what kind of value the process variable is
+     *  @param processVariable the current value of the closed loop
+     *  @param setPoint the desired value for the closed loop
+     * */
+    public static void sdGraphClosedLoop(String subSystem, String varType, double processVariable, double setPoint) { // *** NEW! ***
+    	sdClosedLoop(subSystem,varType,processVariable,setPoint,true,false,0);
+    }
+    public static void sdCurrentClosedLoop(String subSystem, String varType, double processVariable, double setPoint, double current) { // *** NEW! ***
+    	sdClosedLoop(subSystem,varType,processVariable,setPoint,false,true,current);
+    }
+    public static void sdVerboseClosedLoop(String subSystem, String varType, double processVariable, double setPoint, double current) { // *** NEW! ***
+    	sdClosedLoop(subSystem,varType,processVariable,setPoint,true,true,current);
+    }
+    
+    
 }

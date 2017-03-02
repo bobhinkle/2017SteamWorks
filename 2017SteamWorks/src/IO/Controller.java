@@ -5,7 +5,6 @@ import java.util.TimerTask;
 
 import Utilities.Util;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Controller extends Joystick
 {
@@ -73,7 +72,6 @@ public class Controller extends Joystick
         public void run() {
             while (true) {
                 try {
-                	SmartDashboard.putString("FSM", "STARTED");
                 	init();
                     break;
                 } catch (Exception e) {

@@ -1,13 +1,14 @@
 package IO;import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
 import SubSystems.DistanceController;
+import SubSystems.GearIntake;
 import SubSystems.Intake;
 import SubSystems.Shooter;
 import SubSystems.Swerve;
 import SubSystems.Turret;
 import Utilities.Constants;
 import Utilities.Util;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added?
  
 public class TeleController
 {
@@ -48,10 +49,13 @@ public class TeleController
     		robot.gearIntake.retract();
     	}
     	if(coDriver.xButton.isPressed()){
-    		robot.gearIntake.scoreGear();
+    		
     	}
     	if(coDriver.yButton.isPressed()){
-    		
+    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
+    		robot.turret.setState(Turret.State.GyroComp);
+    		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
+    		robot.shooter.setState(Shooter.Status.STARTED);
     	}
     	if(coDriver.rightBumper.isPressed()){
     		robot.intake.intakeForward();
@@ -62,21 +66,20 @@ public class TeleController
     	if(coDriver.backButton.isPressed()){
     		robot.intake.intakeStop();
     		robot.shooter.stop();  		
+    		robot.sweeper.stopRoller();
+    		robot.sweeper.stopSweeper();
     		robot.turret.setState(Turret.State.VisionTracking);
-    		robot.gearIntake.retract();
+    		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED)
+    			robot.gearIntake.setState(GearIntake.State.INTAKE_EXTENDED_OFF);
     	}
     	if(coDriver.rightCenterClick.isPressed()){
     		robot.turret.setAngle(0);
     	}
-    	if(coDriver.rightTrigger.isHeld()){
+    	if(coDriver.rightTrigger.isPressed()){
     		robot.intake.intakeStop();
-    		if(robot.shooter.getStatus() == Shooter.Status.READY){
-	    		robot.sweeper.forwardRoller();
-	    		robot.sweeper.forwardSweeper();
-    		}
-    	}else{
-    		robot.sweeper.stopRoller();
-    		robot.sweeper.stopSweeper();
+    		robot.sweeper.forwardRoller();
+	    	robot.sweeper.forwardSweeper();
+    		
     	}
     	if(coDriver.leftTrigger.isPressed()){
     		robot.turret.lockAngle(robot.intake.getCurrentAngle());
@@ -121,6 +124,9 @@ public class TeleController
     	if(driver.yButton.isPressed()){
         	robot.dt.setHeading(0,true);
         }
+    	if(driver.rightTrigger.isPressed()){
+    		robot.gearIntake.scoreGear();
+    	}
         if(driver.startButton.isHeld()){
         	robot.dt.swerveTrack();
         	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
@@ -129,16 +135,22 @@ public class TeleController
             		Util.turnControlSmoother(0),
             		driver.leftTrigger.isHeld(),
             		robotCentric,
-            		 driver.rightTrigger.isHeld());
+            		 false);
         }else{ 
         	if(!dist.isEnabled()){ 
+        	/*	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
+                		Util.controlSmoother(-driver.getButtonAxis(Xbox.LEFT_STICK_Y)),0,
+                		0,
+                		driver.leftTrigger.isHeld(),
+                		robotCentric,
+                		 false);*/
         		robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
                 		Util.controlSmoother(-driver.getButtonAxis(Xbox.LEFT_STICK_Y)), 
                 		Util.turnControlSmoother(driver.getButtonAxis(Xbox.RIGHT_STICK_X)),
                 		Util.turnControlSmoother(driver.getButtonAxis(Xbox.RIGHT_STICK_Y)),
                 		driver.leftTrigger.isHeld(),
                 		robotCentric,
-                		 driver.rightTrigger.isHeld());
+                		 false);
         	}
         
         }
@@ -191,7 +203,7 @@ public class TeleController
  //       	robot.dt.setHeading(0.0);
  //       	dist.setGoal(0,/*-4*/0, 0, 5, 0.5);
         }
-/**        if(robotCentric)
+/*        if(robotCentric)
         	SmartDashboard.putString("RobotControl", "ROBOT");
         else
             SmartDashboard.putString("RobotControl","FIELD");

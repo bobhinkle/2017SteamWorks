@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends SampleRobot {
 	private RoboSystem robot = RoboSystem.getInstance();
 	private TeleController controllers;
+	@SuppressWarnings("unused")
 	private FSM fsm = FSM.getInstance();
 	
 	final String off = "off";
@@ -32,7 +33,7 @@ public class Robot extends SampleRobot {
 	final String near_hopper = "near_hopper";
 	final String far_hopper  = "far_hopper";
 	/** {@link SmartDashboard} field for selecting an autonomous subroutine to run */
-	SendableChooser autoSelect;
+	SendableChooser<String> autoSelect;
 	
 	/** {@link DistanceController} for sending autonomous or other pre-programmed
 	 * waypoints to the {@link Swerve drivetrain} */
@@ -50,15 +51,14 @@ public class Robot extends SampleRobot {
     	OFF,ONE_GEAR,TWO_GEAR,NEAR_HOPPER,FAR_HOPPER
     }
 	
-    @SuppressWarnings("unchecked")
-	public Robot() {
-    	autoSelect = new SendableChooser();
+    public Robot() {
+    	autoSelect = new SendableChooser<String>();
         autoSelect.addDefault("Off", off);
         autoSelect.addObject("One_Gear", one_gear);
         autoSelect.addObject("Two_Gear", two_gear);
         autoSelect.addObject("Near_Hopper", near_hopper);
         autoSelect.addObject("Far_Hopper", far_hopper);
-        SmartDashboard.putData("Select Auto", autoSelect);
+        SmartDashboard.putData(" Select Auto ", autoSelect);
         
         robot = RoboSystem.getInstance();
         controllers = TeleController.getInstance();
@@ -71,7 +71,7 @@ public class Robot extends SampleRobot {
         
     	/** Autonomous subroutine that the user has selected to run */
     	String autoSelected = (String) autoSelect.getSelected();
-    	SmartDashboard.putString("AutoSelected", autoSelected);
+    	SmartDashboard.putString(" Auto Selected ", autoSelected);
 /*    		switch(autoSelected){
     			case one_gear:
     	            robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
@@ -95,13 +95,7 @@ public class Robot extends SampleRobot {
     				break;
     	*///	}
     	
-//        robot.intake._pidgey.
-/*        SmartDashboard.putBoolean("Manual Wheel Headings?", true);
-		SmartDashboard.putNumber("Manual Heading 1", 0); 
-        SmartDashboard.putNumber("Manual Heading 2", 0);
-        SmartDashboard.putNumber("Manual Heading 3", 0);
-        SmartDashboard.putNumber("Manual Heading 4", 0);
-/**/        
+
     }
 
 	@Override

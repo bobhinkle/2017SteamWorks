@@ -3,11 +3,13 @@ package SubSystems;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
-import com.ctre.CANTalon.VelocityMeasurementPeriod;
 
+import Helpers.InterpolatingDouble;
 import Utilities.Constants;
 import Utilities.Ports;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import Utilities.Util;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added
 
 public class Shooter {
     private static Shooter instance = null;
@@ -78,8 +80,18 @@ public class Shooter {
 		    default:
     	}
     	
-    	SmartDashboard.putNumber("SHOOTER_SPEED", getSpeed());
-		SmartDashboard.putNumber("SHOOTER_TARGET", motor1.getSetpoint());
+    	Util.sdGraphClosedLoop("Shooter", "Speed", getSpeed(), shooterGoal);			// *** NEW! ***
+    	
+    	//SmartDashboard.putNumber("SHOOTER_SPEED", getSpeed());
+		//SmartDashboard.putNumber("SHOOTER_TARGET", motor1.getSetpoint());
+    }
+    public double getShooterSpeedForRange(double range) {
+        InterpolatingDouble result = Constants.kShooterMap.getInterpolated(new InterpolatingDouble(range));
+        if (result != null) {
+            return result.value;
+        } else {
+            return Constants.SHOOTING_SPEED;
+        }
     }
     public void setSpeed(double speed){
     	motor1.set(speed);

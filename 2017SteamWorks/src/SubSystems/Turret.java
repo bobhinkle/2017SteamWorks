@@ -7,7 +7,8 @@ import com.ctre.CANTalon.TalonControlMode;
 import Utilities.Constants;
 import Utilities.Ports;
 import Utilities.Util;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added
 
 public class Turret {
 	private static Turret instance = null;
@@ -54,7 +55,6 @@ public class Turret {
 	public void manualControl(double input){
 		double newAngle = (motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE) + (input * 3.5);
 		setAngle(newAngle);		
-		SmartDashboard.putNumber("TURRET_CURR", motor.getOutputCurrent());
 //		motor.set(-input *0.5);
 	}
 	public void setAngle(double angle){
@@ -79,11 +79,20 @@ public class Turret {
 		case GyroComp:
 			setAngle(lockedTurretAngle + (lockedAngle - heading));
 			break;
+		default:
+			break;
+		}
+		
+		if(motor.getOutputCurrent() > 30){
+			motor.setSetpoint(motor.getPosition());
 		}
 //		SmartDashboard.putNumber("Turret_LockedAngle", lockedTurretAngle);
 //		SmartDashboard.putNumber("TurretLockedHeading", lockedAngle);
-		SmartDashboard.putNumber("TURRET_ANGLE", getAngle());
-		SmartDashboard.putNumber("TURRET_GOAL", getGoal());
-		SmartDashboard.putNumber("TURRET_ERROR", getGoal()-getAngle());
+		
+//		SmartDashboard.putNumber("TURRET_ANGLE", getAngle());
+//		SmartDashboard.putNumber("TURRET_GOAL", getGoal());
+//		SmartDashboard.putNumber("TURRET_ERROR", getGoal()-getAngle());
+		Util.sdVerboseClosedLoop("Turret", "Angle", getAngle(), getGoal(),motor.getOutputCurrent()); // *** NEW! ***
+//		SmartDashboard.putNumber("TURRET_CURR", motor.getOutputCurrent());
 	}
 }

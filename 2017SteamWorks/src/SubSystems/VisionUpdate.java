@@ -16,6 +16,7 @@ import IO.Logger;
  * VisionUpdate contains the various attributes outputted by the vision system,
  * namely a list of targets and the timestamp at which it was captured.
  */
+@SuppressWarnings("unused")
 public class VisionUpdate {
     protected boolean valid = false;
     protected long capturedAgoMs;

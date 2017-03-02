@@ -217,13 +217,13 @@ public class Swerve{
 				yInput = tmp;			
 			}
 		}
-		SmartDashboard.putNumber("Target Heading", _targetAngle);
+//		SmartDashboard.putNumber(" Heading Set Point ", _targetAngle); // moved to Swerve.update()
 		switch(headingController){
-			case Off: SmartDashboard.putString("Heading Controller Mode", "OFF"); break;
-			case Rotation: SmartDashboard.putString("Heading Controller Mode", "rotation"); break;
-			case Heading: SmartDashboard.putString("Heading Controller Mode", "Heading"); break;
-			case Reset: SmartDashboard.putString("Heading Controller Mode", "reset"); break;
-			default: SmartDashboard.putString("Heading Controller Mode", "default"); break;
+			case Off: SmartDashboard.putString(" Heading Controller Mode ", "OFF"); break;
+			case Rotation: SmartDashboard.putString(" Heading Controller Mode ", "rotation"); break;
+			case Heading: SmartDashboard.putString(" Heading Controller Mode ", "Heading"); break;
+			case Reset: SmartDashboard.putString(" Heading Controller Mode ", "reset"); break;
+			default: SmartDashboard.putString(" Heading Controller Mode ", "default"); break;
 		}
 	}
 	/**
@@ -235,8 +235,8 @@ public class Swerve{
 	public class SwerveDriveModule{
 		private CANTalon rotationMotor;
 		public CANTalon driveMotor;
-		private int moduleID;
-		private int absolutePosition,absolutePosition2;
+		@SuppressWarnings("unused") private int moduleID;
+		private int absolutePosition;
 		private double x = 0.0;
 		private double y = 0.0;
 		private double offSet = 0.0;
@@ -272,10 +272,10 @@ public class Swerve{
 		private boolean isTravelling = false;
 		public boolean isTravelling() {return isTravelling;}
 		
-		private double relativeTickZero = 0;
-		private double relativeTickCount(){
+//		private double relativeTickZero = 0;
+/*		private double relativeTickCount(){
 			return getCurrentDriveEncoderPosition() - relativeTickZero;
-		}
+		}*/
 		
 	    
 		
@@ -304,8 +304,8 @@ public class Swerve{
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " dY ", dy*1000);
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (tick) ", x);
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (tick) ", y);
-	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (in) ", x/Constants.DRIVE_TICKS_PER_INCH);
-	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", y/Constants.DRIVE_TICKS_PER_INCH);
+//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (in) ", x/Constants.DRIVE_TICKS_PER_INCH);
+//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", y/Constants.DRIVE_TICKS_PER_INCH);
 	        
 			lastEncPosition = getCurrentDriveEncoderPosition();			
 		}
@@ -321,7 +321,7 @@ public class Swerve{
 			setTotalDistanceTravelled(0);
 			lastEncPosition = 0;
 			setCurrentDriveEncoderPosition(0);
-			relativeTickZero = getCurrentDriveEncoderPosition();
+//			relativeTickZero = getCurrentDriveEncoderPosition();
 			initModule(i);
 		}
 		public void debugValues(){
@@ -519,6 +519,12 @@ public class Swerve{
 				frontRight.setDriveSpeed(-frontRightWheelSpeed);
 				rearLeft.setDriveSpeed(rearLeftWheelSpeed);
 				rearRight.setDriveSpeed(-rearRightWheelSpeed);
+				
+				Util.sdSimpleClosedLoop("Heading", "Angle", currentRobotHeading, _targetAngle);
+				/*
+				SmartDashboard.putNumber(" Heading Angle ", currentRobotHeading); // imported from Intake
+				SmartDashboard.putNumber(" Heading Set Point ", _targetAngle); // added from Swerve.sendInput()
+				SmartDashboard.putNumber(" Heading Error ", _targetAngle - currentRobotHeading);*/
 			}
 		}
 	}	

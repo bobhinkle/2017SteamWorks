@@ -4,6 +4,8 @@ package ControlSystem;
 import SubSystems.*;
 import Utilities.Ports;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added
+
 public class RoboSystem{
     private static RoboSystem instance = null;
 	public Intake intake;
@@ -23,7 +25,7 @@ public class RoboSystem{
     public RoboSystem(){
     	
     	intake = Intake.getInstance();
-//    	intake._pidgey.SetFusedHeading(-90);							// OVER HERE wasn't commented
+//    	intake._pidgey.SetFusedHeading(-90);							// OVER HERE wasn't commented // that was a while ago
     	dt = Swerve.getInstance();
     	shooter = Shooter.getInstance();
     	sweeper = Sweeper.getInstance();

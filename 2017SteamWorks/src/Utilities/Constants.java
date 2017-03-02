@@ -1,5 +1,8 @@
 package Utilities;
 
+import Helpers.InterpolatingDouble;
+import Helpers.InterpolatingTreeMap;
+
 /**
  *
  * @author Rohi Zacharia
@@ -25,6 +28,11 @@ public class Constants {
     public static final double REAR_LEFT_TURN_OFFSET   = 138.1; //289.3
     public static final double REAR_RIGHT_TURN_OFFSET  = 170.1; //172.6
     
+    /**
+     * Number of ticks in one inch, calculated from ideal gear ratios and wheel diameter.
+     * <p>
+     * Multiply by this value to convert inches to ticks. Divide by this value to convert ticks to inches.</p>
+     * */
     public static final double DRIVE_TICKS_PER_INCH =  (13*5760)/(16*Math.PI)/2.0;//36/25542; //0.00200635031508792675265469178699;//0.00163990667972621570986118595697; //0.00150603674668734095803578302171;//60.0/40462.0; //
     public static final double TURN_KP = 0.02; //0.020
     public static final double TURN_KI = 0.00;
@@ -75,7 +83,10 @@ public class Constants {
 	public static final double SHOOTER_ERROR  = 100;
 	
 	public static final double GEAR_INTAKE_POWER = -.85;
-	public static final double GEAR_INTAKE_CURR_DETECT = 40;
+	public static final double GEAR_INTAKE_CURR_DETECT = 30;
+	public static final double GEAR_INTAKE_REVERSE_CURR_DETECT = 40;
+	public static final double GEAR_INTAKE_REVERSE_POWER = 0.5;
+	public static final double GEAR_INTAKE_FORWARD_POWER = -0.2;
 	
 	//Distance Controller
 	public static final double DIST_CONTROLLER_P = 0.000040; //0.0000[23]5
@@ -84,7 +95,7 @@ public class Constants {
 	public static final double DIST_CONTROLLER_SMALL_D = 0.00002; //0
 	public static final double DIST_CONTROLLER_PID_THRESH = 5.0;
 	public static final int DIST_CONTROLLER_CYCLE_THRESH = 15;
-/** Distance from the robot's center to each wheel module */
+/** Distance from the robot's center to each wheel module. */
 	public static final double RADIUS_CENTER_TO_MODULE = Math.sqrt(Math.pow(WHEELBASE_LENGTH/2, 2)+Math.pow(WHEELBASE_WIDTH/2, 2))*DRIVE_TICKS_PER_INCH;
 	
 	//Two Gear Auto
@@ -112,42 +123,19 @@ public class Constants {
     public static double kCameraYawAngleDegrees = 3;  //2.5
     public static double kCameraDeadband = 0.0;
     
-    public static double kCenterOfTargetHeight = 86.0; // inches
-    
- // Pose of the turret frame w.r.t. the vehicle frame
-    public static double kTurretXOffset = -7.376;
-    public static double kTurretYOffset = 0.0;
-    public static double kTurretAngleOffsetDegrees = 0.0;
-    
- // Goal tracker constants
-    public static double kMaxGoalTrackAge = 0.3;
-    public static double kMaxTrackerDistance = 18.0;
-    public static double kCameraFrameRate = 30.0;
-    public static double kTrackReportComparatorStablityWeight = 1.0;
-    public static double kTrackReportComparatorAgeWeight = 1.0;
-    public static double kTrackReportComparatorSwitchingWeight = 3.0;
-    public static double kTrackReportComparatorDistanceWeight = 2.0; // Unused
+    public static double kCenterOfTargetHeight = 86.0; // inches       
 
     public static int kAndroidAppTcpPort = 8254;
 
     public static double kLooperDt = 0.01;
     
- // Auto aiming/shooter constants
     public static double kAutoAimMinRange = 10.0;
     public static double kAutoAimMaxRange = 220.0;
-    public static double kAutoShootMaxDriveSpeed = 18.0;
-    public static double kAutoAimPredictionTime = 0.25;
-    public static int kAutoAimMinConsecutiveCyclesOnTarget = 3;
-    public static double kShootActuationTime = 0.75;
-    public static double kHoodUnstowToFlywheelSpinTime = 0.4;
-    public static double kLoadingTime = 0.5;
-    public static double kStowingOverrideTime = 2.0;
-    
-    public static double kTrackLengthInches = 8.265;
-    public static double kTrackWidthInches = 23.8;
-    public static double kTrackEffectiveDiameter = (kTrackWidthInches * kTrackWidthInches
-            + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
-    public static double kTrackScrubFactor = 0.5;
 
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kShooterMap = new InterpolatingTreeMap<>();
 
+    static {        
+        kShooterMap.put(new InterpolatingDouble(90.0), new InterpolatingDouble(3000.0));
+        kShooterMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(3500.0));        
+    }
 }
