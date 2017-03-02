@@ -26,18 +26,17 @@ public class GearIntake {
 		shaft = new Solenoid(22,solPort);
 	}
 	public void update(){
-		String gearIntakeStatus = null;
 		switch(state){
 			case INTAKE_EXTENDED_OFF:
 				stop();
 				shaft.set(false);
-				gearIntakeStatus = /*/SmartDashboard.putString(" Gear Intake Status ",/*/"EXTENDED OFF"/*/)/*/;
+				SmartDashboard.putString(" Gear Intake Status ","EXTENDED OFF");
 				break;
 	
 			case INTAKE_RETRACTED:
 				stop();
 				shaft.set(true);
-				gearIntakeStatus = /*/SmartDashboard.putString(" Gear Intake Status ",/*/ "RETRACTED"/*/)/*/;
+				SmartDashboard.putString(" Gear Intake Status ", "RETRACTED");
 				break;
 	
 			case INTAKING:
@@ -46,13 +45,13 @@ public class GearIntake {
 				forward();
 				shaft.set(false);
 				state = State.GEAR_DETECT;
-				gearIntakeStatus = /*/SmartDashboard.putString(" Gear Intake Status ",/*/ "INTAKING"/*/)/*/;
+				SmartDashboard.putString(" Gear Intake Status ", "INTAKING");
 				break;
 	
 			case INTAKE_EXTENDED:
 				stop();
 				shaft.set(false);
-				gearIntakeStatus = /*/SmartDashboard.putString(" Gear Intake Status ",/*/ "EXTENDED"/*/)/*/;
+				SmartDashboard.putString(" Gear Intake Status ", "EXTENDED");
 				break;
 	
 			case GEAR_DETECT:
@@ -60,11 +59,11 @@ public class GearIntake {
 					gear.set(Constants.GEAR_INTAKE_FORWARD_POWER);
 					state = State.GEAR_DETECTED;
 				}
-				gearIntakeStatus = /*/SmartDashboard.putString(" Gear Intake Status ",/*/ "WAITING FOR GEAR"/*/)/*/;
+				SmartDashboard.putString(" Gear Intake Status ", "WAITING FOR GEAR");
 				break;
 	
 			case GEAR_DETECTED:
-				gearIntakeStatus = /*/SmartDashboard.putString(" Gear Intake Status ",/*/ "GEAR DETECTED"/*/)/*/;
+				SmartDashboard.putString(" Gear Intake Status ", "GEAR DETECTED");
 				break;
 	
 			case SCORE_GEAR_1:
@@ -85,7 +84,6 @@ public class GearIntake {
 			case INTAKE_TUCK: break;
 			default: break;
 		}
-		SmartDashboard.putString(" Gear Intake Status ", gearIntakeStatus);
 	}
 	public void extend(){
 		state = State.INTAKE_EXTENDED;
