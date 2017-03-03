@@ -15,13 +15,10 @@ public class Vision {
 	// Grip network
 	private final NetworkTable grip = NetworkTable.getTable("SmartDashboard");
 	public Process gripProcess;
-	@SuppressWarnings("unused")
 	private final double[]  DUMMY = {5000};
 	private boolean targetSeen = false;
 	private static volatile double gripCenterY = 0.0;
-	@SuppressWarnings("unused")
 	private boolean autonomousShotTracking = false;
-	@SuppressWarnings("unused")
 	private BIAS bias = BIAS.BIGGEST;
 	public static enum BIAS{
 		LEFT,RIGHT,BIGGEST

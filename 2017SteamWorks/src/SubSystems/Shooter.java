@@ -41,12 +41,12 @@ public class Shooter {
     	motor1.SetVelocityMeasurementPeriod(CANTalon.VelocityMeasurementPeriod.Period_10Ms);
     	motor1.SetVelocityMeasurementWindow(32);
     	motor1.setNominalClosedLoopVoltage(12);
-    	
+    	motor1.enableBrakeMode(false);
 		motor2 = new CANTalon(Ports.SHOOTER_MOTOR_SLAVE);
         motor2.changeControlMode(TalonControlMode.Follower);
         motor2.set(Ports.SHOOTER_MOTOR_MASTER);
         motor2.reverseOutput(true);
-        
+        motor2.enableBrakeMode(false);
         motor2.setStatusFrameRateMs(CANTalon.StatusFrameRate.General,2);
     	motor2.SetVelocityMeasurementPeriod(CANTalon.VelocityMeasurementPeriod.Period_10Ms);
     	motor2.SetVelocityMeasurementWindow(32);
@@ -80,10 +80,10 @@ public class Shooter {
 		    default:
     	}
     	
-    	Util.sdGraphClosedLoop("Shooter", "Speed", getSpeed(), shooterGoal);			// *** NEW! ***
+    	//Util.sdGraphClosedLoop("Shooter", "Speed", getSpeed(), shooterGoal);			// *** NEW! ***
     	
-    	//SmartDashboard.putNumber("SHOOTER_SPEED", getSpeed());
-		//SmartDashboard.putNumber("SHOOTER_TARGET", motor1.getSetpoint());
+    	SmartDashboard.putNumber("SHOOTER_SPEED", getSpeed());
+		SmartDashboard.putNumber("SHOOTER_TARGET", motor1.getSetpoint());
     }
     public double getShooterSpeedForRange(double range) {
         InterpolatingDouble result = Constants.kShooterMap.getInterpolated(new InterpolatingDouble(range));

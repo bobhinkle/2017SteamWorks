@@ -8,8 +8,8 @@ import Helpers.InterpolatingTreeMap;
  * @author Rohi Zacharia
  */
 public class Constants {
-    public static double kBlueSideHopperX = -156.0;
-    public static double kBlueSideHopperY = 10.0;
+    public static double kBlueSideHopperX = -159.0;
+    public static double kBlueSideHopperY = 8.0;
     public static final boolean LOW_GEAR  = true; //Drivetrain low gear
     public static final double MIN_DT_POWER = 0.2;
     public static final double STARTING_ANGLE_OFFSET = 0;
@@ -82,11 +82,12 @@ public class Constants {
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 100;
 	
-	public static final double GEAR_INTAKE_POWER = -.85;
-	public static final double GEAR_INTAKE_CURR_DETECT = 30;
+	public static final double GEAR_INTAKE_POWER = 10;
+	public static final double GEAR_INTAKE_CURR_DETECT = 17;
 	public static final double GEAR_INTAKE_REVERSE_CURR_DETECT = 40;
 	public static final double GEAR_INTAKE_REVERSE_POWER = 0.5;
-	public static final double GEAR_INTAKE_FORWARD_POWER = -0.2;
+	public static final double GEAR_INTAKE_HOLDING_POWER = -0.3;
+	public static final double GEAR_PRESENT = 3.0;
 	
 	//Distance Controller
 	public static final double DIST_CONTROLLER_P = 0.000040; //0.0000[23]5
@@ -94,7 +95,7 @@ public class Constants {
 	public static final double DIST_CONTROLLER_SMALL_P = 0.000032; //0.00003
 	public static final double DIST_CONTROLLER_SMALL_D = 0.00002; //0
 	public static final double DIST_CONTROLLER_PID_THRESH = 5.0;
-	public static final int DIST_CONTROLLER_CYCLE_THRESH = 15;
+	public static final int DIST_CONTROLLER_CYCLE_THRESH = 30;
 /** Distance from the robot's center to each wheel module. */
 	public static final double RADIUS_CENTER_TO_MODULE = Math.sqrt(Math.pow(WHEELBASE_LENGTH/2, 2)+Math.pow(WHEELBASE_WIDTH/2, 2))*DRIVE_TICKS_PER_INCH;
 	
@@ -109,9 +110,9 @@ public class Constants {
 	//Near Hopper Auto
 	public static final double NEAR_HOPPER_FIRST_Y = 72.0;
 	public static final double NEAR_HOPPER_FIRST_X = 0.0;
-	public static final double NEAR_HOPPER_PEG_Y = 97.0;
-	public static final double NEAR_HOPPER_PEG_X = 27.0;
-	public static final double NEAR_HOPPER_DEPLOY_X = -36.0;
+	public static final double NEAR_HOPPER_PEG_Y = 90.0;
+	public static final double NEAR_HOPPER_PEG_X = 15.0;
+	public static final double NEAR_HOPPER_DEPLOY_X = -34.0;
 	public static final double NEAR_HOPPER_DEPLOY_Y = 90.0;
 	public static final double NEAR_HOPPER_PICKUP_Y = 103.0;
 	
@@ -135,7 +136,8 @@ public class Constants {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kShooterMap = new InterpolatingTreeMap<>();
 
     static {        
-        kShooterMap.put(new InterpolatingDouble(90.0), new InterpolatingDouble(3000.0));
-        kShooterMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(3500.0));        
+        kShooterMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(3000.0));          
+        kShooterMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(3200.0)); 
+        
     }
 }

@@ -24,6 +24,9 @@ public class Sweeper {
 	public void forwardSweeper(){
 		sweeper.set(1.0);
 	}
+	public void reducedForward(){
+		sweeper.set(0.5);
+	}
 	public void reverseSweeper(){
 		sweeper.set(-1);
 	}

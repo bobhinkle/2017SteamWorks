@@ -90,6 +90,10 @@ public class Util {
         else if(x > from_max) return to_max;
         return ((x-from_min)*(to_max-to_min)/(from_max-from_min)) + to_min;
     }
+   /*/ public static double scaleStickDeadband(double input, double deadband) {
+    	double offsetInput = input-deadband;
+    	return offsetInput/(1-deadband);
+    }/**/
     public static double normalize(double current, double test){
     	if(current > test) return current;
     	return test;
@@ -191,13 +195,13 @@ public class Util {
 	}
     
     
-    public static void sdClosedLoop(String subSystem, String varType, double processVariable, double setPoint, boolean showGraph, boolean showCurrent, double current) { // *** NEW! ***
+   /* public static void sdClosedLoop(String subSystem, String varType, double processVariable, double setPoint, boolean showGraph, boolean showCurrent, double current) { // *** NEW! ***
     	/*if(showGraph) SmartDashboard.putNumber(subSystem+" "+varType+" Graph", processVariable);
     	SmartDashboard.putNumber(" "+subSystem+" "+varType+" ", processVariable);
        	SmartDashboard.putNumber(" "+subSystem+" Set Point ", setPoint);
     	SmartDashboard.putNumber(" "+subSystem+" Error ",setPoint-processVariable);
     	if(showCurrent) SmartDashboard.putNumber(" "+subSystem+" Current ", current);*/
-    }
+ /*   }
     public static void sdSimpleClosedLoop(String subSystem, String varType, double processVariable, double setPoint) {
     	sdClosedLoop(subSystem,varType,processVariable,setPoint,false,false,0);
     }
@@ -210,8 +214,8 @@ public class Util {
      *  @param processVariable the current value of the closed loop
      *  @param setPoint the desired value for the closed loop
      * */
-    public static void sdGraphClosedLoop(String subSystem, String varType, double processVariable, double setPoint) { // *** NEW! ***
-    	sdClosedLoop(subSystem,varType,processVariable,setPoint,true,false,0);
+  /*  public static void sdGraphClosedLoop(String subSystem, String varType, double processVariable, double setPoint) { // *** NEW! ***
+ /*   	sdClosedLoop(subSystem,varType,processVariable,setPoint,true,false,0);
     }
     public static void sdCurrentClosedLoop(String subSystem, String varType, double processVariable, double setPoint, double current) { // *** NEW! ***
     	sdClosedLoop(subSystem,varType,processVariable,setPoint,false,true,current);
@@ -220,5 +224,6 @@ public class Util {
     	sdClosedLoop(subSystem,varType,processVariable,setPoint,true,true,current);
     }
     
+/**/
     
 }

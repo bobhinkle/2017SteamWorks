@@ -5,6 +5,7 @@ import java.util.TimerTask;
 
 import Utilities.Util;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added after breaking
 
 public class Controller extends Joystick
 {

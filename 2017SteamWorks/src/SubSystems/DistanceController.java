@@ -34,19 +34,19 @@ public class DistanceController {
 
 		SmartDashboard.putBoolean(" Distance Controller Enabled ", isEnabled);
 		SmartDashboard.putBoolean(" Dist On Target ", isOnTarget());
-		Util.sdSimpleClosedLoop("Dist X", "Position", currentPositionX/Constants.DRIVE_TICKS_PER_INCH, targetX/Constants.DRIVE_TICKS_PER_INCH);
-		Util.sdSimpleClosedLoop("Dist Y", "Position", currentPositionY/Constants.DRIVE_TICKS_PER_INCH, targetY/Constants.DRIVE_TICKS_PER_INCH);
+		//Util.sdSimpleClosedLoop("Dist X", "Position", currentPositionX/Constants.DRIVE_TICKS_PER_INCH, targetX/Constants.DRIVE_TICKS_PER_INCH);
+		//Util.sdSimpleClosedLoop("Dist Y", "Position", currentPositionY/Constants.DRIVE_TICKS_PER_INCH, targetY/Constants.DRIVE_TICKS_PER_INCH);
 
-	/*
+	
 		SmartDashboard.putNumber(" Dist X Set Point ", targetX/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber(" Dist Y Set Point ", targetY/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber(" Dist X Position ", currentPositionX/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber(" Dist Y Position ", currentPositionY/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber(" Dist X Error ", (targetX - currentPositionX)/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber(" Dist Y Error ", (targetY - currentPositionY)/Constants.DRIVE_TICKS_PER_INCH);
-	 */
-//		SmartDashboard.putNumber("distInputY", inputY); // this and next line were around line 60 or so,
-//		SmartDashboard.putNumber("distInputX", inputX); //  after an else block
+	 
+		SmartDashboard.putNumber("distInputY", inputY); // this and next line were around line 60 or so,
+		SmartDashboard.putNumber("distInputX", inputX); //  after an else block
 		if(isEnabled){
 			updateCurrentPos();
 			if(timeout >= System.currentTimeMillis()){

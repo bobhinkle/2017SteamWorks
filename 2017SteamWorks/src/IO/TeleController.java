@@ -8,19 +8,22 @@ import SubSystems.Swerve;
 import SubSystems.Turret;
 import Utilities.Constants;
 import Utilities.Util;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added?
  
 public class TeleController
 {
     
 
-    private Controller driver,coDriver;
+    public Controller driver,coDriver;
     private FSM fsm;
     private RoboSystem robot;
     private static TeleController instance = null;
     private boolean robotCentric = false;
     private DistanceController dist;
-    
+    private gearPickedUp gearVibrate;
+    private boolean vibrateRunning = false;
     public TeleController(){
         driver = new Controller(0);
         driver.start();
@@ -49,13 +52,14 @@ public class TeleController
     		robot.gearIntake.retract();
     	}
     	if(coDriver.xButton.isPressed()){
-    		
+    		robot.turret.setState(Turret.State.VisionTracking);
     	}
     	if(coDriver.yButton.isPressed()){
-    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
+    		/*robot.turret.lockAngle(robot.intake.getCurrentAngle());
     		robot.turret.setState(Turret.State.GyroComp);
     		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
-    		robot.shooter.setState(Shooter.Status.STARTED);
+    		robot.shooter.setState(Shooter.Status.STARTED);*/
+    		//robot.gearIntake.autoDep();
     	}
     	if(coDriver.rightBumper.isPressed()){
     		robot.intake.intakeForward();
@@ -84,7 +88,7 @@ public class TeleController
     	if(coDriver.leftTrigger.isPressed()){
     		robot.turret.lockAngle(robot.intake.getCurrentAngle());
     		robot.turret.setState(Turret.State.GyroComp);
-    		robot.shooter.setGoal(Constants.SHOOTING_SPEED);
+    		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.shooter.setState(Shooter.Status.STARTED);
     	}
     	if(coDriver.startButton.isPressed()){
@@ -151,6 +155,9 @@ public class TeleController
                 		driver.leftTrigger.isHeld(),
                 		robotCentric,
                 		 false);
+        		SmartDashboard.putBoolean("sendInput", true);
+        		//Timer.delay(3);
+        		SmartDashboard.putBoolean("sendInput", false);
         	}
         
         }
@@ -161,7 +168,7 @@ public class TeleController
         if(driver.leftBumper.isPressed()){
 //        	robotCentric = false;
         	//dist.setGoal(-30, DistanceController.Direction.X);
-//        	dist.setGoal(0,/*-4*/0, 0, 10, 0.5);
+        	dist.setGoal(0, 0, 1.0, 10, 0.5);
         }
         
         if(driver.rightBumper.isPressed()){            
@@ -211,6 +218,56 @@ public class TeleController
     public void update(){	
     	driver();
     	coDriver();
+    	if(robot.gearIntake.getState() == GearIntake.State.GEAR_LOST){
+    		startVibration(1);
+    	}else if(robot.gearIntake.getState() == GearIntake.State.GEAR_DETECTED){
+    		startVibration(0);
+    	}else{
+    		startVibration(-1);
+    	}
     }
     
+    private void startVibration(int type){
+    	if(!vibrateRunning){
+	    	gearVibrate = new gearPickedUp();
+	    	gearVibrate.setPulseType(type);
+	    	gearVibrate.start();
+    	}
+    }
+    public class gearPickedUp extends Thread{
+    	private int pulseType = 0;
+    	public void setPulseType(int p){
+    		pulseType = p;
+    	}
+    	public void run(){
+    		vibrateRunning = true;
+    		switch(pulseType){
+    		case 0:
+    			for(int i = 0; i < 2; i++){
+        			coDriver.setRumble(RumbleType.kLeftRumble, 0.25);
+            		Timer.delay(0.5);
+            		coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+        		}    
+    			break;
+    		case 1:
+    			for(int i = 0; i < 2; i++){
+        			coDriver.setRumble(RumbleType.kLeftRumble, 0.75);
+        			coDriver.setRumble(RumbleType.kRightRumble, 0.0);
+            		Timer.delay(0.5);
+            		coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+            		coDriver.setRumble(RumbleType.kRightRumble, 0.75);
+            		Timer.delay(1);
+            		coDriver.setRumble(RumbleType.kRightRumble, 0.0);
+        			coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+        		}    
+    			break;
+    		default:
+    			coDriver.setRumble(RumbleType.kRightRumble, 0.0);
+    			coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+    			break;
+    		}
+    				
+    		vibrateRunning = false;
+        }
+    }
 }

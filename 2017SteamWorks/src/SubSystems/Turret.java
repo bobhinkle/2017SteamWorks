@@ -89,10 +89,10 @@ public class Turret {
 //		SmartDashboard.putNumber("Turret_LockedAngle", lockedTurretAngle);
 //		SmartDashboard.putNumber("TurretLockedHeading", lockedAngle);
 		
-//		SmartDashboard.putNumber("TURRET_ANGLE", getAngle());
-//		SmartDashboard.putNumber("TURRET_GOAL", getGoal());
-//		SmartDashboard.putNumber("TURRET_ERROR", getGoal()-getAngle());
-		Util.sdVerboseClosedLoop("Turret", "Angle", getAngle(), getGoal(),motor.getOutputCurrent()); // *** NEW! ***
-//		SmartDashboard.putNumber("TURRET_CURR", motor.getOutputCurrent());
+		SmartDashboard.putNumber("TURRET_ANGLE", getAngle());
+		SmartDashboard.putNumber("TURRET_GOAL", getGoal());
+		SmartDashboard.putNumber("TURRET_ERROR", getGoal()-getAngle());
+//		Util.sdVerboseClosedLoop("Turret", "Angle", getAngle(), getGoal(),motor.getOutputCurrent()); // *** NEW! ***
+		SmartDashboard.putNumber("TURRET_CURR", motor.getOutputCurrent());
 	}
 }
