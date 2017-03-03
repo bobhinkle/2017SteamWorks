@@ -58,7 +58,7 @@ public class Vision {
     public static double getAngle(double x){
         double slope = Constants.CAMERA_FOV/Constants.CAMERA_PIXEL_WIDTH;
         double intercept = -Constants.CAMERA_FOV/2.0;
-//        System.out.println("slope:" + slope + " intertecpt:" + intercept + " x:" + x);
+//        System.out.println("slope:" + slope + " intercept:" + intercept + " x:" + x);
         return (((x*slope)+intercept)*Constants.CAM_CALIBRATION)+Constants.GRIP_X_OFFSET; //gripX
     }
     public static double getAngle(){
@@ -69,7 +69,7 @@ public class Vision {
     }
     public void update(){
     	updateGripNetwork();
-    	SmartDashboard.putNumber("AngeToTurnAim", getAngle());
+    	SmartDashboard.putNumber("AngleToTurnAim", getAngle());
     	SmartDashboard.putBoolean("TARGET_SEEN", isTargetSeen()); 
     	SmartDashboard.putNumber("XCoorX", gripX);
     	SmartDashboard.putNumber("YCOOR",gripCenterY);

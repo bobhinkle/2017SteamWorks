@@ -12,9 +12,9 @@ public class Sweeper {
 	
 	public Sweeper(){
 		sweeper = new CANTalon(Ports.SWEEPER);
-		sweeper.setVoltageRampRate(36);
+		sweeper.setVoltageRampRate(48);
 		sweeper_roller = new CANTalon(Ports.SWEEPER_ROLLER);
-		sweeper_roller.setVoltageRampRate(36);
+		sweeper_roller.setVoltageRampRate(48);
 	}
 	public static Sweeper getInstance(){
 		if(instance == null)
@@ -23,6 +23,9 @@ public class Sweeper {
 	}
 	public void forwardSweeper(){
 		sweeper.set(1.0);
+	}
+	public void reducedForward(){
+		sweeper.set(0.5);
 	}
 	public void reverseSweeper(){
 		sweeper.set(-1);
@@ -40,7 +43,9 @@ public class Sweeper {
 		sweeper_roller.set(0);
 	}
 	public void SweeperDebug(){
-		SmartDashboard.putNumber("Sweeper_Curr", sweeper.getOutputCurrent());
-		SmartDashboard.putNumber("SweepRoller", sweeper_roller.getOutputCurrent());
+		SmartDashboard.putNumber(" Sweeper Rotor Current ", sweeper.getOutputCurrent());
+		SmartDashboard.putNumber(" Sweeper Roller Current ", sweeper_roller.getOutputCurrent());
+		SmartDashboard.putNumber(" Sweeper Rotor Voltage", sweeper.getOutputVoltage());
+		SmartDashboard.putNumber(" Sweeper Roller Voltage", sweeper_roller.getOutputVoltage());
 	}
 }

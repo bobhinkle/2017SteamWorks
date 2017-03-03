@@ -1,11 +1,11 @@
 package SubSystems;
 
 import com.ctre.CANTalon;
+import com.ctre.CANTalon.TalonControlMode;
 import com.ctre.PigeonImu;
 import com.ctre.PigeonImu.PigeonState;
 
 import Utilities.Ports;
-import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake {
@@ -14,18 +14,22 @@ public class Intake {
 	public CANTalon intakeLeft;
 	public CANTalon intakeRight;
 	private double currentAngle = 0.0;
-    public PigeonImu _pidgey;
+    private PigeonImu _pidgey;
     boolean angleIsGood = false;
     double currentAngularRate = 0.0;
+    public enum AnglePresets{
+		ZERO,NINETY,ONE_EIGHTY, TWO_SEVENTY
+	}
 	public Intake(){
 		intakeLeft = new CANTalon(Ports.INTAKE_MOTOR_L);
-		intakeLeft.configNominalOutputVoltage(12.0f, -12.0f);
-		intakeLeft.setVoltageRampRate(24);
-		intakeLeft.setCurrentLimit(25);
+		intakeLeft.changeControlMode(TalonControlMode.Current);
+		intakeLeft.setPID(0.01, 0.00, 0, 0.0175, 0, 0.0, 0);
+		intakeLeft.reverseOutput(true);
+		intakeLeft.setCloseLoopRampRate(24);
 		intakeRight = new CANTalon(Ports.INTAKE_MOTOR_R);
-		intakeRight.configNominalOutputVoltage(12.0f, -12.0f);
-		intakeRight.setVoltageRampRate(24);
-		intakeRight.setCurrentLimit(25);
+		intakeRight.changeControlMode(TalonControlMode.Current);
+		intakeRight.setPID(0.01, 0.00, 0, 0.0175, 0, 0.0, 0);
+		intakeRight.reverseOutput(false);
 		try{
 			_pidgey = new PigeonImu(intakeLeft);
 		}catch(Exception e){
@@ -47,9 +51,9 @@ public class Intake {
 			_pidgey.GetRawGyro(xyz_dps);
 			angleIsGood = (_pidgey.GetState() == PigeonState.Ready) ? true : false;
 			currentAngularRate = -xyz_dps[2];
-			SmartDashboard.putNumber("Pigeon_CA", currentAngle);
-			SmartDashboard.putNumber(" Pigeon Rate ", currentAngularRate);
-			SmartDashboard.putBoolean("PigeonGood", angleIsGood);
+			SmartDashboard.putNumber(" Heading Angle ", currentAngle); // moved to Swerve.update()
+//			SmartDashboard.putNumber(" Pigeon Rate ", currentAngularRate);
+			SmartDashboard.putBoolean(" Pigeon Good ", angleIsGood);
 		}catch(Exception e){
 			System.out.println(e);
 		}
@@ -65,23 +69,43 @@ public class Intake {
 		return currentAngularRate;
 	}
 	public void intakeForward(){
-		intakeLeft.set(-1.0); 
-		intakeRight.set(1.0);
+		intakeLeft.set(20); 
+		intakeRight.set(20);
 	}
 	public void intakeReverse(){
-		intakeLeft.set(1.0);
-		intakeRight.set(-1.0);
+		intakeLeft.set(-20);
+		intakeRight.set(-20);
 	}
 	public void intakeStop(){
 		intakeLeft.set(0);
 		intakeRight.set(0);
 	}
 	public void debugValues(){
-		SmartDashboard.putNumber("INTAKE_L_C", intakeLeft.getOutputCurrent());
-		SmartDashboard.putNumber("INTAKE_R_C", intakeRight.getOutputCurrent());
+		SmartDashboard.putNumber(" Intake Left Current ", intakeLeft.getOutputCurrent());
+		SmartDashboard.putNumber(" Intake Right Current ", intakeRight.getOutputCurrent());
+		SmartDashboard.putNumber("Intake Left Error", intakeLeft.getSetpoint()-intakeLeft.getOutputCurrent());
+		SmartDashboard.putNumber("Intake Right Error", intakeRight.getSetpoint()-intakeRight.getOutputCurrent());
+		SmartDashboard.putNumber("Intake Left Voltage", intakeLeft.getOutputVoltage());
+		SmartDashboard.putNumber("Intake Right Voltage", intakeRight.getOutputVoltage());
 	}
 	public void update(){
 		pigeonUpdate();
 		debugValues();
+	}
+	public void setPresetAngles(AnglePresets i){
+		switch(i){
+		case ZERO:
+			_pidgey.SetFusedHeading(0);
+			break;
+		case ONE_EIGHTY:
+			_pidgey.SetFusedHeading(180);
+			break;
+		case NINETY:
+			_pidgey.SetFusedHeading(270);
+			break;
+		case TWO_SEVENTY:
+			_pidgey.SetFusedHeading(90);
+			break;
+		}
 	}
 }

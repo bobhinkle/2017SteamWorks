@@ -1,21 +1,29 @@
 package IO;import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
 import SubSystems.DistanceController;
+import SubSystems.GearIntake;
+import SubSystems.Intake;
+import SubSystems.Shooter;
+import SubSystems.Swerve;
+import SubSystems.Turret;
 import Utilities.Constants;
 import Utilities.Util;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added?
  
 public class TeleController
 {
     
 
-    private Controller driver,coDriver;
+    public Controller driver,coDriver;
     private FSM fsm;
     private RoboSystem robot;
     private static TeleController instance = null;
     private boolean robotCentric = false;
     private DistanceController dist;
-    
+    private gearPickedUp gearVibrate;
+    private boolean vibrateRunning = false;
     public TeleController(){
         driver = new Controller(0);
         driver.start();
@@ -34,22 +42,24 @@ public class TeleController
    
     public void coDriver(){
     	if(coDriver.aButton.isPressed() || coDriver.aButton.isHeld()){
-    		if(coDriver.aButton.isHeld() && coDriver.aButton.buttonHoldTime() > 3){
+    		if(coDriver.aButton.isHeld() && coDriver.aButton.buttonHoldTime() > 1.5){
         		robot.gearIntake.grabGear();
         	}else{
         		robot.gearIntake.extend();
         	}    		
     	}
     	if(coDriver.bButton.isPressed() || coDriver.bButton.isHeld()){
-    		if(coDriver.bButton.isHeld() && coDriver.bButton.buttonHoldTime() > 3){
-        		robot.gearIntake.scoreGear();
-        	}else{
-        		robot.gearIntake.retract();
-        	}    
+    		robot.gearIntake.retract();
     	}
     	if(coDriver.xButton.isPressed()){
-    		robot.sweeper.forwardRoller();
-    		robot.sweeper.forwardSweeper();
+    		robot.turret.setState(Turret.State.VisionTracking);
+    	}
+    	if(coDriver.yButton.isPressed()){
+    		/*robot.turret.lockAngle(robot.intake.getCurrentAngle());
+    		robot.turret.setState(Turret.State.GyroComp);
+    		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
+    		robot.shooter.setState(Shooter.Status.STARTED);*/
+    		//robot.gearIntake.autoDep();
     	}
     	if(coDriver.rightBumper.isPressed()){
     		robot.intake.intakeForward();
@@ -58,27 +68,37 @@ public class TeleController
     		robot.intake.intakeReverse();
     	}
     	if(coDriver.backButton.isPressed()){
+    		robot.intake.intakeStop();
+    		robot.shooter.stop();  		
     		robot.sweeper.stopRoller();
     		robot.sweeper.stopSweeper();
-    		robot.intake.intakeStop();
-    		robot.shooter.setSpeed(0);
-    		robot.gearIntake.stop();
+    		robot.turret.setState(Turret.State.VisionTracking);
+    		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED)
+    			robot.gearIntake.setState(GearIntake.State.INTAKE_EXTENDED_OFF);
     	}
     	if(coDriver.rightCenterClick.isPressed()){
     		robot.turret.setAngle(0);
     	}
     	if(coDriver.rightTrigger.isPressed()){
-    		robot.shooter.setSpeed(.75); //
+    		robot.intake.intakeStop();
+    		robot.sweeper.forwardRoller();
+	    	robot.sweeper.forwardSweeper();
+    		
     	}
     	if(coDriver.leftTrigger.isPressed()){
-    		robot.gearIntake.forward();
+    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
+    		robot.turret.setState(Turret.State.GyroComp);
+    		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
+    		robot.shooter.setState(Shooter.Status.STARTED);
     	}
     	if(coDriver.startButton.isPressed()){
-    		robot.gearIntake.reverse();
+    		
     	}
     	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > Constants.STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -Constants.STICK_DEAD_BAND){
+    		robot.turret.setState(Turret.State.Manual);
     		robot.turret.manualControl(coDriver.getButtonAxis(Controller.RIGHT_STICK_X));
     	}
+    	
     	if(coDriver.getPOV() == 270)
     		robot.turret.setAngle(-45);
     	if(coDriver.getPOV() == 0)
@@ -108,6 +128,9 @@ public class TeleController
     	if(driver.yButton.isPressed()){
         	robot.dt.setHeading(0,true);
         }
+    	if(driver.rightTrigger.isPressed()){
+    		robot.gearIntake.scoreGear();
+    	}
         if(driver.startButton.isHeld()){
         	robot.dt.swerveTrack();
         	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
@@ -116,48 +139,57 @@ public class TeleController
             		Util.turnControlSmoother(0),
             		driver.leftTrigger.isHeld(),
             		robotCentric,
-            		 driver.rightTrigger.isHeld());
+            		 false);
         }else{ 
         	if(!dist.isEnabled()){ 
+        	/*	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
+                		Util.controlSmoother(-driver.getButtonAxis(Xbox.LEFT_STICK_Y)),0,
+                		0,
+                		driver.leftTrigger.isHeld(),
+                		robotCentric,
+                		 false);*/
         		robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
                 		Util.controlSmoother(-driver.getButtonAxis(Xbox.LEFT_STICK_Y)), 
                 		Util.turnControlSmoother(driver.getButtonAxis(Xbox.RIGHT_STICK_X)),
                 		Util.turnControlSmoother(driver.getButtonAxis(Xbox.RIGHT_STICK_Y)),
                 		driver.leftTrigger.isHeld(),
                 		robotCentric,
-                		 driver.rightTrigger.isHeld());
+                		 false);
+        		SmartDashboard.putBoolean("sendInput", true);
+        		//Timer.delay(3);
+        		SmartDashboard.putBoolean("sendInput", false);
         	}
         
         }
         if(driver.rightTrigger.isPressed()) {
-        	
+//        	dist.setGoal(0, 10, 0, 4, 0.7); // added this line to help with putting the robot back after testing
         }
         
         if(driver.leftBumper.isPressed()){
-        	robotCentric = false;
+//        	robotCentric = false;
         	//dist.setGoal(-30, DistanceController.Direction.X);
-//        	dist.setGoal(0,/*-4*/0, 0, 10, 0.5);
+        	dist.setGoal(0, 0, 1.0, 10, 0.5);
         }
         
         if(driver.rightBumper.isPressed()){            
-        	robotCentric = true;
+//        	robotCentric = true;
         	//dist.setGoal(30, DistanceController.Direction.X);
 //        	dist.setGoal(0, 36, 0, 10, 0.5);
         }
         
         if(driver.backButton.isHeld()){ 
-        	robot.intake._pidgey.SetFusedHeading(0.0);
-        	robot.dt.setHeading(0.0,false);
-        	
+        	robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+        	robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
+        	dist.disable();    
+        	robot.dt.setHeading(0, false);
         }
         if(driver.backButton.isPressed()){
 //        	robot.shooter.setSpeed(0);
-        	robot.dt.resetCoord();
-        	dist.disable();
-        	
+        	    	
         }
         if(driver.startButton.isPressed()){
-        	
+        	robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+        	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
         }
         
         if(driver.rightCenterClick.isPressed()){
@@ -176,9 +208,9 @@ public class TeleController
         	// This button will now be used to test starting orientations
  //       	robot.intake._pidgey.SetFusedHeading(180.0);
  //       	robot.dt.setHeading(0.0);
-        	dist.setGoal(0,/*-4*/0, 0, 5, 0.5);
+ //       	dist.setGoal(0,/*-4*/0, 0, 5, 0.5);
         }
-/**        if(robotCentric)
+/*        if(robotCentric)
         	SmartDashboard.putString("RobotControl", "ROBOT");
         else
             SmartDashboard.putString("RobotControl","FIELD");
@@ -186,6 +218,56 @@ public class TeleController
     public void update(){	
     	driver();
     	coDriver();
+    	if(robot.gearIntake.getState() == GearIntake.State.GEAR_LOST){
+    		startVibration(1);
+    	}else if(robot.gearIntake.getState() == GearIntake.State.GEAR_DETECTED){
+    		startVibration(0);
+    	}else{
+    		startVibration(-1);
+    	}
     }
     
+    private void startVibration(int type){
+    	if(!vibrateRunning){
+	    	gearVibrate = new gearPickedUp();
+	    	gearVibrate.setPulseType(type);
+	    	gearVibrate.start();
+    	}
+    }
+    public class gearPickedUp extends Thread{
+    	private int pulseType = 0;
+    	public void setPulseType(int p){
+    		pulseType = p;
+    	}
+    	public void run(){
+    		vibrateRunning = true;
+    		switch(pulseType){
+    		case 0:
+    			for(int i = 0; i < 2; i++){
+        			coDriver.setRumble(RumbleType.kLeftRumble, 0.25);
+            		Timer.delay(0.5);
+            		coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+        		}    
+    			break;
+    		case 1:
+    			for(int i = 0; i < 2; i++){
+        			coDriver.setRumble(RumbleType.kLeftRumble, 0.75);
+        			coDriver.setRumble(RumbleType.kRightRumble, 0.0);
+            		Timer.delay(0.5);
+            		coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+            		coDriver.setRumble(RumbleType.kRightRumble, 0.75);
+            		Timer.delay(1);
+            		coDriver.setRumble(RumbleType.kRightRumble, 0.0);
+        			coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+        		}    
+    			break;
+    		default:
+    			coDriver.setRumble(RumbleType.kRightRumble, 0.0);
+    			coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+    			break;
+    		}
+    				
+    		vibrateRunning = false;
+        }
+    }
 }

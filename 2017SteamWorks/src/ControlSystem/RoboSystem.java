@@ -1,24 +1,20 @@
 
 package ControlSystem;
 
-import SubSystems.GearIntake;
-import SubSystems.Intake;
-import SubSystems.Shooter;
-import SubSystems.Sweeper;
-import SubSystems.Swerve;
-import SubSystems.Turret;
+import SubSystems.*;
 import Utilities.Ports;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added
 
 public class RoboSystem{
     private static RoboSystem instance = null;
-    public Swerve dt;
-//    public Navigation nav;
-//	public Vision vision;
-	public Shooter shooter;
 	public Intake intake;
+    public Swerve dt;
+	public Shooter shooter;
 	public Sweeper sweeper;
 	public Turret turret;
 	public GearIntake gearIntake;
+
     public static RoboSystem getInstance()
     {
         if( instance == null )
@@ -28,11 +24,10 @@ public class RoboSystem{
     
     public RoboSystem(){
     	
-    	dt = Swerve.getInstance();
-//    	nav = Navigation.getInstance();
-//    	vision = Vision.getInstance();
-    	shooter = Shooter.getInstance();
     	intake = Intake.getInstance();
+//    	intake._pidgey.SetFusedHeading(-90);							// OVER HERE wasn't commented // that was a while ago
+    	dt = Swerve.getInstance();
+    	shooter = Shooter.getInstance();
     	sweeper = Sweeper.getInstance();
     	turret = Turret.getInstance();
     	gearIntake = new GearIntake(Ports.GEAR_HANG, Ports.INTAKE_ARM);
