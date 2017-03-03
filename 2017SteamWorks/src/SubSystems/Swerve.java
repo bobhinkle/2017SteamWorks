@@ -57,6 +57,8 @@ public class Swerve{
 			headingController = HeadingController.Rotation;
 		_targetAngle = Util.continousAngle(goal,intake.getCurrentAngle());
 	}
+
+	}
 	/**
 	 * States of the {@link Swerve} {@link Swerve#headingController heading controller}.
 	 * */
@@ -280,9 +282,6 @@ public class Swerve{
 		private double relativeTickCount(){
 			return getCurrentDriveEncoderPosition() - relativeTickZero;
 		}
-		
-	    
-		
 		
 		public void updateCoord(){			
 			setCurrentDriveEncoderPosition(driveMotor.getEncPosition());
