@@ -33,7 +33,7 @@ public class Constants {
      * <p>
      * Multiply by this value to convert inches to ticks. Divide by this value to convert ticks to inches.</p>
      * */
-    public static final double DRIVE_TICKS_PER_INCH =  (13*5760)/(16*Math.PI)/2.0;//36/25542; //0.00200635031508792675265469178699;//0.00163990667972621570986118595697; //0.00150603674668734095803578302171;//60.0/40462.0; //
+    public static final double DRIVE_TICKS_PER_INCH =  (13*5760)/(16*Math.PI)/2.0*.957;//36/25542; //0.00200635031508792675265469178699;//0.00163990667972621570986118595697; //0.00150603674668734095803578302171;//60.0/40462.0; //
     public static final double TURN_KP = 0.02; //0.020
     public static final double TURN_KI = 0.00;
     public static final double TURN_KD = 0.02;//0.02
@@ -52,7 +52,7 @@ public class Constants {
 	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.012; // 0.009; 0.015
 	public static final double SWERVE_SMALL_TURNING_GAIN_D = 0.002; //0.002
 	// TODO Tune kPHeadingGain (now SWERVE_HEADING_GAIN_P) to prevent drift while driving
-	public static final double SWERVE_HEADING_GAIN_P = 0.003; // 0.003; 0.002
+	public static final double SWERVE_HEADING_GAIN_P = 0.002; // 0.003; 0.002
 	public static final double SWERVE_HEADING_GAIN_D = 0.001; // 0.001
 	public static final double SWERVE_HEADING_MAX_CORRECTION_RATIO = 0.75; //0.75
 	public static final double SWERVE_SMALL_HEADING_MAX_CORRECTION_RATIO = 0.18; //0.18
@@ -82,11 +82,11 @@ public class Constants {
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 100;
 	
-	public static final double GEAR_INTAKE_POWER = 10;
-	public static final double GEAR_INTAKE_CURR_DETECT = 17;
+	public static final double GEAR_INTAKE_POWER = 15;
+	public static final double GEAR_INTAKE_CURR_DETECT = 20;
 	public static final double GEAR_INTAKE_REVERSE_CURR_DETECT = 40;
 	public static final double GEAR_INTAKE_REVERSE_POWER = 0.5;
-	public static final double GEAR_INTAKE_HOLDING_POWER = -0.3;
+	public static final double GEAR_INTAKE_HOLDING_POWER = -0.35;
 	public static final double GEAR_PRESENT = 3.0;
 	
 	//Distance Controller
@@ -113,7 +113,7 @@ public class Constants {
 	public static final double NEAR_HOPPER_PEG_Y = 90.0;
 	public static final double NEAR_HOPPER_PEG_X = 15.0;
 	public static final double NEAR_HOPPER_DEPLOY_X = -34.0;
-	public static final double NEAR_HOPPER_DEPLOY_Y = 90.0;
+	public static final double NEAR_HOPPER_DEPLOY_Y = 112.0;
 	public static final double NEAR_HOPPER_PICKUP_Y = 103.0;
 	
 	// Pose of the camera frame w.r.t. the turret frame

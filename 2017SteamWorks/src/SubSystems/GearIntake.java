@@ -17,7 +17,7 @@ public class GearIntake {
 	public enum State{
 		INTAKE_EXTENDED, INTAKING, INTAKE_RETRACTED, GEAR_DETECT,
 		GEAR_DETECTED, CLIMB_DETECT, CLIMB_DETECTED, SCORE_GEAR_1,SCORE_GEAR_2,INTAKE_TUCK,INTAKE_EXTENDED_OFF,INTAKE_RETRACTED_WITH_GEAR,
-		GEAR_LOST, GEAR_AUTO
+		GEAR_LOST_EXTENDED, GEAR_AUTO, GEAR_LOST_RETRACTED, INTAKE_RETRACTED_GEAR_DETECT, INTAKE_RETRACTED_GEAR_DETECTED
 	}
 	private State state = State.INTAKE_TUCK;
 	
@@ -50,7 +50,7 @@ public class GearIntake {
 			case INTAKE_RETRACTED_WITH_GEAR:
 				gearCylinder.set(true);
 				if(gear.getOutputCurrent() < Constants.GEAR_PRESENT){
-					state = State.GEAR_LOST;
+					state = State.GEAR_LOST_RETRACTED;
 				}
 				SmartDashboard.putString(" Gear Intake Status ", "RETRACTED WITH GEAR");
 				break;
@@ -78,17 +78,19 @@ public class GearIntake {
 	
 			case GEAR_DETECTED:
 				if(gear.getOutputCurrent() < Constants.GEAR_PRESENT){
-					state = State.GEAR_LOST;
+					state = State.GEAR_LOST_EXTENDED;
 				}
 				SmartDashboard.putString(" Gear Intake Status ", "GEAR DETECTED");
 				break;
-			case GEAR_LOST:
+			case GEAR_LOST_EXTENDED:
+//				state = State.INTAKING;
+				SmartDashboard.putString(" Gear Intake Status ", "GEAR LOST");
+				break;
+			case GEAR_LOST_RETRACTED:
 				SmartDashboard.putString(" Gear Intake Status ", "GEAR LOST");
 				break;
 			case SCORE_GEAR_1:
-				timeout = System.currentTimeMillis() + solenoidTime;
-				gearCylinder.set(false);
-				reverse();
+				autoDep();
 				state = State.SCORE_GEAR_2;
 				break;
 	
@@ -99,6 +101,17 @@ public class GearIntake {
 				break;
 	
 			case INTAKE_TUCK: break;
+			case INTAKE_RETRACTED_GEAR_DETECT:
+				forward();
+				
+				break;
+			case INTAKE_RETRACTED_GEAR_DETECTED:
+				if(gear.getOutputCurrent() > Constants.GEAR_INTAKE_CURR_DETECT){
+					gear.changeControlMode(TalonControlMode.PercentVbus);
+					gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);
+					state = State.INTAKE_RETRACTED_WITH_GEAR;
+				}
+				break;
 			default: 
 				
 				break;
@@ -109,13 +122,13 @@ public class GearIntake {
 		SmartDashboard.putNumber("Gear Intake Voltage" ,gear.getOutputVoltage());
 	}
 	public void extend(){
-		if(state == State.GEAR_LOST || state == State.INTAKING || state == State.GEAR_DETECT)
+		if(state == State.GEAR_LOST_EXTENDED || state == State.GEAR_LOST_RETRACTED || state == State.INTAKING || state == State.GEAR_DETECT)
 			state = State.INTAKING;
 		else
 			state = State.INTAKE_EXTENDED;
 	}
 	public void retract(){
-		if(state != State.GEAR_DETECTED && state != State.INTAKE_RETRACTED_WITH_GEAR && state != State.GEAR_LOST){
+		if(state != State.GEAR_DETECTED && state != State.INTAKE_RETRACTED_WITH_GEAR && state != State.GEAR_LOST_EXTENDED && state != State.GEAR_LOST_RETRACTED){
 			state = State.INTAKE_RETRACTED;
 		}else{
 			state  = State.INTAKE_RETRACTED_WITH_GEAR;
@@ -161,10 +174,9 @@ public class GearIntake {
 			state = GearIntake.State.GEAR_AUTO;
 			gear.changeControlMode(TalonControlMode.Current);
 			gear.setProfile(0);
-			gear.set(10);
+			gear.set(-10);
 			Timer.delay(1);
-			gearCylinder.set(true);
-			Timer.delay(2);
+			gearCylinder.set(false);
 		}
 	}
 }

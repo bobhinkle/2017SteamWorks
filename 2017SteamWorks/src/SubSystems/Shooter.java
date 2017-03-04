@@ -83,6 +83,7 @@ public class Shooter {
     	//Util.sdGraphClosedLoop("Shooter", "Speed", getSpeed(), shooterGoal);			// *** NEW! ***
     	
     	SmartDashboard.putNumber("SHOOTER_SPEED", getSpeed());
+    	SmartDashboard.putNumber("SHOOTER_SPEED_GRAPH", getSpeed());
 		SmartDashboard.putNumber("SHOOTER_TARGET", motor1.getSetpoint());
     }
     public double getShooterSpeedForRange(double range) {

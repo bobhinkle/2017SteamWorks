@@ -168,7 +168,7 @@ public class TeleController
         if(driver.leftBumper.isPressed()){
 //        	robotCentric = false;
         	//dist.setGoal(-30, DistanceController.Direction.X);
-        	dist.setGoal(0, 0, 1.0, 10, 0.5);
+        	//dist.setGoal(0, 0, 1.0, 10, 0.5);
         }
         
         if(driver.rightBumper.isPressed()){            
@@ -218,7 +218,7 @@ public class TeleController
     public void update(){	
     	driver();
     	coDriver();
-    	if(robot.gearIntake.getState() == GearIntake.State.GEAR_LOST){
+    	if(robot.gearIntake.getState() == GearIntake.State.GEAR_LOST_EXTENDED || robot.gearIntake.getState() == GearIntake.State.GEAR_LOST_RETRACTED){
     		startVibration(1);
     	}else if(robot.gearIntake.getState() == GearIntake.State.GEAR_DETECTED){
     		startVibration(0);
@@ -244,26 +244,45 @@ public class TeleController
     		switch(pulseType){
     		case 0:
     			for(int i = 0; i < 2; i++){
-        			coDriver.setRumble(RumbleType.kLeftRumble, 0.25);
+        			coDriver.setRumble(RumbleType.kLeftRumble, 0.4);
+        			driver.setRumble(RumbleType.kLeftRumble, 0.4);
             		Timer.delay(0.5);
             		coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+            		driver.setRumble(RumbleType.kLeftRumble, 0.0);
         		}    
     			break;
     		case 1:
+    			switch(robot.gearIntake.getState()){
+	    			case GEAR_LOST_EXTENDED:
+	    				//robot.gearIntake.grabGear();
+	    				break;
+	    			case GEAR_LOST_RETRACTED:
+	    				
+	    				break;
+    			}
+    			
     			for(int i = 0; i < 2; i++){
         			coDriver.setRumble(RumbleType.kLeftRumble, 0.75);
         			coDriver.setRumble(RumbleType.kRightRumble, 0.0);
+        			driver.setRumble(RumbleType.kLeftRumble, 0.75);
+        			driver.setRumble(RumbleType.kRightRumble, 0.0);
             		Timer.delay(0.5);
             		coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
             		coDriver.setRumble(RumbleType.kRightRumble, 0.75);
+            		driver.setRumble(RumbleType.kLeftRumble, 0.0);
+            		driver.setRumble(RumbleType.kRightRumble, 0.75);
             		Timer.delay(1);
             		coDriver.setRumble(RumbleType.kRightRumble, 0.0);
         			coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+        			driver.setRumble(RumbleType.kRightRumble, 0.0);
+        			driver.setRumble(RumbleType.kLeftRumble, 0.0);
         		}    
     			break;
     		default:
     			coDriver.setRumble(RumbleType.kRightRumble, 0.0);
     			coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+    			driver.setRumble(RumbleType.kRightRumble, 0.0);
+    			driver.setRumble(RumbleType.kLeftRumble, 0.0);
     			break;
     		}
     				

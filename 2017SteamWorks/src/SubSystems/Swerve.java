@@ -58,7 +58,6 @@ public class Swerve{
 		_targetAngle = Util.continousAngle(goal,intake.getCurrentAngle());
 	}
 
-	}
 	/**
 	 * States of the {@link Swerve} {@link Swerve#headingController heading controller}.
 	 * */
@@ -307,8 +306,8 @@ public class Swerve{
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " dY ", dy*1000);
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (tick) ", x);
 //	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (tick) ", y);
-//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (in) ", x/Constants.DRIVE_TICKS_PER_INCH);
-//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", y/Constants.DRIVE_TICKS_PER_INCH);
+ 	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (in) ", x/Constants.DRIVE_TICKS_PER_INCH);
+	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", y/Constants.DRIVE_TICKS_PER_INCH);
 	        
 			lastEncPosition = getCurrentDriveEncoderPosition();			
 		}

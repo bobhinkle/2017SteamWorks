@@ -25,7 +25,7 @@ public class Sweeper {
 		sweeper.set(1.0);
 	}
 	public void reducedForward(){
-		sweeper.set(0.5);
+		sweeper.set(0.75);
 	}
 	public void reverseSweeper(){
 		sweeper.set(-1);

@@ -1,7 +1,6 @@
 package SubSystems;
 
 import Utilities.Constants;
-import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DistanceController {
@@ -14,6 +13,7 @@ public class DistanceController {
 	private double allowableError = 1.0;
 	private boolean onTarget = false;
 	private int cyclesOnTarget = 0;
+	private int cyclesToCheck = 0;
 	private Swerve dt;
 	private double inputY = 0.0;
 	private double inputX = 0.0;
@@ -51,7 +51,7 @@ public class DistanceController {
 			updateCurrentPos();
 			if(timeout >= System.currentTimeMillis()){
 				if(!isOnTarget()){
-					cyclesOnTarget = Constants.DIST_CONTROLLER_CYCLE_THRESH;	
+					cyclesOnTarget = cyclesToCheck;	
 					if(Math.abs(targetY - currentPositionY) > Constants.DIST_CONTROLLER_PID_THRESH * Constants.DRIVE_TICKS_PER_INCH){
 						inputY = (targetY - currentPositionY) * Constants.DIST_CONTROLLER_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_D;
 					}else{
@@ -90,13 +90,14 @@ public class DistanceController {
 		return onTarget;
 	}
 
-	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput){
+	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput, int checks){
 		reset();
 		targetY = _goalY*Constants.DRIVE_TICKS_PER_INCH;// + currentPositionY;//dt.frontLeft.getY();
 		targetX = _goalX*Constants.DRIVE_TICKS_PER_INCH;// + currentPositionX;//dt.frontLeft.getX();
 		allowableError = error*Constants.DRIVE_TICKS_PER_INCH;
 		timeout = (timeLimit * 1000) + System.currentTimeMillis();
 		inputCap = maxInput;
+		cyclesToCheck = cyclesOnTarget = checks;
 		enable();
 	}
 	public void setOffsetGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput){
