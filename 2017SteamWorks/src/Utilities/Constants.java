@@ -121,7 +121,7 @@ public class Constants {
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 16;
     public static double kCameraPitchAngleDegrees = 25.5; // calibrated 4/22  35.75
-    public static double kCameraYawAngleDegrees = 3;  //2.5
+    public static double kCameraYawAngleDegrees = 3.25;  //2.5
     public static double kCameraDeadband = 0.0;
     
     public static double kCenterOfTargetHeight = 86.0; // inches       
@@ -136,8 +136,9 @@ public class Constants {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kShooterMap = new InterpolatingTreeMap<>();
 
     static {        
-        kShooterMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(3000.0));          
+    	kShooterMap.put(new InterpolatingDouble(105.0), new InterpolatingDouble(2850.0));
+        kShooterMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(2950.0));
+        kShooterMap.put(new InterpolatingDouble(155.0), new InterpolatingDouble(3150.0)); 
         kShooterMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(3200.0)); 
-        kShooterMap.put(new InterpolatingDouble(131.0), new InterpolatingDouble(3000.0)); 
     }
 }
