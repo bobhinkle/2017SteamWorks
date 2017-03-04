@@ -138,6 +138,6 @@ public class Constants {
     static {        
         kShooterMap.put(new InterpolatingDouble(110.0), new InterpolatingDouble(3000.0));          
         kShooterMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(3200.0)); 
-        
+        kShooterMap.put(new InterpolatingDouble(131.0), new InterpolatingDouble(3000.0)); 
     }
 }
