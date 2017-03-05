@@ -17,7 +17,7 @@ public class Logger {
 		try{
 			Date date = new Date() ;
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss") ;
-			file = new File(path + dateFormat.format(date) + ".txt") ;		
+			file = new File(path + "Log.txt");		
 			out = new BufferedWriter(new FileWriter(file));
 			out.write("NEW BOOT");
 			out.newLine();
