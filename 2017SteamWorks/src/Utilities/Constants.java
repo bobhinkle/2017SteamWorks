@@ -47,9 +47,9 @@ public class Constants {
     public static final double TURN_KP_TURN = 0.08;
     
 	//Swerve Turning Gains
-	public static final double SWERVE_TURNING_GAIN_P = 0.02; // 0.02 percent throttle per degree of error 0.02
+	public static final double SWERVE_TURNING_GAIN_P = 0.0195; // 0.02 percent throttle per degree of error 0.02
 	public static final double SWERVE_TURNING_GAIN_D = 0.00425; // 0.00425percent throttle per angular velocity dps 0.00425
-	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.012; // 0.009; 0.015
+	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.019; // 0.009; 0.015
 	public static final double SWERVE_SMALL_TURNING_GAIN_D = 0.002; //0.002
 	// TODO Tune kPHeadingGain (now SWERVE_HEADING_GAIN_P) to prevent drift while driving
 	public static final double SWERVE_HEADING_GAIN_P = 0.002; // 0.003; 0.002
