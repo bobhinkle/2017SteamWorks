@@ -28,7 +28,7 @@ public class Turret {
     	motor.setAllowableClosedLoopErr(0); 
     	motor.changeControlMode(TalonControlMode.Position);
     	motor.set(0);
-    	motor.setPID(1.25, 0, 37.5, 0.0, 0, 0.0, 0);			//practice bot pid tuning
+    	motor.setPID(1.75, 0, 25, 0.0, 0, 0.0, 0);			//practice bot pid tuning
 		motor.enableBrakeMode(true);
 		motor.setNominalClosedLoopVoltage(12);
 	}

@@ -82,8 +82,9 @@ public class Constants {
 	public static final double SHOOTING_SPEED = 3050;
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 100;
-	
+
 	public static final double GEAR_INTAKE_POWER = 15;
+	public static final double GEAR_INTAKE_POWER_REVERSE = 20;
 	public static final double GEAR_INTAKE_CURR_DETECT = 20;
 	public static final double GEAR_INTAKE_REVERSE_CURR_DETECT = 40;
 	public static final double GEAR_INTAKE_REVERSE_POWER = 0.5;

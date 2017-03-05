@@ -151,7 +151,7 @@ public class GearIntake {
 	public void reverse(){
 		gear.changeControlMode(TalonControlMode.Current);
 		gear.setProfile(0);
-		gear.set(-Constants.GEAR_INTAKE_POWER);
+		gear.set(-Constants.GEAR_INTAKE_POWER_REVERSE);
 	}
 	public void stop(){
 		gear.set(0);

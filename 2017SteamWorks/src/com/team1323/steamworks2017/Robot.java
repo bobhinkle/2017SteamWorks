@@ -353,7 +353,7 @@ public class Robot extends SampleRobot {
     		robot.turret.setState(Turret.State.Off);
     		robot.shooter.setState(Shooter.Status.STARTED);
     		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
-    			Timer.delay(.01);
+    			Timer.delay(0.01);
     		}
     		robot.sweeper.forwardRoller();
     		robot.sweeper.forwardSweeper();
