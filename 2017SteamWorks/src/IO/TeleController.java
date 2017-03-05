@@ -24,6 +24,8 @@ public class TeleController
     private DistanceController dist;
     private gearPickedUp gearVibrate;
     private boolean vibrateRunning = false;
+    private boolean isBumpedUp = false;
+    private boolean isBumpedDown = false;
     public TeleController(){
         driver = new Controller(0);
         driver.start();
@@ -40,6 +42,12 @@ public class TeleController
         return instance;
     }    
    
+    
+    /**
+     * At the moment, only Y and Start don't have anything assigned to them.
+     * TODO Add shooter RPM +-100
+     * TODO Left joystick to move turret fast, right to move slow
+     * */
     public void coDriver(){
     	if(coDriver.aButton.isPressed() || coDriver.aButton.isHeld()){
     		if(coDriver.aButton.isHeld() && coDriver.aButton.buttonHoldTime() > 1.5){
@@ -53,6 +61,8 @@ public class TeleController
     	}
     	if(coDriver.xButton.isPressed()){
     		robot.turret.setState(Turret.State.VisionTracking);
+    		isBumpedUp = false;
+    		isBumpedDown = false;
     	}
     	if(coDriver.yButton.isPressed()){
     		/*robot.turret.lockAngle(robot.intake.getCurrentAngle());
@@ -102,12 +112,38 @@ public class TeleController
     	if(coDriver.getPOV() == 270)
     		robot.turret.setAngle(-45);
     	if(coDriver.getPOV() == 0)
-    		robot.turret.setAngle(0);
+    		//robot.turret.setAngle(0);
+    		if(!isBumpedUp && robot.shooter.getStatus() != Shooter.Status.OFF){
+    			robot.shooter.setGoal(robot.shooter.getTarget() + 100);
+    			robot.shooter.setState(Shooter.Status.STARTED);
+    			if(isBumpedDown){
+    				isBumpedUp = false;
+    				isBumpedDown = false;
+    			}else{
+    				isBumpedUp = true;
+    			}
+    		}
     	if(coDriver.getPOV() == 90)
     		robot.turret.setAngle(45);
+    	if(coDriver.getPOV() == 180){
+    		if(!isBumpedDown && robot.shooter.getStatus() != Shooter.Status.OFF){
+    			robot.shooter.setGoal(robot.shooter.getTarget() - 100);
+    			robot.shooter.setState(Shooter.Status.STARTED);
+    			if(isBumpedUp){
+    				isBumpedDown = false;
+    				isBumpedUp=  false;
+    			}else{
+    				isBumpedDown = true;
+    			}
+    		}
+    	}
     	if(coDriver.rightCenterClick.isPressed())
     		robot.turret.setAngle(0);    	
     }
+    
+    
+    
+    
     public void driver() {
     	
     	if(driver.aButton.isPressed()){       

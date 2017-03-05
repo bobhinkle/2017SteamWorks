@@ -26,7 +26,7 @@ public class Constants {
     public static final double FRONT_RIGHT_TURN_OFFSET = 283.0; //281.2
     public static final double FRONT_LEFT_TURN_OFFSET  = 170.5; //171.2
     public static final double REAR_LEFT_TURN_OFFSET   = 138.1; //289.3
-    public static final double REAR_RIGHT_TURN_OFFSET  = 170.1; //172.6
+    public static final double REAR_RIGHT_TURN_OFFSET  = 140.0; //172.6
     
     /**
      * Number of ticks in one inch, calculated from ideal gear ratios and wheel diameter.
@@ -67,6 +67,7 @@ public class Constants {
 	public static final int MIN_CYCLES_HEADING_ON_TARGET = 30;
 	public static final double HEADING_MAX_ERROR = 1.0;
 	public static final double SWERVE_ROTATION_HEADING_ON_TARGET_THRESHOLD = /**/HEADING_MAX_ERROR/*/10/**/;
+	public static final double SWERVE_IMPACT_CURRENT_THRESHOLD = 20;
     
     public static final double CAMERA_PIXEL_WIDTH = 320.0;
 	public static final double CAMERA_FOV = 60; //45.3

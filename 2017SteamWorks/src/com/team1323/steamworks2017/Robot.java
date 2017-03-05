@@ -51,7 +51,22 @@ public class Robot extends SampleRobot {
     
     
 	public static enum AUTO{
-    	OFF,ONE_GEAR,TWO_GEAR,NEAR_HOPPER,FAR_HOPPER, NEAR_HOPPER_INSIDE, NEAR_HOPPER_OUTSIDE, NEAR_HOPPER_RECEIVE
+    	/** Do not run any autonomous subroutine. */
+		OFF,
+    	/** Start at center position. Move field-forward to score gear. Shoot balls. */
+		ONE_GEAR,
+    	/** Start at center position. Move field-forward to score gear. Move field-backward and rotate to 90 or 270 degrees
+    	 *   to face another gear on the field. Intake gear from floor. Rotate to 180 degrees and move field-forward to score
+    	 *   gear. Shoot balls. */
+		TWO_GEAR,
+    	/** Deploy hoppers on boiler side of field. Move under the outside hopper to receive balls. Shoot balls. */
+		NEAR_HOPPER,
+    	/** Deploy hoppers on not-boiler side of field. Move under the outside hopper to receive balls. Move to field x-center,
+    	 *    */
+		FAR_HOPPER,
+		NEAR_HOPPER_INSIDE,
+		NEAR_HOPPER_OUTSIDE,
+		NEAR_HOPPER_RECEIVE
     }
 	
     public Robot() {
@@ -328,10 +343,13 @@ public class Robot extends SampleRobot {
     		delay();
     		dist.setGoal(robot.dt.getX()-24, robot.dt.getY(), 3.0, 0.9, 0.9, 10);
     		delay();
+    		/*while(!robot.dt.isImpacting() && isAutonomous()){
+    			Timer.delay(0.01);
+    		}*/
     		dist.setGoal(robot.dt.getX() + 3, robot.dt.getY() + 18, 1.0, 1.5, 0.95, 10);
     		delay();
     	/** Commented the following to test autos while shooter is out of commission */
-    	/*/	robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
+    	/**/robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.turret.setState(Turret.State.Off);
     		robot.shooter.setState(Shooter.Status.STARTED);
     		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
@@ -359,7 +377,7 @@ public class Robot extends SampleRobot {
     		delay();
 
         	/** Commented the following to test autos while shooter is out of commission */
-    		/*/
+    		/**/
     		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.turret.setState(Turret.State.Off);
     		robot.shooter.setState(Shooter.Status.STARTED);
@@ -385,7 +403,7 @@ public class Robot extends SampleRobot {
     		dist.setGoal(robot.dt.getX()-50, robot.dt.getY(), 3.0, 2.0, 0.7, 20);
     		delay();
         	/** Commented the following to test autos while shooter is out of commission */
-/*/    		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
+/**/    	robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.turret.setState(Turret.State.Off);
     		robot.shooter.setState(Shooter.Status.STARTED);
     		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){

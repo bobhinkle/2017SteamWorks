@@ -330,7 +330,8 @@ public class Swerve{
 			if(wheelError() >= Constants.TURNING_DETECT_THRESHOLD) {isRotating = true;} else {isRotating = false;}
 			if(isRotating || Math.abs(getCurrentDriveEncoderPosition()-lastEncPosition) <= Constants.DRIVING_DETECT_THRESHOLD /*clicks*/) {isTravelling = false;} else {isTravelling = true;}
 			//Note #3
-//			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Angle (deg) ", Util.boundAngle0to360Degrees(getCurrentModuleAngle()));
+			SmartDashboard.putNumber(Integer.toString(moduleID) + " Current", driveMotor.getOutputCurrent());
+			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Angle (deg) ", Util.boundAngle0to360Degrees(getCurrentModuleAngle()));
 //			SmartDashboard.putNumber("DRV_" + Integer.toString(moduleID), driveMotor.get());
 //			SmartDashboard.putNumber(Integer.toString(moduleID) + " Bearing ", Util.boundAngle0to360Degrees(getCurrentAngle()-offSet)); // `-offSet' was commented out
 //			SmartDashboard.putNumber("GOAL " + Integer.toString(moduleID), Util.boundAngle0to360Degrees(rotationMotor.getSetpoint()-(360-offSet)));
@@ -561,6 +562,9 @@ public class Swerve{
 		else
 			onTarget = Constants.MIN_CYCLES_HEADING_ON_TARGET;
 		return onTarget <= 0;
+	}
+	public boolean isImpacting(){
+		return frontLeft.driveMotor.getOutputCurrent() > Constants.SWERVE_IMPACT_CURRENT_THRESHOLD;
 	}
 	public void updateCoord(){
 		/*frontLeft.updateCoord();
