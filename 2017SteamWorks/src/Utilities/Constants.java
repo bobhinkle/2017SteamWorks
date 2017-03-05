@@ -90,6 +90,10 @@ public class Constants {
 	public static final double GEAR_INTAKE_REVERSE_POWER = 0.5;
 	public static final double GEAR_INTAKE_HOLDING_POWER = -0.35;
 	public static final double GEAR_PRESENT = 3.0;
+	public static final double GEAR_HANG_CURRENT = 70;
+	public static final double GEAR_HANG_CURRENT_THRESHOLD = 80;
+	public static final double GEAR_HANG_HOLD_CURRENT = 10;
+	public static final int GEAR_HANG_THRESHOLD = 0;
 	
 	//Distance Controller
 	public static final double DIST_CONTROLLER_P = 0.000040; //0.0000[23]5
@@ -139,7 +143,8 @@ public class Constants {
 
     static {        
     	kShooterMap.put(new InterpolatingDouble(105.0), new InterpolatingDouble(2850.0));
-        kShooterMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(2950.0));
+    	kShooterMap.put(new InterpolatingDouble(125.0), new InterpolatingDouble(2950.0));
+        kShooterMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(2960.0));
         kShooterMap.put(new InterpolatingDouble(155.0), new InterpolatingDouble(3150.0)); 
         kShooterMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(3200.0)); 
     }

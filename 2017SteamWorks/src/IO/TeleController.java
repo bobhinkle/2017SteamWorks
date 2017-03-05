@@ -2,6 +2,7 @@ package IO;import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
 import SubSystems.DistanceController;
 import SubSystems.GearIntake;
+import SubSystems.GearIntake.State;
 import SubSystems.Intake;
 import SubSystems.Shooter;
 import SubSystems.Swerve;
@@ -167,17 +168,10 @@ public class TeleController
     	if(driver.rightTrigger.isPressed()){
     		robot.gearIntake.scoreGear();
     	}
-        if(driver.startButton.isHeld()){
-        	robot.dt.swerveTrack();
-        	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
-            		Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_Y)), 
-            		Util.turnControlSmoother(0),
-            		Util.turnControlSmoother(0),
-            		driver.leftTrigger.isHeld(),
-            		robotCentric,
-            		 false);
-        }else{ 
-        	if(!dist.isEnabled()){ 
+        if(driver.startButton.isPressed()){
+        	 robot.gearIntake.setState(State.HANGING);
+        }
+        if(!dist.isEnabled()){ 
         	/*	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
                 		Util.controlSmoother(-driver.getButtonAxis(Xbox.LEFT_STICK_Y)),0,
                 		0,
@@ -196,7 +190,7 @@ public class TeleController
         		SmartDashboard.putBoolean("sendInput", false);
         	}
         
-        }
+        
         if(driver.rightTrigger.isPressed()) {
 //        	dist.setGoal(0, 10, 0, 4, 0.7); // added this line to help with putting the robot back after testing
         }

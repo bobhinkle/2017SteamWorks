@@ -14,3 +14,4 @@ Lock shooter speed (well) before the shooter begins spinning
 //Reboot `com.team254.cheezdroid` through ADB
 Develop more complex Arduino LED controls
 //Add co-driver controls to bump up/down shooter RPM manually
+Fix math for vision abscissa

@@ -17,9 +17,11 @@ public class GearIntake {
 	public enum State{
 		INTAKE_EXTENDED, INTAKING, INTAKE_RETRACTED, GEAR_DETECT,
 		GEAR_DETECTED, CLIMB_DETECT, CLIMB_DETECTED, SCORE_GEAR_1,SCORE_GEAR_2,INTAKE_TUCK,INTAKE_EXTENDED_OFF,INTAKE_RETRACTED_WITH_GEAR,
-		GEAR_LOST_EXTENDED, GEAR_AUTO, GEAR_LOST_RETRACTED, INTAKE_RETRACTED_GEAR_DETECT, INTAKE_RETRACTED_GEAR_DETECTED
+		GEAR_LOST_EXTENDED, GEAR_AUTO, GEAR_LOST_RETRACTED, INTAKE_RETRACTED_GEAR_DETECT, INTAKE_RETRACTED_GEAR_DETECTED,
+		HANGING, HANG_WAITING, HANG_DETECTED
 	}
 	private State state = State.INTAKE_TUCK;
+	private int hangThreshold = Constants.GEAR_HANG_THRESHOLD;
 	
 	public GearIntake(int canPort, int solPort){
 		gear = new CANTalon(canPort);
@@ -111,6 +113,24 @@ public class GearIntake {
 					gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);
 					state = State.INTAKE_RETRACTED_WITH_GEAR;
 				}
+				break;
+			case HANGING:
+				gear.changeControlMode(TalonControlMode.Current);
+				hangThreshold = Constants.GEAR_HANG_THRESHOLD;
+				gear.set(Constants.GEAR_HANG_CURRENT);
+				state = State.HANG_WAITING;
+				SmartDashboard.putString(" Gear Intake Status ", "Hanging");
+				break;
+			case HANG_WAITING:
+				if(gear.getOutputCurrent()>Constants.GEAR_HANG_CURRENT_THRESHOLD)
+					state = State.HANG_DETECTED;
+					
+				SmartDashboard.putString(" Gear Intake Status ", "Hanging Waiting");
+				break;
+			case HANG_DETECTED:
+				gear.changeControlMode(TalonControlMode.PercentVbus);
+				gear.set(-(3.0/12.0));
+				SmartDashboard.putString(" Gear Intake Status ", "Hang Detected");
 				break;
 			default: 
 				

@@ -369,15 +369,16 @@ public class Robot extends SampleRobot {
     		robot.turret.setAngle(-75);
     		robot.turret.setState(Turret.State.VisionTracking);
     		//robot.intake.intakeReverse();
-    		dist.setGoal(robot.dt.getX(), Constants.NEAR_HOPPER_DEPLOY_Y, 4.0, 3.0, 0.7, 20);
+    		dist.setGoal(robot.dt.getX(), Constants.NEAR_HOPPER_DEPLOY_Y, 4.0, 3.0, 0.7, 10);
     		delay();
-    		dist.setGoal(robot.dt.getX()-24 - 43, robot.dt.getY(), 3.0, /**/2.5/*/0.9/**/, 0.8, 10);
+    		dist.setGoal(robot.dt.getX()-24-25, robot.dt.getY(), 3.0, /**/1.25/*/0.9/**/, 0.8, 10);
     		delay();
     		dist.setGoal(robot.dt.getX() + 3, robot.dt.getY() + 18, 1.0, 1.5, 0.95, 10);
     		delay();
 
         	/** Commented the following to test autos while shooter is out of commission */
     		/**/
+    		Timer.delay(1.5);
     		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.turret.setState(Turret.State.Off);
     		robot.shooter.setState(Shooter.Status.STARTED);
