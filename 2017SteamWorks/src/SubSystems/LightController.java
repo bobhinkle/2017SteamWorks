@@ -10,7 +10,12 @@ package SubSystems;
  */
 public class LightController {
 	
-	private LightController instance = new LightController();
+	private static LightController instance = new LightController();	// Eclipse wanted to add the `static'
+	public static LightController getInstance() {
+		if(instance == null)
+				instance = new LightController();
+		return instance;
+	}
 	public enum Status {
 		/** "Black" means the robot is off. */
 		OFF,
@@ -33,7 +38,9 @@ public class LightController {
 	public LightController() {
 		status = Status.OFF;
 	}
-	
+	public void setStatus(Status _status) {
+		status = _status;
+	}
 	public void update() {
 		switch(status) {
 			case OFF: break;

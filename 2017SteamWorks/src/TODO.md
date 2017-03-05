@@ -2,6 +2,9 @@
 
 ### Erryday
 Tune autos
+	* Near Hopper Inside
+	* Near Hopper Outside
+	* Near Hopper Receive
 
 ### With the Bob
 Implement Swerve current detection to know when we've run into something
