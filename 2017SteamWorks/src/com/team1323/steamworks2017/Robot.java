@@ -371,7 +371,7 @@ public class Robot extends SampleRobot {
     		//robot.intake.intakeReverse();
     		dist.setGoal(robot.dt.getX(), Constants.NEAR_HOPPER_DEPLOY_Y, 4.0, 3.0, 0.7, 20);
     		delay();
-    		dist.setGoal(robot.dt.getX()-24 - 43, robot.dt.getY(), 3.0, 3.0/*0.9*/, 0.9, 10);
+    		dist.setGoal(robot.dt.getX()-24 - 43, robot.dt.getY(), 3.0, /**/2.5/*/0.9/**/, 0.8, 10);
     		delay();
     		dist.setGoal(robot.dt.getX() + 3, robot.dt.getY() + 18, 1.0, 1.5, 0.95, 10);
     		delay();
@@ -382,7 +382,7 @@ public class Robot extends SampleRobot {
     		robot.turret.setState(Turret.State.Off);
     		robot.shooter.setState(Shooter.Status.STARTED);
     		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
-    			Timer.delay(.01);
+    			Timer.delay(0.01);
     		}
     		robot.sweeper.forwardRoller();
     		robot.sweeper.forwardSweeper();
