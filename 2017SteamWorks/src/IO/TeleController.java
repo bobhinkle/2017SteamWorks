@@ -93,7 +93,7 @@ public class TeleController
     	if(coDriver.rightTrigger.isPressed()){
     		robot.intake.intakeStop();
     		robot.sweeper.forwardRoller();
-	    	robot.sweeper.forwardSweeper();
+	    	robot.sweeper.reducedForward();
     		
     	}
     	if(coDriver.leftTrigger.isPressed()){
@@ -113,8 +113,9 @@ public class TeleController
     	if(coDriver.getPOV() == 270)
     		robot.turret.setAngle(-45);
     	if(coDriver.getPOV() == 0)
+    		robot.turret.setAngle(2);
     		//robot.turret.setAngle(0);
-    		if(!isBumpedUp && robot.shooter.getStatus() != Shooter.Status.OFF){
+    		/*if(!isBumpedUp && robot.shooter.getStatus() != Shooter.Status.OFF){
     			robot.shooter.setGoal(robot.shooter.getTarget() + 100);
     			robot.shooter.setState(Shooter.Status.STARTED);
     			if(isBumpedDown){
@@ -123,11 +124,12 @@ public class TeleController
     			}else{
     				isBumpedUp = true;
     			}
-    		}
+    		}*/
     	if(coDriver.getPOV() == 90)
     		robot.turret.setAngle(45);
     	if(coDriver.getPOV() == 180){
-    		if(!isBumpedDown && robot.shooter.getStatus() != Shooter.Status.OFF){
+    		robot.turret.setAngle(-2);
+/*    		if(!isBumpedDown && robot.shooter.getStatus() != Shooter.Status.OFF){
     			robot.shooter.setGoal(robot.shooter.getTarget() - 100);
     			robot.shooter.setState(Shooter.Status.STARTED);
     			if(isBumpedUp){
@@ -136,7 +138,7 @@ public class TeleController
     			}else{
     				isBumpedDown = true;
     			}
-    		}
+    		}*/
     	}
     	if(coDriver.rightCenterClick.isPressed())
     		robot.turret.setAngle(0);    	

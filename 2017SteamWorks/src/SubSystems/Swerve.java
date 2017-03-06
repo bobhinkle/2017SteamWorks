@@ -383,9 +383,12 @@ public class Swerve{
 	    	rotationMotor.setProfile(0);
 	    	rotationMotor.set(rotationMotor.getEncPosition());
 	    }
-	   
+	    
+	   // 2017-03-05 Added because of a potential logic error
+    	/** Determines whether we're close enough to a wheel's desired angle to start driving that wheel.*/
+	    public boolean isAngleOkay(){if(wheelError() < Constants.TURNING_ADD_POWER_THRESHOLD) {return true;} else {return false;}}
+    	/** Determines whether we're close enough to a wheel's desired angle to start driving that wheel, then actually applies power to the wheel. */
 	    public void setDriveSpeed(double power){
-	    	// This function determines whether we're close enough to a wheel's desired angle to start driving that wheel
 	    	if(wheelError() < Constants.TURNING_ADD_POWER_THRESHOLD) {
 	    		driveMotor.set(-power);}
 	   	}
@@ -429,6 +432,12 @@ public class Swerve{
 			x = 0-getRobotX();
 			y = 0-getRobotY();
 		*/}
+	}
+	
+	// 2017-03-05 Added because of a potential logic error
+	/** Checks whether all module angles are on target. */
+	public boolean areModuleAngleStatusesOkay() {
+		return (frontRight.isAngleOkay() && frontLeft.isAngleOkay() && rearLeft.isAngleOkay() && rearRight.isAngleOkay());
 	}
 	
 	/**
@@ -511,12 +520,25 @@ public class Swerve{
 				frontRight.setGoal(frontRightSteeringAngle);
 				rearLeft.setGoal(rearLeftSteeringAngle);
 				rearRight.setGoal(rearRightSteeringAngle);
-				
-				frontLeft.setDriveSpeed(frontLeftWheelSpeed);
-				frontRight.setDriveSpeed(-frontRightWheelSpeed);
-				rearLeft.setDriveSpeed(rearLeftWheelSpeed);
-				rearRight.setDriveSpeed(-rearRightWheelSpeed);
-				
+				/**
+				 * 2017-03-05 Added because of a potential logic error:
+				 * <p>
+				 * 	Previously, each module checked independently whether its angle was on target,
+				 *   then applied power to its own drive motor if it was. Suppose that modules 1 and 2
+				 *   are on target, but 3 and 4 are not. 1 and 2 will apply power, moving the robot and
+				 *   the other modules. In the meantime, 3 and 4 do not apply power, but get moved
+				 *   around and thrown off somewhat.</p>
+				 * <p>Proposed solution: Check whether all module angles are on target. If they are,
+				 *   apply power to each of them. (Note that the {@link SubSystems.Swerve.SwerveDriveModule#setDriveSpeed() setDriveSpeed}
+				 *   method checks the angle status another time before applying power.) If they are not,
+				 *   do not apply power to any of the modules' drive motors.</p>
+				 * */
+				if(areModuleAngleStatusesOkay()) {
+					frontLeft.setDriveSpeed(frontLeftWheelSpeed);
+					frontRight.setDriveSpeed(-frontRightWheelSpeed);
+					rearLeft.setDriveSpeed(rearLeftWheelSpeed);
+					rearRight.setDriveSpeed(-rearRightWheelSpeed);
+				}
 				//Util.sdSimpleClosedLoop("Heading", "Angle", currentRobotHeading, _targetAngle);
 				
 //				SmartDashboard.putNumber(" Heading Angle ", currentRobotHeading); // imported from Intake

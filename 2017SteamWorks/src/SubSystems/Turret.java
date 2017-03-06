@@ -28,7 +28,7 @@ public class Turret {
     	motor.setAllowableClosedLoopErr(0); 
     	motor.changeControlMode(TalonControlMode.Position);
     	motor.set(0);
-    	motor.setPID(1.75, 0, 25, 0.0, 0, 0.0, 0);			//practice bot pid tuning
+    	motor.setPID(Constants.TURRET_DEFAULT_P, 0.001, Constants.TURRET_DEFAULT_D, 0.0, 0, 0.0, 0);			//practice bot pid tuning
 		motor.enableBrakeMode(true);
 		motor.setNominalClosedLoopVoltage(12);
 	}
@@ -47,6 +47,16 @@ public class Turret {
 	public State getCurrentState(){
 		return currentState;
 	}
+	/** 
+	 * 2017-03-05 Added to provide flexibility in PID tuning based on turret state.
+	 *  */
+	public void updatePID() {
+		switch(currentState) {
+			case VisionTracking: motor.setPID(Constants.TURRET_VISION_P, 0, Constants.TURRET_VISION_D, 0.0, 0, 0.0, 0); break; // should profile be not zero?
+			default: motor.setPID(Constants.TURRET_DEFAULT_P, 0, Constants.TURRET_DEFAULT_D, 0.0, 0, 0.0, 0); break;
+		}
+	}
+	
 	public void lockAngle(double newAngle){
 		lockedAngle = newAngle;
 		lockedTurretAngle = getAngle();
@@ -94,5 +104,6 @@ public class Turret {
 		SmartDashboard.putNumber("TURRET_ERROR", getGoal()-getAngle());
 //		Util.sdVerboseClosedLoop("Turret", "Angle", getAngle(), getGoal(),motor.getOutputCurrent()); // *** NEW! ***
 		SmartDashboard.putNumber("TURRET_CURR", motor.getOutputCurrent());
+		SmartDashboard.putNumber("TURRET_VOLTAGE", motor.getOutputVoltage());
 	}
 }

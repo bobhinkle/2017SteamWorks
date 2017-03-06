@@ -22,11 +22,11 @@ public class Constants {
     public static final double SWERVE_R = 27.16;
 	public static final double ANGLE_FRONT_MODULE_CENTER = Math.atan(WHEELBASE_LENGTH/WHEELBASE_WIDTH);
 	
-    
-    public static final double FRONT_RIGHT_TURN_OFFSET = 283.0; //281.2
-    public static final double FRONT_LEFT_TURN_OFFSET  = 170.5; //171.2
-    public static final double REAR_LEFT_TURN_OFFSET   = 138.1; //289.3
-    public static final double REAR_RIGHT_TURN_OFFSET  = 131.6;//140.0; //172.6
+    // 2017-03-05 Added little adjustments to the offsets
+    public static final double FRONT_RIGHT_TURN_OFFSET = 283.0+1.3; //281.2
+    public static final double FRONT_LEFT_TURN_OFFSET  = 170.5-0.5; //171.2
+    public static final double REAR_LEFT_TURN_OFFSET   = 138.1+1.5; //289.3
+    public static final double REAR_RIGHT_TURN_OFFSET  = 131.6+3.4; //140.0; //172.6
     
     /**
      * Number of ticks in one inch, calculated from ideal gear ratios and wheel diameter.
@@ -76,10 +76,14 @@ public class Constants {
 	
 	public static final double TURRET_CLICKS_TO_ANGLE = 66.2252;
 	public static final double TURRET_MAX_ANGLE = 90;
+	public static final double TURRET_DEFAULT_P = 0.75;//1.75
+	public static final double TURRET_DEFAULT_D = 0;//25
+	public static final double TURRET_VISION_P = 1.25;
+	public static final double TURRET_VISION_D = 25;
 	
 	public static final double STICK_DEAD_BAND = 0.2;
 	
-	public static final double SHOOTING_SPEED = 3050;
+	public static final double SHOOTING_SPEED = 2800;//3150 for closer hopper
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 100;
 
@@ -90,7 +94,7 @@ public class Constants {
 	public static final double GEAR_INTAKE_REVERSE_POWER = 0.5;
 	public static final double GEAR_INTAKE_HOLDING_POWER = -0.35;
 	public static final double GEAR_PRESENT = 3.0;
-	public static final double GEAR_HANG_CURRENT = 70;
+	public static final double GEAR_HANG_CURRENT = 70;  
 	public static final double GEAR_HANG_CURRENT_THRESHOLD = 80;
 	public static final double GEAR_HANG_HOLD_CURRENT = 10;
 	public static final int GEAR_HANG_THRESHOLD = 0;
@@ -127,7 +131,7 @@ public class Constants {
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 16;
     public static double kCameraPitchAngleDegrees = 25.5; // calibrated 4/22  35.75
-    public static double kCameraYawAngleDegrees = 3.25;  //2.5
+    public static double kCameraYawAngleDegrees = 2.5;  //2.5
     public static double kCameraDeadband = 0.0;
     
     public static double kCenterOfTargetHeight = 86.0; // inches       
@@ -142,10 +146,10 @@ public class Constants {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kShooterMap = new InterpolatingTreeMap<>();
 
     static {        
-    	kShooterMap.put(new InterpolatingDouble(105.0), new InterpolatingDouble(2850.0));
-    	kShooterMap.put(new InterpolatingDouble(125.0), new InterpolatingDouble(2950.0));
-        kShooterMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(2960.0));
-        kShooterMap.put(new InterpolatingDouble(155.0), new InterpolatingDouble(3150.0)); 
-        kShooterMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(3200.0)); 
+    	//kShooterMap.put(new InterpolatingDouble(105.0), new InterpolatingDouble(2850.0));
+    	//kShooterMap.put(new InterpolatingDouble(125.0), new InterpolatingDouble(2950.0));
+       // kShooterMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(2960.0));
+       // kShooterMap.put(new InterpolatingDouble(155.0), new InterpolatingDouble(3150.0)); 
+       // kShooterMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(3200.0)); 
     }
 }

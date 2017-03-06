@@ -34,6 +34,7 @@ public class Robot extends SampleRobot {
 	final String near_hopper_inside = "near_hopper_inside";
 	final String near_hopper_outside = "near_hopper_outside";
 	final String near_hopper_receive = "near_hopper_receive";
+	final String near_hopper_close_inside = "near_hopper_close_inside";
 	
 	/** {@link SmartDashboard} field for selecting an autonomous subroutine to run */
 	SendableChooser autoSelect;
@@ -66,7 +67,8 @@ public class Robot extends SampleRobot {
 		FAR_HOPPER,
 		NEAR_HOPPER_INSIDE,
 		NEAR_HOPPER_OUTSIDE,
-		NEAR_HOPPER_RECEIVE
+		NEAR_HOPPER_RECEIVE,
+		NEAR_HOPPER_CLOSE_INSIDE
     }
 	
     public Robot() {
@@ -79,6 +81,7 @@ public class Robot extends SampleRobot {
         autoSelect.addObject("Near_Hopper_Outside", near_hopper_outside);
         autoSelect.addObject("Far_Hopper", far_hopper);
         autoSelect.addObject("Near_Hopper_Receive", near_hopper_receive);
+        autoSelect.addObject("Near_Hopper_Close_Inside", near_hopper_close_inside);
         SmartDashboard.putData(" Select Auto ", autoSelect);
         
         robot = RoboSystem.getInstance();
@@ -167,6 +170,15 @@ public class Robot extends SampleRobot {
     	            robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
     	            Timer.delay(0.1);
     				executeAuto(AUTO.NEAR_HOPPER_INSIDE);
+    			case near_hopper_close_inside:
+    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+    		        Timer.delay(0.1);
+    		        robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
+    	            Timer.delay(0.1);
+    	            robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
+    	            Timer.delay(0.1);
+    	            executeAuto(AUTO.NEAR_HOPPER_CLOSE_INSIDE);
+    				break;
     			case near_hopper_outside:
     				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
     		        Timer.delay(0.1);
@@ -337,19 +349,19 @@ public class Robot extends SampleRobot {
     		break;
     	case NEAR_HOPPER_INSIDE:
     		robot.turret.setAngle(-75);
-    		robot.turret.setState(Turret.State.VisionTracking);
+//    		robot.turret.setState(Turret.State.VisionTracking);
     		//robot.intake.intakeReverse();
-    		dist.setGoal(robot.dt.getX(), Constants.NEAR_HOPPER_DEPLOY_Y, 4.0, 3.0, 0.7, 20);
+    		dist.setGoal(robot.dt.getX(), Constants.NEAR_HOPPER_DEPLOY_Y, 4.0, 2.75, 0.7, 20);
     		delay();
-    		dist.setGoal(robot.dt.getX()-24, robot.dt.getY(), 3.0, 0.9, 0.9, 10);
-    		delay();
+/*    		dist.setGoal(robot.dt.getX()-24 + 4, robot.dt.getY(), 3.0, 0.9, 0.9, 10);
+    		delay();*/
     		/*while(!robot.dt.isImpacting() && isAutonomous()){
     			Timer.delay(0.01);
     		}*/
-    		dist.setGoal(robot.dt.getX() + 3, robot.dt.getY() + 18, 1.0, 1.5, 0.95, 10);
-    		delay();
+/*    		dist.setGoal(robot.dt.getX() + 6, robot.dt.getY() + 18, 1.0, 1.5, 0.95, 10);
+    		delay();*/
     	/** Commented the following to test autos while shooter is out of commission */
-    	/**/robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
+    	/*/robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.turret.setState(Turret.State.Off);
     		robot.shooter.setState(Shooter.Status.STARTED);
     		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
@@ -365,6 +377,36 @@ public class Robot extends SampleRobot {
     		Timer.delay(1);
     		robot.shooter.setState(Shooter.Status.OFF);/**/
     		break;
+    	case NEAR_HOPPER_CLOSE_INSIDE:
+    		robot.turret.setAngle(-75);
+    		//robot.turret.setState(Turret.State.VisionTracking);
+    		//robot.intake.intakeReverse();
+    		dist.setGoal(robot.dt.getX(), Constants.NEAR_HOPPER_DEPLOY_Y-35, 4.0, 2.75, 0.7, 20);
+    		delay();
+    		Timer.delay(2);
+    		dist.setGoal(robot.dt.getX()-24 + 4, robot.dt.getY(), 3.0, 0.9, 0.9, 10);
+    		delay();
+    		Timer.delay(2);
+    		dist.setGoal(robot.dt.getX() + 6, robot.dt.getY() - 18, 1.0, 1.5, 0.95, 10);
+    		delay();
+    		Timer.delay(2);
+    		//robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
+    		robot.shooter.setGoal(Constants.SHOOTING_SPEED);
+    		robot.turret.setState(Turret.State.Off);
+    		robot.shooter.setState(Shooter.Status.STARTED);
+    		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
+    			Timer.delay(0.01);
+    		}
+    		robot.sweeper.forwardRoller();
+    		robot.sweeper.forwardSweeper();
+    		robot.intake.reducedForward();
+    		Timer.delay(6);
+    		robot.sweeper.stopRoller();
+    		robot.sweeper.stopSweeper();
+    		robot.intake.intakeStop();
+    		Timer.delay(1);
+    		robot.shooter.setState(Shooter.Status.OFF);
+    		break;
     	case NEAR_HOPPER_OUTSIDE:
     		robot.turret.setAngle(-75);
     		robot.turret.setState(Turret.State.VisionTracking);
@@ -377,7 +419,7 @@ public class Robot extends SampleRobot {
     		delay();
 
         	/** Commented the following to test autos while shooter is out of commission */
-    		/**/
+    		/*/
     		Timer.delay(1.5);
     		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.turret.setState(Turret.State.Off);
@@ -404,7 +446,7 @@ public class Robot extends SampleRobot {
     		dist.setGoal(robot.dt.getX()-50, robot.dt.getY(), 3.0, 2.0, 0.7, 20);
     		delay();
         	/** Commented the following to test autos while shooter is out of commission */
-/**/    	robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
+/*/    	robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.turret.setState(Turret.State.Off);
     		robot.shooter.setState(Shooter.Status.STARTED);
     		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
@@ -463,6 +505,8 @@ public class Robot extends SampleRobot {
     	case OFF: break;
     	default: break;
     }
+    	while(isAutonomous())
+    	{Timer.delay(0.1);}
     }/**/
     
     public void operatorControl() {
