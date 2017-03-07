@@ -72,6 +72,10 @@ public class Intake {
 		intakeLeft.set(20); 
 		intakeRight.set(20);
 	}
+	public void reducedForward(){
+		intakeLeft.set(10);
+		intakeRight.set(10);
+	}
 	public void intakeReverse(){
 		intakeLeft.set(-20);
 		intakeRight.set(-20);

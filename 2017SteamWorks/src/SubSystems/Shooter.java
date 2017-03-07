@@ -83,7 +83,8 @@ public class Shooter {
     	//Util.sdGraphClosedLoop("Shooter", "Speed", getSpeed(), shooterGoal);			// *** NEW! ***
     	
     	SmartDashboard.putNumber("SHOOTER_SPEED", getSpeed());
-		SmartDashboard.putNumber("SHOOTER_TARGET", motor1.getSetpoint());
+    	SmartDashboard.putNumber("SHOOTER_SPEED_GRAPH", getSpeed());
+		SmartDashboard.putNumber("SHOOTER_TARGET", shooterGoal/*motor1.getSetpoint()*/);
     }
     public double getShooterSpeedForRange(double range) {
         InterpolatingDouble result = Constants.kShooterMap.getInterpolated(new InterpolatingDouble(range));
@@ -124,6 +125,9 @@ public class Shooter {
     		return true;
     	}
     	return false;
+    }
+    public double getTarget(){
+    	return shooterGoal;
     }
     
 }
