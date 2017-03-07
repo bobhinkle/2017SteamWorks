@@ -27,6 +27,9 @@ Tune autos
 * Check that auto selection switch has all the appropriate `break` statements, no fallthrough
 * Move the alliance selection switch out of the auto-calling switch, assign its output to a variable, and call the autos with that variable
 * Fix indentation, especially in the auto selection switch
+* Swerve.java, near line 300: Shouldn't the math follow this form?
+
+        `dx = distance * Math.cos(Math.toRadians(90-(intakeAngle + wheelAngle)))`
 
 
 ## Doing
