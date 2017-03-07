@@ -6,8 +6,6 @@ import com.ctre.CANTalon.TalonControlMode;
 
 import Utilities.Constants;
 import Utilities.Ports;
-import Utilities.Util;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added
 
 public class Turret {
@@ -15,6 +13,7 @@ public class Turret {
 	private CANTalon motor;
 	private double lockedAngle = 0.0;
 	private double lockedTurretAngle = 0.0;
+	private int onTargetCheck = 0;
 //	private int absolutePosition;
 	public Turret(){
 		motor = new CANTalon(Ports.TURRET);
@@ -28,7 +27,9 @@ public class Turret {
     	motor.setAllowableClosedLoopErr(0); 
     	motor.changeControlMode(TalonControlMode.Position);
     	motor.set(0);
-    	motor.setPID(Constants.TURRET_DEFAULT_P, 0.001, Constants.TURRET_DEFAULT_D, 0.0, 0, 0.0, 0);			//practice bot pid tuning
+    	motor.setPID(Constants.TURRET_DEFAULT_P, 0.0, Constants.TURRET_DEFAULT_D, 0.0, 0, 0.0, 0);	//practice bot pid tuning
+    	motor.setPID(Constants.TURRET_SMALL_P, 0.00, Constants.TURRET_SMALL_P, 0.0, 0, 0.0, 1);
+    	motor.setProfile(0);
 		motor.enableBrakeMode(true);
 		motor.setNominalClosedLoopVoltage(12);
 	}
@@ -47,15 +48,6 @@ public class Turret {
 	public State getCurrentState(){
 		return currentState;
 	}
-	/** 
-	 * 2017-03-05 Added to provide flexibility in PID tuning based on turret state.
-	 *  */
-	public void updatePID() {
-		switch(currentState) {
-			case VisionTracking: motor.setPID(Constants.TURRET_VISION_P, 0, Constants.TURRET_VISION_D, 0.0, 0, 0.0, 0); break; // should profile be not zero?
-			default: motor.setPID(Constants.TURRET_DEFAULT_P, 0, Constants.TURRET_DEFAULT_D, 0.0, 0, 0.0, 0); break;
-		}
-	}
 	
 	public void lockAngle(double newAngle){
 		lockedAngle = newAngle;
@@ -65,6 +57,7 @@ public class Turret {
 	public void manualControl(double input){
 		double newAngle = (motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE) + (input * 3.5);
 		setAngle(newAngle);		
+		onTargetCheck = Constants.TURRET_ONTARGET_THRESH;
 //		motor.set(-input *0.5);
 	}
 	public void setAngle(double angle){
@@ -73,6 +66,7 @@ public class Turret {
 		if(angle < -Constants.TURRET_MAX_ANGLE)
 			angle = -Constants.TURRET_MAX_ANGLE;
 		motor.set(angle/Constants.TURRET_CLICKS_TO_ANGLE);
+		onTargetCheck = Constants.TURRET_ONTARGET_THRESH;
 	}
 	public void moveDegrees(double degree){
 		double newAngle = getAngle() - degree;
@@ -85,6 +79,11 @@ public class Turret {
 		return motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE;
 	}
 	public void update(double heading){
+		if(Math.abs(getError()) < Constants.TURRET_SMALL_PID_THRESH){
+			motor.setProfile(0);
+		}else{
+			motor.setProfile(0);
+		}
 		switch(currentState){
 		case GyroComp:
 			setAngle(lockedTurretAngle + (lockedAngle - heading));
@@ -101,9 +100,21 @@ public class Turret {
 		
 		SmartDashboard.putNumber("TURRET_ANGLE", getAngle());
 		SmartDashboard.putNumber("TURRET_GOAL", getGoal());
-		SmartDashboard.putNumber("TURRET_ERROR", getGoal()-getAngle());
+		SmartDashboard.putNumber("TURRET_ERROR", getError());
 //		Util.sdVerboseClosedLoop("Turret", "Angle", getAngle(), getGoal(),motor.getOutputCurrent()); // *** NEW! ***
 		SmartDashboard.putNumber("TURRET_CURR", motor.getOutputCurrent());
 		SmartDashboard.putNumber("TURRET_VOLTAGE", motor.getOutputVoltage());
+		
+	}
+	public double getError(){
+		return getGoal() - getAngle();
+	}
+	public boolean onTarget(){
+		if(Math.abs(getError()) < 1.0){
+			onTargetCheck--;
+		}else{
+			onTargetCheck = Constants.TURRET_ONTARGET_THRESH;
+		}
+		return onTargetCheck <= 0;
 	}
 }

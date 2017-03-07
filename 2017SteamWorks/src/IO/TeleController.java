@@ -93,7 +93,7 @@ public class TeleController
     	if(coDriver.rightTrigger.isPressed()){
     		robot.intake.intakeStop();
     		robot.sweeper.forwardRoller();
-	    	robot.sweeper.reducedForward();
+	    	robot.sweeper.forwardSweeper();
     		
     	}
     	if(coDriver.leftTrigger.isPressed()){
@@ -156,13 +156,13 @@ public class TeleController
     		robot.dt.setHeading(90,true);
         }
     	if(driver.bButton.buttonHoldTime() > 2 && driver.bButton.isHeld()){
-    		robot.dt.setHeading(120,true);
+    		//robot.dt.setHeading(120,true);
     	}
     	if(driver.xButton.isPressed()){
     		robot.dt.setHeading(270,true);
         }
     	if(driver.xButton.buttonHoldTime() > 2 && driver.xButton.isHeld()){
-    		robot.dt.setHeading(240,true);
+    		//robot.dt.setHeading(240,true);
     	}
     	if(driver.yButton.isPressed()){
         	robot.dt.setHeading(0,true);

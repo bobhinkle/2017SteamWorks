@@ -88,6 +88,7 @@ public class FSM {
         robot.dt.update();
         robot.intake.update();
         robot.sweeper.SweeperDebug();
+        robot.sweeper.update();
         robot.turret.update(robot.intake.getCurrentAngle());
         dist.update();
         robot.gearIntake.update();
@@ -193,7 +194,7 @@ public class FSM {
                 }
             }
         }else{
-
+        	
         	setTargetVisibility(false);
             lights.setStatus(LightController.Status.TARGET_NOT_DETECTED);
         	SmartDashboard.putNumber("TargetX", 0);

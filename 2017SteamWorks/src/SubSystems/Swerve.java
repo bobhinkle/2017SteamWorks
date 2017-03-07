@@ -153,26 +153,30 @@ public class Swerve{
 				rotateInput = 0.0;
 			}
 			double angle = intake.getCurrentAngle()/180.0*Math.PI; // radians
-			double angleDiff = Math.abs(_targetAngle - intake.getCurrentAngle());
+			double angleDiff = Math.abs(getError());
 			switch(headingController){
 			case Off:
 				rotationCorrection = 0.0;
 				break;
 			case Heading:
-				if(angleDiff > 0.5){
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * Constants.SWERVE_HEADING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_HEADING_GAIN_D;
-					rotationCorrection = Cap(rotationCorrection, Constants.SWERVE_MAX_CORRECTION_HEADING);
+				if(angleDiff >=20){
+					headingController = HeadingController.Rotation;
 				}else{
-				rotationCorrection = 0.0;
+					if(angleDiff > 0.5){
+						rotationCorrection = (getError()) * Constants.SWERVE_HEADING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_HEADING_GAIN_D;
+						rotationCorrection = Util.limit(rotationCorrection, Constants.SWERVE_HEADING_MAX_CORRECTION_HEADING);						
+					}else{
+					rotationCorrection = 0.0;
+					}
 				}
 				break;
-			case Rotation:				
+			case Rotation:		
 				if(angleDiff < 8){
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * Constants.SWERVE_SMALL_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_SMALL_TURNING_GAIN_D;
-					rotationCorrection = Cap(rotationCorrection, Constants.SWERVE_SMALL_HEADING_MAX_CORRECTION_RATIO);
+					rotationCorrection = (getError()) * Constants.SWERVE_SMALL_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_SMALL_TURNING_GAIN_D;
+					rotationCorrection = Util.limit(rotationCorrection, Constants.SWERVE_ROTATION_SMALL_MAX_CORRECTION_RATIO);
 				}else{
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * Constants.SWERVE_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_TURNING_GAIN_D;
-					rotationCorrection = Cap(rotationCorrection, Constants.SWERVE_HEADING_MAX_CORRECTION_RATIO);
+					rotationCorrection = (getError()) * Constants.SWERVE_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_TURNING_GAIN_D;
+					rotationCorrection = Util.limit(rotationCorrection, Constants.SWERVE_ROTATION_MAX_CORRECTION_RATIO);
 				}
 				if(angleDiff < Constants.SWERVE_ROTATION_HEADING_ON_TARGET_THRESHOLD){
 					rotationOnTarget--;
@@ -190,16 +194,14 @@ public class Swerve{
 				
 				break;
 			}
-			if (headingController == HeadingController.Rotation) {
-				
-				SmartDashboard.putNumber("ROTATE_CORRECT", rotationCorrection);
-			} else if (headingController == HeadingController.Off) {
+			if(headingController == HeadingController.Off) {
 				rotationCorrection = 0;
-			} else {
 			}
+			
+			SmartDashboard.putNumber("ROTATE_CORRECT", rotationCorrection);
 			if(halfPower){
-				y = y * 0.5;
-				x = x * 0.5;			
+				y = y * 0.3;
+				x = x * 0.3;			
 			}else{
 				y = y * 1.0;
 				x = x * 1.0;
@@ -208,9 +210,9 @@ public class Swerve{
 				rotateInput = rotateInput + rotationCorrection;
 			}else{
 				if(halfPower)
-					rotateInput = (rotateInput * Constants.SWERVE_ROTATION_SCALE_FACTOR) + rotationCorrection;
+					rotateInput = (rotateInput * Constants.SWERVE_ROTATION_SCALE_FACTOR_SMALL) + rotationCorrection;
 				else
-					rotateInput = (rotateInput * Constants.SWERVE_ROTATION_SCALE_FACTOR_FAST) + rotationCorrection;
+					rotateInput = (rotateInput * Constants.SWERVE_ROTATION_SCALE_FACTOR_BIG) + rotationCorrection;
 			}		
 			if(robotCentric){
 				xInput = x;
@@ -542,8 +544,8 @@ public class Swerve{
 				//Util.sdSimpleClosedLoop("Heading", "Angle", currentRobotHeading, _targetAngle);
 				
 //				SmartDashboard.putNumber(" Heading Angle ", currentRobotHeading); // imported from Intake
-//				SmartDashboard.putNumber(" Heading Set Point ", _targetAngle); // added from Swerve.sendInput()
-				SmartDashboard.putNumber(" Heading Error ", _targetAngle - currentRobotHeading);
+				SmartDashboard.putNumber(" Heading Set Point ", _targetAngle); // added from Swerve.sendInput()
+				SmartDashboard.putNumber(" Heading Error ", getError());
 			}
 		//}
 	}	
@@ -551,8 +553,8 @@ public class Swerve{
 	double Cap(double value, double peak) {
 		if (value < -peak)
 			return -peak;
-		if (value > +peak)
-			return +peak;
+		if (value > peak)
+			return peak;
 		return value;
 	}
 	
@@ -579,7 +581,7 @@ public class Swerve{
 		disableUpdates = false;
 	}
 	public boolean headingOnTarget(){
-		if(Math.abs(_targetAngle - intake.getCurrentAngle()) < Constants.HEADING_MAX_ERROR)
+		if(Math.abs(getError()) < Constants.HEADING_MAX_ERROR)
 			onTarget--;
 		else
 			onTarget = Constants.MIN_CYCLES_HEADING_ON_TARGET;
@@ -587,6 +589,9 @@ public class Swerve{
 	}
 	public boolean isImpacting(){
 		return frontLeft.driveMotor.getOutputCurrent() > Constants.SWERVE_IMPACT_CURRENT_THRESHOLD;
+	}
+	public double getError(){
+		return _targetAngle - intake.getCurrentAngle();
 	}
 	public void updateCoord(){
 		/*frontLeft.updateCoord();
