@@ -153,26 +153,30 @@ public class Swerve{
 				rotateInput = 0.0;
 			}
 			double angle = intake.getCurrentAngle()/180.0*Math.PI; // radians
-			double angleDiff = Math.abs(_targetAngle - intake.getCurrentAngle());
+			double angleDiff = Math.abs(getError());
 			switch(headingController){
 			case Off:
 				rotationCorrection = 0.0;
 				break;
 			case Heading:
-				if(angleDiff > 0.5){
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * Constants.SWERVE_HEADING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_HEADING_GAIN_D;
-					rotationCorrection = Cap(rotationCorrection, Constants.SWERVE_MAX_CORRECTION_HEADING);
+				if(angleDiff >=20){
+					headingController = HeadingController.Rotation;
 				}else{
-				rotationCorrection = 0.0;
+					if(angleDiff > 0.5){
+						rotationCorrection = (getError()) * Constants.SWERVE_HEADING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_HEADING_GAIN_D;
+						rotationCorrection = Util.limit(rotationCorrection, Constants.SWERVE_HEADING_MAX_CORRECTION_HEADING);						
+					}else{
+					rotationCorrection = 0.0;
+					}
 				}
 				break;
-			case Rotation:				
+			case Rotation:		
 				if(angleDiff < 8){
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * Constants.SWERVE_SMALL_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_SMALL_TURNING_GAIN_D;
-					rotationCorrection = Cap(rotationCorrection, Constants.SWERVE_SMALL_HEADING_MAX_CORRECTION_RATIO);
+					rotationCorrection = (getError()) * Constants.SWERVE_SMALL_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_SMALL_TURNING_GAIN_D;
+					rotationCorrection = Util.limit(rotationCorrection, Constants.SWERVE_ROTATION_SMALL_MAX_CORRECTION_RATIO);
 				}else{
-					rotationCorrection = (_targetAngle - intake.getCurrentAngle()) * Constants.SWERVE_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_TURNING_GAIN_D;
-					rotationCorrection = Cap(rotationCorrection, Constants.SWERVE_HEADING_MAX_CORRECTION_RATIO);
+					rotationCorrection = (getError()) * Constants.SWERVE_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_TURNING_GAIN_D;
+					rotationCorrection = Util.limit(rotationCorrection, Constants.SWERVE_ROTATION_MAX_CORRECTION_RATIO);
 				}
 				if(angleDiff < Constants.SWERVE_ROTATION_HEADING_ON_TARGET_THRESHOLD){
 					rotationOnTarget--;
@@ -190,16 +194,14 @@ public class Swerve{
 				
 				break;
 			}
-			if (headingController == HeadingController.Rotation) {
-				
-				SmartDashboard.putNumber("ROTATE_CORRECT", rotationCorrection);
-			} else if (headingController == HeadingController.Off) {
+			if(headingController == HeadingController.Off) {
 				rotationCorrection = 0;
-			} else {
 			}
+			
+			SmartDashboard.putNumber("ROTATE_CORRECT", rotationCorrection);
 			if(halfPower){
-				y = y * 0.5;
-				x = x * 0.5;			
+				y = y * 0.3;
+				x = x * 0.3;			
 			}else{
 				y = y * 1.0;
 				x = x * 1.0;
@@ -208,9 +210,9 @@ public class Swerve{
 				rotateInput = rotateInput + rotationCorrection;
 			}else{
 				if(halfPower)
-					rotateInput = (rotateInput * Constants.SWERVE_ROTATION_SCALE_FACTOR) + rotationCorrection;
+					rotateInput = (rotateInput * Constants.SWERVE_ROTATION_SCALE_FACTOR_SMALL) + rotationCorrection;
 				else
-					rotateInput = (rotateInput * Constants.SWERVE_ROTATION_SCALE_FACTOR_FAST) + rotationCorrection;
+					rotateInput = (rotateInput * Constants.SWERVE_ROTATION_SCALE_FACTOR_BIG) + rotationCorrection;
 			}		
 			if(robotCentric){
 				xInput = x;
@@ -383,9 +385,12 @@ public class Swerve{
 	    	rotationMotor.setProfile(0);
 	    	rotationMotor.set(rotationMotor.getEncPosition());
 	    }
-	   
+	    
+	   // 2017-03-05 Added because of a potential logic error
+    	/** Determines whether we're close enough to a wheel's desired angle to start driving that wheel.*/
+	    public boolean isAngleOkay(){if(wheelError() < Constants.TURNING_ADD_POWER_THRESHOLD) {return true;} else {return false;}}
+    	/** Determines whether we're close enough to a wheel's desired angle to start driving that wheel, then actually applies power to the wheel. */
 	    public void setDriveSpeed(double power){
-	    	// This function determines whether we're close enough to a wheel's desired angle to start driving that wheel
 	    	if(wheelError() < Constants.TURNING_ADD_POWER_THRESHOLD) {
 	    		driveMotor.set(-power);}
 	   	}
@@ -429,6 +434,12 @@ public class Swerve{
 			x = 0-getRobotX();
 			y = 0-getRobotY();
 		*/}
+	}
+	
+	// 2017-03-05 Added because of a potential logic error
+	/** Checks whether all module angles are on target. */
+	public boolean areModuleAngleStatusesOkay() {
+		return (frontRight.isAngleOkay() && frontLeft.isAngleOkay() && rearLeft.isAngleOkay() && rearRight.isAngleOkay());
 	}
 	
 	/**
@@ -511,17 +522,30 @@ public class Swerve{
 				frontRight.setGoal(frontRightSteeringAngle);
 				rearLeft.setGoal(rearLeftSteeringAngle);
 				rearRight.setGoal(rearRightSteeringAngle);
-				
-				frontLeft.setDriveSpeed(frontLeftWheelSpeed);
-				frontRight.setDriveSpeed(-frontRightWheelSpeed);
-				rearLeft.setDriveSpeed(rearLeftWheelSpeed);
-				rearRight.setDriveSpeed(-rearRightWheelSpeed);
-				
+				/**
+				 * 2017-03-05 Added because of a potential logic error:
+				 * <p>
+				 * 	Previously, each module checked independently whether its angle was on target,
+				 *   then applied power to its own drive motor if it was. Suppose that modules 1 and 2
+				 *   are on target, but 3 and 4 are not. 1 and 2 will apply power, moving the robot and
+				 *   the other modules. In the meantime, 3 and 4 do not apply power, but get moved
+				 *   around and thrown off somewhat.</p>
+				 * <p>Proposed solution: Check whether all module angles are on target. If they are,
+				 *   apply power to each of them. (Note that the {@link SubSystems.Swerve.SwerveDriveModule#setDriveSpeed() setDriveSpeed}
+				 *   method checks the angle status another time before applying power.) If they are not,
+				 *   do not apply power to any of the modules' drive motors.</p>
+				 * */
+				if(areModuleAngleStatusesOkay()) {
+					frontLeft.setDriveSpeed(frontLeftWheelSpeed);
+					frontRight.setDriveSpeed(-frontRightWheelSpeed);
+					rearLeft.setDriveSpeed(rearLeftWheelSpeed);
+					rearRight.setDriveSpeed(-rearRightWheelSpeed);
+				}
 				//Util.sdSimpleClosedLoop("Heading", "Angle", currentRobotHeading, _targetAngle);
 				
 //				SmartDashboard.putNumber(" Heading Angle ", currentRobotHeading); // imported from Intake
-//				SmartDashboard.putNumber(" Heading Set Point ", _targetAngle); // added from Swerve.sendInput()
-				SmartDashboard.putNumber(" Heading Error ", _targetAngle - currentRobotHeading);
+				SmartDashboard.putNumber(" Heading Set Point ", _targetAngle); // added from Swerve.sendInput()
+				SmartDashboard.putNumber(" Heading Error ", getError());
 			}
 		//}
 	}	
@@ -529,8 +553,8 @@ public class Swerve{
 	double Cap(double value, double peak) {
 		if (value < -peak)
 			return -peak;
-		if (value > +peak)
-			return +peak;
+		if (value > peak)
+			return peak;
 		return value;
 	}
 	
@@ -557,7 +581,7 @@ public class Swerve{
 		disableUpdates = false;
 	}
 	public boolean headingOnTarget(){
-		if(Math.abs(_targetAngle - intake.getCurrentAngle()) < Constants.HEADING_MAX_ERROR)
+		if(Math.abs(getError()) < Constants.HEADING_MAX_ERROR)
 			onTarget--;
 		else
 			onTarget = Constants.MIN_CYCLES_HEADING_ON_TARGET;
@@ -565,6 +589,9 @@ public class Swerve{
 	}
 	public boolean isImpacting(){
 		return frontLeft.driveMotor.getOutputCurrent() > Constants.SWERVE_IMPACT_CURRENT_THRESHOLD;
+	}
+	public double getError(){
+		return _targetAngle - intake.getCurrentAngle();
 	}
 	public void updateCoord(){
 		/*frontLeft.updateCoord();

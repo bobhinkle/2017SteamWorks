@@ -19,8 +19,8 @@ public class Ports {
     public static final int SHOOTER_MOTOR_MASTER= 0;
     public static final int SHOOTER_MOTOR_SLAVE = 1;
     
-    public static final int SWEEPER 			= 14;
-    public static final int SWEEPER_ROLLER 		= 9;
+    public static final int SWEEPER 			= 9;//switched from 14
+    public static final int SWEEPER_ROLLER 		= 14;//switched from 9
     
     public static final int INTAKE_MOTOR_L    	= 7;
     public static final int INTAKE_MOTOR_R    	= 8;

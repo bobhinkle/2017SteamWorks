@@ -22,11 +22,11 @@ public class Constants {
     public static final double SWERVE_R = 27.16;
 	public static final double ANGLE_FRONT_MODULE_CENTER = Math.atan(WHEELBASE_LENGTH/WHEELBASE_WIDTH);
 	
-    
-    public static final double FRONT_RIGHT_TURN_OFFSET = 283.0; //281.2
-    public static final double FRONT_LEFT_TURN_OFFSET  = 170.5; //171.2
-    public static final double REAR_LEFT_TURN_OFFSET   = 138.1; //289.3
-    public static final double REAR_RIGHT_TURN_OFFSET  = 131.6;//140.0; //172.6
+    // 2017-03-05 Added little adjustments to the offsets
+    public static final double FRONT_RIGHT_TURN_OFFSET = 283.0+1.3; //281.2
+    public static final double FRONT_LEFT_TURN_OFFSET  = 170.5-0.5; //171.2
+    public static final double REAR_LEFT_TURN_OFFSET   = 138.1+1.5; //289.3
+    public static final double REAR_RIGHT_TURN_OFFSET  = 131.6+3.4; //140.0; //172.6
     
     /**
      * Number of ticks in one inch, calculated from ideal gear ratios and wheel diameter.
@@ -46,26 +46,35 @@ public class Constants {
     // Turn, KP, turn!
     public static final double TURN_KP_TURN = 0.08;
     
+    public static final double SWEEPER_JAM_CURRENT = 75;
+    public static final double SWEEPER_FORWARD = 1.0;
+    public static final double SWEEPER_REDUCED_FORWARD = .75;
+    public static final double SWEEPER_REVERSE = -1;
+    public static final double SWEEPER_ROLLER_FORWARD = 1.0;
+    public static final double SWEEPER_ROLLER_REVERSE = -1.0;
+    
 	//Swerve Turning Gains
 	public static final double SWERVE_TURNING_GAIN_P = 0.0195; // 0.02 percent throttle per degree of error 0.02
 	public static final double SWERVE_TURNING_GAIN_D = 0.00425; // 0.00425percent throttle per angular velocity dps 0.00425
-	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.018; //0.019; // 0.009; 0.015
-	public static final double SWERVE_SMALL_TURNING_GAIN_D = 0.002; //0.002
+	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.03; //0.019; // 0.009; 0.015
+	public static final double SWERVE_SMALL_TURNING_GAIN_D = 0.02; //0.002
+	public static final double SWERVE_ROTATION_MAX_CORRECTION_RATIO = 0.75; //0.75
+	public static final double SWERVE_ROTATION_SMALL_MAX_CORRECTION_RATIO = 0.18; //0.18
+	//////////////////////////////////////////////////////////////////////////////
+	public static final double SWERVE_ROTATION_SCALE_FACTOR_SMALL = 0.225;
+	public static final double SWERVE_ROTATION_SCALE_FACTOR_BIG = 0.35;
 	// TODO Tune kPHeadingGain (now SWERVE_HEADING_GAIN_P) to prevent drift while driving
-	public static final double SWERVE_HEADING_GAIN_P = 0.002; // 0.003; 0.002
-	public static final double SWERVE_HEADING_GAIN_D = 0.001; // 0.001
-	public static final double SWERVE_HEADING_MAX_CORRECTION_RATIO = 0.75; //0.75
-	public static final double SWERVE_SMALL_HEADING_MAX_CORRECTION_RATIO = 0.18; //0.18
-	public static final double SWERVE_MAX_CORRECTION_HEADING = 0.12;
-	public static final double SWERVE_ROTATION_SCALE_FACTOR = 0.225;
-	public static final double SWERVE_ROTATION_SCALE_FACTOR_FAST = 0.35;
+	public static final double SWERVE_HEADING_GAIN_P = 0.01; // 0.003; 0.002
+	public static final double SWERVE_HEADING_GAIN_D = 0.00; // 0.001
+	public static final double SWERVE_HEADING_MAX_CORRECTION_HEADING = 0.07;
+	
     
     public static final double TURNING_ADD_POWER_THRESHOLD = 10; //10
     public static final double TURNING_DETECT_THRESHOLD = TURNING_ADD_POWER_THRESHOLD;//1; //10// 3
     public static final int DRIVING_DETECT_THRESHOLD = 1; // clicks
     public static final double ROBOT_ROTATING_DETECT_THRESHOLD = 15;
-	public static final int MIN_CYCLES_HEADING_ON_TARGET = 30;
-	public static final double HEADING_MAX_ERROR = 1.0;
+	public static final int MIN_CYCLES_HEADING_ON_TARGET = 0;
+	public static final double HEADING_MAX_ERROR = 2.0;
 	public static final double SWERVE_ROTATION_HEADING_ON_TARGET_THRESHOLD = /**/HEADING_MAX_ERROR/*/10/**/;
 	public static final double SWERVE_IMPACT_CURRENT_THRESHOLD = 20;
     
@@ -76,10 +85,17 @@ public class Constants {
 	
 	public static final double TURRET_CLICKS_TO_ANGLE = 66.2252;
 	public static final double TURRET_MAX_ANGLE = 90;
+	public static final double TURRET_DEFAULT_P = 1.75;//1.75
+	public static final double TURRET_DEFAULT_D = 10;//25
+	public static final int TURRET_I_ZONE = (int) (1023.0 / TURRET_DEFAULT_P);
 	
+	public static final double TURRET_SMALL_P = 10.0;
+	public static final double TURRET_SMALL_D = 5.0;
+	public static final double TURRET_SMALL_PID_THRESH = 5;
+	public static final int    TURRET_ONTARGET_THRESH  = 1;
 	public static final double STICK_DEAD_BAND = 0.2;
 	
-	public static final double SHOOTING_SPEED = 3050;
+	public static final double SHOOTING_SPEED = 2750;//2800;//3150 for closer hopper
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 100;
 
@@ -90,7 +106,7 @@ public class Constants {
 	public static final double GEAR_INTAKE_REVERSE_POWER = 0.5;
 	public static final double GEAR_INTAKE_HOLDING_POWER = -0.35;
 	public static final double GEAR_PRESENT = 3.0;
-	public static final double GEAR_HANG_CURRENT = 70;
+	public static final double GEAR_HANG_CURRENT = 70;  
 	public static final double GEAR_HANG_CURRENT_THRESHOLD = 80;
 	public static final double GEAR_HANG_HOLD_CURRENT = 10;
 	public static final int GEAR_HANG_THRESHOLD = 0;
@@ -127,7 +143,7 @@ public class Constants {
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 16;
     public static double kCameraPitchAngleDegrees = 25.5; // calibrated 4/22  35.75
-    public static double kCameraYawAngleDegrees = 3.25;  //2.5
+    public static double kCameraYawAngleDegrees = 2.5;  //2.5
     public static double kCameraDeadband = 0.0;
     
     public static double kCenterOfTargetHeight = 86.0; // inches       
@@ -142,10 +158,10 @@ public class Constants {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kShooterMap = new InterpolatingTreeMap<>();
 
     static {        
-    	kShooterMap.put(new InterpolatingDouble(105.0), new InterpolatingDouble(2850.0));
-    	kShooterMap.put(new InterpolatingDouble(125.0), new InterpolatingDouble(2950.0));
-        kShooterMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(2960.0));
-        kShooterMap.put(new InterpolatingDouble(155.0), new InterpolatingDouble(3150.0)); 
-        kShooterMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(3200.0)); 
+    	//kShooterMap.put(new InterpolatingDouble(105.0), new InterpolatingDouble(2850.0));
+    	//kShooterMap.put(new InterpolatingDouble(125.0), new InterpolatingDouble(2950.0));
+       // kShooterMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(2960.0));
+       // kShooterMap.put(new InterpolatingDouble(155.0), new InterpolatingDouble(3150.0)); 
+       // kShooterMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(3200.0)); 
     }
 }
