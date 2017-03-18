@@ -3,6 +3,8 @@
  */
 package SubSystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /**
  * The LightController subsystem controls the signal sent to the Arduino board, which lights up LEDs to signal various robot states.
  * 
@@ -17,7 +19,7 @@ public class LightController {
 		return instance;
 	}
 	public enum Status {
-		/** "Black" means the robot is off. */
+		/**  */
 		OFF,
 		/** Robot is disabled. */
 		DISABLED,
@@ -43,14 +45,30 @@ public class LightController {
 	}
 	public void update() {
 		switch(status) {
-			case OFF: break;
-			case DISABLED: break;
-			case CATASTROPHE: break;
-			case GEAR_DETECTED: break;
-			case GEAR_LOST: break;
-			case TARGET_DETECTED: break;
-			case TARGET_NOT_DETECTED: break;
-			default: break;
+			case OFF:
+				SmartDashboard.putString("Lights", "0");
+				break;
+			case DISABLED: 
+				SmartDashboard.putString("Lights", "2");
+				break;
+			case CATASTROPHE: 
+				SmartDashboard.putString("Lights", "7");
+				break;
+			case GEAR_DETECTED:
+				SmartDashboard.putString("Lights", "6");
+				break;
+			case GEAR_LOST:
+				SmartDashboard.putString("Lights", "3");
+				break;
+			case TARGET_DETECTED: 
+				SmartDashboard.putString("Lights", "4");
+				break;
+			case TARGET_NOT_DETECTED:
+				SmartDashboard.putString("Lights", "1");
+				break;
+			default:
+				SmartDashboard.putString("Lights", "5"); // if we're not disabled but nothing else is happening?
+				break;
 		}
 	}
 }

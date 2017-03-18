@@ -9,8 +9,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import IO.Logger;
-
 
 /**
  * VisionUpdate contains the various attributes outputted by the vision system,

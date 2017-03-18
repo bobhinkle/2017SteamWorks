@@ -10,15 +10,18 @@ import Helpers.Rotation2d;
 import Helpers.Translation2d;
 import IO.Logger;
 import SubSystems.DistanceController;
+import SubSystems.GearIntake;
 import SubSystems.LightController;
+import SubSystems.Shooter;
 import SubSystems.TargetInfo;
 import SubSystems.Turret;
 import Utilities.Constants;
 import Utilities.Util;
+import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class FSM {
+public class FSM extends SampleRobot {
 
 	public enum State{
     	DEFAULT, INIT,SHOOTER_STARTED, SHOOTER_WAITING, SHOOTER_READY, SHOOTER_SHOOTING, GEAR_GRAB, GEAR_SCORE, INTAKE_BALLS
@@ -39,11 +42,13 @@ public class FSM {
 	private double nextPosUpdate = 0;
     private double targetDistance = 0.0;
     private long lastVisionUpdate = System.currentTimeMillis();
-
+    private boolean phoneConnected = false;
     private LightController lights;
     private boolean targetVisibility = false;
     private void setTargetVisibility(boolean seen) {targetVisibility = seen;}
     public boolean getTargetVisibility() {return targetVisibility;}
+    private int cyclesOnTarget = 1;
+    private int cyclesOnTargetDefault = 1;
     
     public static FSM getInstance()
     {
@@ -95,12 +100,13 @@ public class FSM {
         robot.shooter.update();
         robot.gearIntake.gearCurrent();
         lights.update();
+        robot.hanger.update();
         
         if(System.currentTimeMillis()>this.nextPosUpdate){
         	logger.writePosition(robot.dt.getX(),robot.dt.getY());
         	nextPosUpdate = System.currentTimeMillis()+2000;
         }
-        
+        lightsUpdate();
     }
     public synchronized double getTargetDistance(){
     	return targetDistance;
@@ -117,8 +123,9 @@ public class FSM {
         camera_yaw_correction_ = Rotation2d.fromDegrees(-Constants.kCameraYawAngleDegrees);
         differential_height_ = Constants.kCenterOfTargetHeight - Constants.kCameraZOffset;
     }
+    
     public void addVisionUpdate(double timestamp, List<TargetInfo> vision_update) {
-    	
+    	phoneConnected = true;
 		List<Translation2d> field_to_goals = new ArrayList<>();
 //        RigidTransform2d field_to_camera = getFieldToCamera(timestamp);
         if (!(vision_update == null || vision_update.isEmpty())) {
@@ -140,7 +147,7 @@ public class FSM {
                 // find intersection with the goal
                 if (zr > 0) {
                     double scaling = differential_height_ / zr;
-                    double distance = Math.hypot(xr, yr) * scaling;
+                    double distance = (Math.hypot(xr, yr) * scaling)+Constants.VISION_CENTER_TO_CAMERA_RADIUS;
                     Rotation2d angle = new Rotation2d(xr, yr, true);
 //                    SmartDashboard.putNumber("Target_hypot", Math.hypot(xr, yr));
 //                    SmartDashboard.putNumber("Target_Angle", angle.getDegrees());
@@ -164,24 +171,17 @@ public class FSM {
                     SmartDashboard.putNumber("Target Cosine", cosine);
                     SmartDashboard.putNumber("Dx",Dx);
                     SmartDashboard.putNumber("Dy", Dy);
-                    robot.dt.setOffsets(x_offset, y_offset);
+                    SmartDashboard.putNumber(" angle.getDegrees ", angle.getDegrees());
+                    if(mathAbsoluteHeadingOfTurret > 180)
+                    	robot.dt.setOffsets(x_offset, y_offset);
                     if(robot.turret.getCurrentState() == Turret.State.VisionTracking){
-                    	robot.turret.moveDegrees(angle.getDegrees());
-                    }
-                    else if(robot.turret.getCurrentState() == Turret.State.CalculatedTracking){
-                    	double calculatedAngle = Math.atan((robot.dt.getRobotXInch()-Constants.kBlueSideHopperX)/(robot.dt.getRobotYInch()-Constants.kBlueSideHopperY));
-//                        SmartDashboard.putNumber("Est_Angle_Target", Math.toDegrees(calculatedAngle));
-                        double robotAdjustedAngle = -Util.boundAngleNeg180to180Degrees(robot.intake.getCurrentAngle()-180 - Math.toDegrees(calculatedAngle));
-//                        SmartDashboard.putNumber("RobAdjustAngle", robotAdjustedAngle);
-                        if(robot.turret.getCurrentState() == Turret.State.CalculatedTracking)
-                        	robot.turret.setAngle(robotAdjustedAngle);
-                    }
-                    
+                    	if(robot.turret.onTarget())
+                    		robot.turret.moveDegrees(angle.getDegrees());
+                    }                    
 
                     targetDistance = distance;
                 	setTargetVisibility(true);
-                    lights.setStatus(LightController.Status.TARGET_DETECTED);
-                	SmartDashboard.putBoolean(" Target Found ", true);
+                	SmartDashboard.putBoolean("Vision Target Seen", true);
                     SmartDashboard.putNumber(" Target Distance ", distance);
                     SmartDashboard.putNumber("Vision Shot Speed", robot.shooter.getShooterSpeedForRange(distance));
                     long now = System.currentTimeMillis();
@@ -194,12 +194,11 @@ public class FSM {
                 }
             }
         }else{
-        	
         	setTargetVisibility(false);
-            lights.setStatus(LightController.Status.TARGET_NOT_DETECTED);
+            
         	SmartDashboard.putNumber("TargetX", 0);
         	SmartDashboard.putNumber("TargetY", 0);
-            SmartDashboard.putBoolean(" Target Found ", false);
+            SmartDashboard.putBoolean("Vision Target Seen", false);
             
             double calculatedAngle = Math.atan((robot.dt.getXWithOffsets()-Constants.kBlueSideHopperX)/(robot.dt.getYWithOffsets()-Constants.kBlueSideHopperY));
 //            SmartDashboard.putNumber("Est_Angle_Target", Math.toDegrees(calculatedAngle));
@@ -207,13 +206,37 @@ public class FSM {
 //            SmartDashboard.putNumber("RobAdjustAngle", robotAdjustedAngle);
             if(robot.turret.getCurrentState() == Turret.State.CalculatedTracking)
             	robot.turret.setAngle(robotAdjustedAngle);
-            targetDistance = 130;
+            targetDistance = 82;
             SmartDashboard.putNumber(" Target Distance ",0);
         }
         
         synchronized (this) {
 //            goal_tracker_.update(timestamp, field_to_goals);
         }
+        
     }
-
+    private void lightsUpdate(){
+    	if(!phoneConnected || !robot.intake.pidgeyGood()){
+    		lights.setStatus(LightController.Status.CATASTROPHE);
+    	}else
+    		if(isDisabled()){
+    			lights.setStatus(LightController.Status.DISABLED);
+    		} else {
+    		if(robot.shooter.getStatus() == Shooter.Status.OFF){
+    			if(targetVisibility){
+    				lights.setStatus(LightController.Status.TARGET_DETECTED);
+    			}else{
+    				lights.setStatus(LightController.Status.TARGET_NOT_DETECTED);
+    			}
+    		}
+    		}
+    }
+    public boolean isAtDistance(double d){
+    	if(targetDistance < d && targetDistance > 40){
+    		cyclesOnTarget--;
+    	}else{
+    		cyclesOnTarget = cyclesOnTargetDefault;
+    	}
+    	return cyclesOnTarget <= 0;
+    }
 }

@@ -79,11 +79,6 @@ public class Turret {
 		return motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE;
 	}
 	public void update(double heading){
-		if(Math.abs(getError()) < Constants.TURRET_SMALL_PID_THRESH){
-			motor.setProfile(0);
-		}else{
-			motor.setProfile(0);
-		}
 		switch(currentState){
 		case GyroComp:
 			setAngle(lockedTurretAngle + (lockedAngle - heading));
@@ -110,11 +105,15 @@ public class Turret {
 		return getGoal() - getAngle();
 	}
 	public boolean onTarget(){
-		if(Math.abs(getError()) < 1.0){
+		if(Math.abs(getError()) < 2.5){
 			onTargetCheck--;
 		}else{
 			onTargetCheck = Constants.TURRET_ONTARGET_THRESH;
 		}
 		return onTargetCheck <= 0;
+	}
+	public void resetAngle(double a){
+		motor.setEncPosition((int)(a * Constants.TURRET_CLICKS_TO_ANGLE));
+		motor.setSetpoint(motor.getPosition());
 	}
 }

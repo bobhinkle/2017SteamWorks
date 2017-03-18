@@ -8,8 +8,9 @@ import Helpers.InterpolatingTreeMap;
  * @author Rohi Zacharia
  */
 public class Constants {
-    public static double kBlueSideHopperX = -159.0;
+    public static double kBlueSideHopperX = -156.0;
     public static double kBlueSideHopperY = 8.0;
+    
     public static final boolean LOW_GEAR  = true; //Drivetrain low gear
     public static final double MIN_DT_POWER = 0.2;
     public static final double STARTING_ANGLE_OFFSET = 0;
@@ -17,23 +18,23 @@ public class Constants {
     public static final int GYRO_INIT = 0;
     public static final int GYRO_READY  = 1;
     
-    public static final double WHEELBASE_LENGTH = 22.181;
-    public static final double WHEELBASE_WIDTH  = 15.681;
+    public static final double WHEELBASE_LENGTH = 15.681;
+    public static final double WHEELBASE_WIDTH  = 22.181;
     public static final double SWERVE_R = 27.16;
 	public static final double ANGLE_FRONT_MODULE_CENTER = Math.atan(WHEELBASE_LENGTH/WHEELBASE_WIDTH);
 	
     // 2017-03-05 Added little adjustments to the offsets
-    public static final double FRONT_RIGHT_TURN_OFFSET = 283.0+1.3; //281.2
-    public static final double FRONT_LEFT_TURN_OFFSET  = 170.5-0.5; //171.2
-    public static final double REAR_LEFT_TURN_OFFSET   = 138.1+1.5; //289.3
-    public static final double REAR_RIGHT_TURN_OFFSET  = 131.6+3.4; //140.0; //172.6
+    public static final double FRONT_RIGHT_TURN_OFFSET = 227.1;//pbot 283.0+1.3; //281.2
+    public static final double FRONT_LEFT_TURN_OFFSET  = 191.5;//pbot 170.5-0.5; //171.2
+    public static final double REAR_LEFT_TURN_OFFSET   = 263.1;//pbot 138.1+1.5; //289.3
+    public static final double REAR_RIGHT_TURN_OFFSET  = 45.5;//pbot 131.6+3.4; //140.0; //172.6
     
     /**
      * Number of ticks in one inch, calculated from ideal gear ratios and wheel diameter.
      * <p>
      * Multiply by this value to convert inches to ticks. Divide by this value to convert ticks to inches.</p>
      * */
-    public static final double DRIVE_TICKS_PER_INCH =  (13*5760)/(16*Math.PI)/2.0*.957;//36/25542; //0.00200635031508792675265469178699;//0.00163990667972621570986118595697; //0.00150603674668734095803578302171;//60.0/40462.0; //
+    public static final double DRIVE_TICKS_PER_INCH =  (13.0*5760.0)/(16.0*Math.PI)/2.0*.957;//36/25542; //0.00200635031508792675265469178699;//0.00163990667972621570986118595697; //0.00150603674668734095803578302171;//60.0/40462.0; //
     public static final double TURN_KP = 0.02; //0.020
     public static final double TURN_KI = 0.00;
     public static final double TURN_KD = 0.02;//0.02
@@ -47,26 +48,29 @@ public class Constants {
     public static final double TURN_KP_TURN = 0.08;
     
     public static final double SWEEPER_JAM_CURRENT = 75;
-    public static final double SWEEPER_FORWARD = 1.0;
+    public static final double SWEEPER_FORWARD = 0.75;
     public static final double SWEEPER_REDUCED_FORWARD = .75;
     public static final double SWEEPER_REVERSE = -1;
-    public static final double SWEEPER_ROLLER_FORWARD = 1.0;
-    public static final double SWEEPER_ROLLER_REVERSE = -1.0;
+    public static final double SWEEPER_ROLLER_FORWARD = 65.0;//1.0;
+    public static final double SWEEPER_ROLLER_REVERSE = -65.0;
     
 	//Swerve Turning Gains
-	public static final double SWERVE_TURNING_GAIN_P = 0.0195; // 0.02 percent throttle per degree of error 0.02
-	public static final double SWERVE_TURNING_GAIN_D = 0.00425; // 0.00425percent throttle per angular velocity dps 0.00425
-	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.03; //0.019; // 0.009; 0.015
-	public static final double SWERVE_SMALL_TURNING_GAIN_D = 0.02; //0.002
-	public static final double SWERVE_ROTATION_MAX_CORRECTION_RATIO = 0.75; //0.75
-	public static final double SWERVE_ROTATION_SMALL_MAX_CORRECTION_RATIO = 0.18; //0.18
+	public static final double SWERVE_TURNING_GAIN_P = 0.02; // 0.02 percent throttle per degree of error 0.02
+	public static final double SWERVE_TURNING_GAIN_D = 0.0055; // 0.00425percent throttle per angular velocity dps 0.00425
+	public static final double SWERVE_SMALL_TURNING_GAIN_P = 0.1; //0.03; // 0.009; 0.015
+	public static final double SWERVE_SMALL_TURNING_GAIN_D = 0.01; //0.02
+	public static final double SWERVE_ROTATION_MAX_CORRECTION_RATIO = 0.5; //0.75
+	public static final double SWERVE_ROTATION_SMALL_MAX_CORRECTION_RATIO = 0.2; //0.18
 	//////////////////////////////////////////////////////////////////////////////
-	public static final double SWERVE_ROTATION_SCALE_FACTOR_SMALL = 0.225;
-	public static final double SWERVE_ROTATION_SCALE_FACTOR_BIG = 0.35;
-	// TODO Tune kPHeadingGain (now SWERVE_HEADING_GAIN_P) to prevent drift while driving
-	public static final double SWERVE_HEADING_GAIN_P = 0.01; // 0.003; 0.002
-	public static final double SWERVE_HEADING_GAIN_D = 0.00; // 0.001
-	public static final double SWERVE_HEADING_MAX_CORRECTION_HEADING = 0.07;
+	public static final double SWERVE_ROTATION_SCALE_FACTOR_SMALL = 0.1; //.225
+	public static final double SWERVE_ROTATION_SCALE_FACTOR_BIG = 0.35;  
+	// TODO Tune kP Gain to prevent drift while driving
+	public static final double SWERVE_HEADING_GAIN_P = 0.003; // 0.003; 0.002
+	public static final double SWERVE_HEADING_GAIN_D = 0.0005; // 0.001
+	public static final double SWERVE_HEADING_BIG_P = 0.012;
+	public static final double SWERVE_HEADING_BIG_D = 0;
+	public static final double SWERVE_HEADING_MAX_CORRECTION_HEADING = 0.2; 
+	public static final double SWERVE_HEADING_BIG_MAX_CORRECTION_HEADING = 0.13;
 	
     
     public static final double TURNING_ADD_POWER_THRESHOLD = 10; //10
@@ -84,7 +88,7 @@ public class Constants {
 	public static final double CAM_CALIBRATION = 1.0;
 	
 	public static final double TURRET_CLICKS_TO_ANGLE = 66.2252;
-	public static final double TURRET_MAX_ANGLE = 90;
+	public static final double TURRET_MAX_ANGLE = 105;
 	public static final double TURRET_DEFAULT_P = 1.75;//1.75
 	public static final double TURRET_DEFAULT_D = 10;//25
 	public static final int TURRET_I_ZONE = (int) (1023.0 / TURRET_DEFAULT_P);
@@ -92,22 +96,21 @@ public class Constants {
 	public static final double TURRET_SMALL_P = 10.0;
 	public static final double TURRET_SMALL_D = 5.0;
 	public static final double TURRET_SMALL_PID_THRESH = 5;
-	public static final int    TURRET_ONTARGET_THRESH  = 1;
+	public static final int    TURRET_ONTARGET_THRESH  = 5;
 	public static final double STICK_DEAD_BAND = 0.2;
 	
-	public static final double SHOOTING_SPEED = 2750;//2800;//3150 for closer hopper
+	public static final double SHOOTING_SPEED = 2700;//2675;//2850
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
-	public static final double SHOOTER_ERROR  = 100;
+	public static final double SHOOTER_ERROR  = 200;
 
 	public static final double GEAR_INTAKE_POWER = 15;
-	public static final double GEAR_INTAKE_POWER_REVERSE = 20;
-	public static final double GEAR_INTAKE_CURR_DETECT = 20;
+	public static final double GEAR_INTAKE_POWER_REVERSE = 12;
+	public static final double GEAR_INTAKE_CURR_DETECT = 24;
 	public static final double GEAR_INTAKE_REVERSE_CURR_DETECT = 40;
-	public static final double GEAR_INTAKE_REVERSE_POWER = 0.5;
-	public static final double GEAR_INTAKE_HOLDING_POWER = -0.35;
+	public static final double GEAR_INTAKE_HOLDING_POWER = -0.25;
 	public static final double GEAR_PRESENT = 3.0;
 	public static final double GEAR_HANG_CURRENT = 70;  
-	public static final double GEAR_HANG_CURRENT_THRESHOLD = 80;
+	public static final double GEAR_HANG_CURRENT_THRESHOLD = 55;
 	public static final double GEAR_HANG_HOLD_CURRENT = 10;
 	public static final int GEAR_HANG_THRESHOLD = 0;
 	
@@ -142,12 +145,14 @@ public class Constants {
     public static double kCameraXOffset = 0;
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 16;
-    public static double kCameraPitchAngleDegrees = 25.5; // calibrated 4/22  35.75
-    public static double kCameraYawAngleDegrees = 2.5;  //2.5
+    public static double kCameraPitchAngleDegrees = 34; // calibrated 4/22  35.75
+    public static double kCameraYawAngleDegrees = 3;  //2.5 //positive moves the turret to the left
     public static double kCameraDeadband = 0.0;
     
     public static double kCenterOfTargetHeight = 86.0; // inches       
 
+    public static final double VISION_CENTER_TO_CAMERA_RADIUS = 9.0;
+    
     public static int kAndroidAppTcpPort = 8254;
 
     public static double kLooperDt = 0.01;
@@ -158,10 +163,22 @@ public class Constants {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kShooterMap = new InterpolatingTreeMap<>();
 
     static {        
-    	//kShooterMap.put(new InterpolatingDouble(105.0), new InterpolatingDouble(2850.0));
-    	//kShooterMap.put(new InterpolatingDouble(125.0), new InterpolatingDouble(2950.0));
-       // kShooterMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(2960.0));
-       // kShooterMap.put(new InterpolatingDouble(155.0), new InterpolatingDouble(3150.0)); 
-       // kShooterMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(3200.0)); 
+    	
+    	/*kShooterMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(2610.0));
+    	kShooterMap.put(new InterpolatingDouble(65.8), new InterpolatingDouble(2650.0));
+    	kShooterMap.put(new InterpolatingDouble(73.7), new InterpolatingDouble(2700.0));
+    	kShooterMap.put(new InterpolatingDouble(78.5), new InterpolatingDouble(2750.0)); 
+    	kShooterMap.put(new InterpolatingDouble(82.0), new InterpolatingDouble(2800.0));
+    	kShooterMap.put(new InterpolatingDouble(94.0), new InterpolatingDouble(3050.0)); */
+    	
+    	//73.7 : 2750
+    	//65.8, 2650
+    }
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kDistanceMap = new InterpolatingTreeMap<>();
+    static {        
+    	kDistanceMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(0.0));
+    	kDistanceMap.put(new InterpolatingDouble(75.0), new InterpolatingDouble(0.0));
+    	kDistanceMap.put(new InterpolatingDouble(80.0), new InterpolatingDouble(0.25));
+    	kDistanceMap.put(new InterpolatingDouble(150.0), new InterpolatingDouble(0.5));     	
     }
 }

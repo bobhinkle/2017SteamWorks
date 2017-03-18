@@ -1,5 +1,6 @@
 package SubSystems;
 
+import IO.Logger;
 import Utilities.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -21,9 +22,11 @@ public class DistanceController {
 	private double lastDistanceX = 0.0;
 	private boolean isEnabled = false;
 	private double timeout = 0;
+	private Logger logger;
 	private double inputCap = 0.7;
 	public DistanceController(){
 		dt = Swerve.getInstance();
+		logger = Logger.getInstance();
 	}
 	public static DistanceController getInstance(){
 		if(instance == null)
@@ -64,21 +67,23 @@ public class DistanceController {
 					}
 					
 
-					dt.sendInput(inputCap(inputX),inputCap(inputY) , 0, 0, false, false, false); // second false was true
+					dt.sendInput(inputCap(inputX),inputCap(inputY) , 0, 0, false, false, false, false); // second false was true
 					lastDistanceY = currentPositionY;
 					lastDistanceX = currentPositionX;
 				}else{
-					dt.sendInput(0, 0, 0, 0, false, false, false); // second false was true
+					dt.sendInput(0, 0, 0, 0, false, false, false, false); // second false was true
 					if(cyclesOnTarget <= 0){
 						onTarget = true;
+						logger.writeToLog("Distance Controller Reached Target");
 						disable();
 					}else{
 						cyclesOnTarget--;
 					}
 				}
 			}else{
-				dt.sendInput(0, 0, 0, 0, false, false, false); // second false was true
+				dt.sendInput(0, 0, 0, 0, false, false, false, false);
 				onTarget = true;
+				logger.writeToLog("Distance Controller Timed Out");
 				disable();
 			}
 		}
@@ -134,6 +139,7 @@ public class DistanceController {
 		isEnabled = true;
 	}
 	public void disable(){
+		dt.sendInput(0, 0, 0, 0, false, false, false, false);
 		isEnabled = false;
 		//reset();
 	}

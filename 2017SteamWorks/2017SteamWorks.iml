@@ -7,10 +7,10 @@
     <libelement value="jar://$USER_HOME$/wpilib/java/current/lib/WPILib.jar!/" />
     <libelement value="jar://$USER_HOME$/Downloads/CTRE_FRCLibs_NON-WINDOWS_v4.4.1.12/java/lib/CTRLib.jar!/" />
     <libelement value="jar://$USER_HOME$/wpilib/java/current/lib/NetworkTables.jar!/" />
-    <libelement value="jar://$USER_HOME$/Downloads/json-simple-1.1.1.jar!/" />
-    <varelement var="jar://$USER_HOME$/wpilib/java/current/lib/json-simple-1.1.1.jar!/" value="USER_HOME/wpilib/java/current/lib/json-simple-1.1.1.jar" />
+    <libelement value="jar://$USER_HOME$/wpilib/java/current/lib/json.jar!/" />    
     <varelement var="file://$wpilib$" value="wpilib" />
     <varelement var="file://$wpilib.sources$" kind="src:" value="wpilib.sources" />
+    <varelement var="file://$json$" value="json" />
     <varelement var="file://$networktables$" value="networktables" />
     <varelement var="file://$networktables.sources$" kind="src:" value="networktables.sources" />
     <varelement var="file://$opencv$" value="opencv" />
@@ -30,9 +30,9 @@
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
-      <library name="json-simple-1.1.1.jar">
+      <library name="json.jar">
         <CLASSES>
-          <root url="jar://$USER_HOME$/Downloads/json-simple-1.1.1.jar!/" />
+          <root url="jar://$USER_HOME$/wpilib/java/current/lib/json.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

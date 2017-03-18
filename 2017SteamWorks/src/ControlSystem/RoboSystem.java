@@ -14,6 +14,7 @@ public class RoboSystem{
 	public Sweeper sweeper;
 	public Turret turret;
 	public GearIntake gearIntake;
+	public Hanger hanger;
 
     public static RoboSystem getInstance()
     {
@@ -30,6 +31,7 @@ public class RoboSystem{
     	shooter = Shooter.getInstance();
     	sweeper = Sweeper.getInstance();
     	turret = Turret.getInstance();
-    	gearIntake = new GearIntake(Ports.GEAR_HANG, Ports.INTAKE_ARM);
+    	gearIntake = new GearIntake(Ports.GEAR_INTAKE, Ports.INTAKE_ARM);
+    	hanger = Hanger.getInstance();
     } 
 }

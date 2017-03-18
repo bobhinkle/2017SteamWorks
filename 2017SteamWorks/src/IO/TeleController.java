@@ -3,6 +3,7 @@ import ControlSystem.RoboSystem;
 import SubSystems.DistanceController;
 import SubSystems.GearIntake;
 import SubSystems.GearIntake.State;
+import SubSystems.Hanger;
 import SubSystems.Intake;
 import SubSystems.Shooter;
 import SubSystems.Swerve;
@@ -27,6 +28,8 @@ public class TeleController
     private boolean vibrateRunning = false;
     private boolean isBumpedUp = false;
     private boolean isBumpedDown = false;
+    private boolean isHanging = false;
+    private boolean canReverseSweeper = true;
     public TeleController(){
         driver = new Controller(0);
         driver.start();
@@ -42,20 +45,13 @@ public class TeleController
         }
         return instance;
     }    
-   
-    
-    /**
-     * At the moment, only Y and Start don't have anything assigned to them.
-     * TODO Add shooter RPM +-100
-     * TODO Left joystick to move turret fast, right to move slow
-     * */
+ 
     public void coDriver(){
     	if(coDriver.aButton.isPressed() || coDriver.aButton.isHeld()){
-    		if(coDriver.aButton.isHeld() && coDriver.aButton.buttonHoldTime() > 1.5){
-        		robot.gearIntake.grabGear();
-        	}else{
-        		robot.gearIntake.extend();
-        	}    		
+    		if(robot.gearIntake.getState() != GearIntake.State.GEAR_DETECTED){
+	    		robot.gearIntake.grabGear();
+	    		//robot.gearIntake.extend();	
+    		}
     	}
     	if(coDriver.bButton.isPressed() || coDriver.bButton.isHeld()){
     		robot.gearIntake.retract();
@@ -65,12 +61,24 @@ public class TeleController
     		isBumpedUp = false;
     		isBumpedDown = false;
     	}
-    	if(coDriver.yButton.isPressed()){
+    	if(coDriver.yButton.isHeld()){
     		/*robot.turret.lockAngle(robot.intake.getCurrentAngle());
     		robot.turret.setState(Turret.State.GyroComp);
     		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.shooter.setState(Shooter.Status.STARTED);*/
     		//robot.gearIntake.autoDep();
+    		robot.sweeper.stopRoller();
+    		robot.sweeper.stopSweeper();
+    		if(robot.sweeper.isStopped()){
+    			robot.sweeper.reverseRoller();
+    			robot.sweeper.needsToStop = true;
+    		}
+    	}else{
+    		if(robot.sweeper.needsToStop == true){
+    			robot.sweeper.stopSweeper();
+    			robot.sweeper.stopRoller();
+    			robot.sweeper.needsToStop = false;
+    		}
     	}
     	if(coDriver.rightBumper.isPressed()){
     		robot.intake.intakeForward();
@@ -83,27 +91,30 @@ public class TeleController
     		robot.shooter.stop();  		
     		robot.sweeper.stopRoller();
     		robot.sweeper.stopSweeper();
+    		canReverseSweeper = true;
     		robot.turret.setState(Turret.State.VisionTracking);
-    		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED && robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED_WITH_GEAR)
+    		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED && robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED_WITH_GEAR && robot.gearIntake.getState() != GearIntake.State.GEAR_LOST_RETRACTED)
     			robot.gearIntake.setState(GearIntake.State.INTAKE_EXTENDED_OFF);
+    		robot.hanger.stop();
     	}
     	if(coDriver.rightCenterClick.isPressed()){
     		robot.turret.setAngle(0);
     	}
     	if(coDriver.rightTrigger.isPressed()){
-    		robot.intake.intakeStop();
-    		robot.sweeper.forwardRoller();
-	    	robot.sweeper.forwardSweeper();
-    		
+    		if(robot.shooter.getStatus() == Shooter.Status.READY){
+	    		robot.intake.intakeStop();
+	    		robot.sweeper.turnSweeperOn();
+		    	canReverseSweeper = false;
+    		}
     	}
     	if(coDriver.leftTrigger.isPressed()){
-    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
-    		robot.turret.setState(Turret.State.GyroComp);
+//    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
+//    		robot.turret.setState(Turret.State.GyroComp);
     		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.shooter.setState(Shooter.Status.STARTED);
     	}
     	if(coDriver.startButton.isPressed()){
-    		
+    		robot.hanger.setState(Hanger.State.HANGING);
     	}
     	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > Constants.STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -Constants.STICK_DEAD_BAND){
     		robot.turret.setState(Turret.State.Manual);
@@ -111,9 +122,11 @@ public class TeleController
     	}
     	
     	if(coDriver.getPOV() == 270)
-    		robot.turret.setAngle(-45);
+    		robot.turret.setAngle(-90);
+    	
     	if(coDriver.getPOV() == 0)
-    		robot.turret.setAngle(2);
+    		robot.gearIntake.forward();
+    		//robot.turret.resetAngle(90);
     		//robot.turret.setAngle(0);
     		/*if(!isBumpedUp && robot.shooter.getStatus() != Shooter.Status.OFF){
     			robot.shooter.setGoal(robot.shooter.getTarget() + 100);
@@ -126,9 +139,10 @@ public class TeleController
     			}
     		}*/
     	if(coDriver.getPOV() == 90)
-    		robot.turret.setAngle(45);
+    		robot.turret.setAngle(90);
     	if(coDriver.getPOV() == 180){
-    		robot.turret.setAngle(-2);
+    		robot.gearIntake.reverse();
+    		//robot.turret.setAngle(-2);
 /*    		if(!isBumpedDown && robot.shooter.getStatus() != Shooter.Status.OFF){
     			robot.shooter.setGoal(robot.shooter.getTarget() - 100);
     			robot.shooter.setState(Shooter.Status.STARTED);
@@ -141,11 +155,8 @@ public class TeleController
     		}*/
     	}
     	if(coDriver.rightCenterClick.isPressed())
-    		robot.turret.setAngle(0);    	
+    		robot.turret.setAngle(0);   
     }
-    
-    
-    
     
     public void driver() {
     	
@@ -153,7 +164,7 @@ public class TeleController
     		robot.dt.setHeading(180,true);
         }
     	if(driver.bButton.isPressed()){  
-    		robot.dt.setHeading(90,true);
+    		robot.dt.setHeading(90,true); //90 degrees
         }
     	if(driver.bButton.buttonHoldTime() > 2 && driver.bButton.isHeld()){
     		//robot.dt.setHeading(120,true);
@@ -171,7 +182,7 @@ public class TeleController
     		robot.gearIntake.scoreGear();
     	}
         if(driver.startButton.isPressed()){
-        	 robot.gearIntake.setState(State.HANGING);
+        	robot.hanger.setState(Hanger.State.HANGING);
         }
         if(!dist.isEnabled()){ 
         	/*	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
@@ -184,12 +195,9 @@ public class TeleController
                 		Util.controlSmoother(-driver.getButtonAxis(Xbox.LEFT_STICK_Y)), 
                 		Util.turnControlSmoother(driver.getButtonAxis(Xbox.RIGHT_STICK_X)),
                 		Util.turnControlSmoother(driver.getButtonAxis(Xbox.RIGHT_STICK_Y)),
-                		driver.leftTrigger.isHeld(),
+                		driver.leftTrigger.isHeld() || driver.leftTrigger.isPressed(),
                 		robotCentric,
-                		 false);
-        		SmartDashboard.putBoolean("sendInput", true);
-        		//Timer.delay(3);
-        		SmartDashboard.putBoolean("sendInput", false);
+                		 false, driver.leftBumper.isPressed() || driver.leftBumper.isHeld());
         	}
         
         
@@ -219,10 +227,10 @@ public class TeleController
 //        	robot.shooter.setSpeed(0);
         	    	
         }
-        if(driver.startButton.isPressed()){
+        /*if(driver.startButton.isPressed()){
         	robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
         	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
-        }
+        }*/
         
         if(driver.rightCenterClick.isPressed()){
 //        	robot.shooter.setSpeed(3300); //3475 far shot, 3000 closeshot
@@ -251,12 +259,15 @@ public class TeleController
     	driver();
     	coDriver();
     	if(robot.gearIntake.getState() == GearIntake.State.GEAR_LOST_EXTENDED || robot.gearIntake.getState() == GearIntake.State.GEAR_LOST_RETRACTED){
-    		startVibration(1);
+    		//startVibration(1);
     	}else if(robot.gearIntake.getState() == GearIntake.State.GEAR_DETECTED){
     		startVibration(0);
+    	}else if(robot.turret.onTarget() && robot.turret.getCurrentState() == Turret.State.VisionTracking && fsm.getTargetVisibility()){
+    		startVibration(2);
     	}else{
     		startVibration(-1);
     	}
+    	
     }
     
     private void startVibration(int type){
@@ -310,6 +321,13 @@ public class TeleController
         			driver.setRumble(RumbleType.kLeftRumble, 0.0);
         		}    
     			break;
+    		case 2:
+    			for(int i = 0; i < 2; i++){
+        			coDriver.setRumble(RumbleType.kLeftRumble, 0.7);
+        			Timer.delay(0.5);
+            		coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+    			}
+        		break;
     		default:
     			coDriver.setRumble(RumbleType.kRightRumble, 0.0);
     			coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
