@@ -24,16 +24,11 @@ public class Constants {
 	public static final double ANGLE_FRONT_MODULE_CENTER = Math.atan(WHEELBASE_LENGTH/WHEELBASE_WIDTH);
 	
     // 2017-03-05 Added little adjustments to the offsets
-    public static final double FRONT_RIGHT_TURN_OFFSET = 227.1;//pbot 283.0+1.3; //281.2
-    public static final double FRONT_LEFT_TURN_OFFSET  = 191.5;//pbot 170.5-0.5; //171.2
-    public static final double REAR_LEFT_TURN_OFFSET   = 263.1;//pbot 138.1+1.5; //289.3
-    public static final double REAR_RIGHT_TURN_OFFSET  = 45.5;//pbot 131.6+3.4; //140.0; //172.6
+    public static final double FRONT_RIGHT_TURN_OFFSET = 344;//pbot 283.0+1.3; //281.2
+    public static final double FRONT_LEFT_TURN_OFFSET  = 191.5-6.5;//pbot 170.5-0.5; //171.2
+    public static final double REAR_LEFT_TURN_OFFSET   = 263.1-6.0;//pbot 138.1+1.5; //289.3
+    public static final double REAR_RIGHT_TURN_OFFSET  = 45.5-0.5;//pbot 131.6+3.4; //140.0; //172.6
     
-    /**
-     * Number of ticks in one inch, calculated from ideal gear ratios and wheel diameter.
-     * <p>
-     * Multiply by this value to convert inches to ticks. Divide by this value to convert ticks to inches.</p>
-     * */
     public static final double DRIVE_TICKS_PER_INCH =  (13.0*5760.0)/(16.0*Math.PI)/2.0*.957;//36/25542; //0.00200635031508792675265469178699;//0.00163990667972621570986118595697; //0.00150603674668734095803578302171;//60.0/40462.0; //
     public static final double TURN_KP = 0.02; //0.020
     public static final double TURN_KI = 0.00;
@@ -62,7 +57,7 @@ public class Constants {
 	public static final double SWERVE_ROTATION_MAX_CORRECTION_RATIO = 0.5; //0.75
 	public static final double SWERVE_ROTATION_SMALL_MAX_CORRECTION_RATIO = 0.2; //0.18
 	//////////////////////////////////////////////////////////////////////////////
-	public static final double SWERVE_ROTATION_SCALE_FACTOR_SMALL = 0.1; //.225
+	public static final double SWERVE_ROTATION_SCALE_FACTOR_SMALL = 0.225; //.225
 	public static final double SWERVE_ROTATION_SCALE_FACTOR_BIG = 0.35;  
 	// TODO Tune kP Gain to prevent drift while driving
 	public static final double SWERVE_HEADING_GAIN_P = 0.003; // 0.003; 0.002
@@ -77,7 +72,7 @@ public class Constants {
     public static final double TURNING_DETECT_THRESHOLD = TURNING_ADD_POWER_THRESHOLD;//1; //10// 3
     public static final int DRIVING_DETECT_THRESHOLD = 1; // clicks
     public static final double ROBOT_ROTATING_DETECT_THRESHOLD = 15;
-	public static final int MIN_CYCLES_HEADING_ON_TARGET = 0;
+	public static final int MIN_CYCLES_HEADING_ON_TARGET = 10;
 	public static final double HEADING_MAX_ERROR = 2.0;
 	public static final double SWERVE_ROTATION_HEADING_ON_TARGET_THRESHOLD = /**/HEADING_MAX_ERROR/*/10/**/;
 	public static final double SWERVE_IMPACT_CURRENT_THRESHOLD = 20;
@@ -88,7 +83,8 @@ public class Constants {
 	public static final double CAM_CALIBRATION = 1.0;
 	
 	public static final double TURRET_CLICKS_TO_ANGLE = 66.2252;
-	public static final double TURRET_MAX_ANGLE = 105;
+	public static final int    TURRET_TICKS_PER_90    = 22;
+	public static final double TURRET_MAX_ANGLE = 110;
 	public static final double TURRET_DEFAULT_P = 1.75;//1.75
 	public static final double TURRET_DEFAULT_D = 10;//25
 	public static final int TURRET_I_ZONE = (int) (1023.0 / TURRET_DEFAULT_P);
@@ -99,11 +95,11 @@ public class Constants {
 	public static final int    TURRET_ONTARGET_THRESH  = 5;
 	public static final double STICK_DEAD_BAND = 0.2;
 	
-	public static final double SHOOTING_SPEED = 2700;//2675;//2850
+	public static final double SHOOTING_SPEED = 2650;//2675;//2850
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 200;
 
-	public static final double GEAR_INTAKE_POWER = 15;
+	public static final double GEAR_INTAKE_POWER = 0.75;
 	public static final double GEAR_INTAKE_POWER_REVERSE = 12;
 	public static final double GEAR_INTAKE_CURR_DETECT = 24;
 	public static final double GEAR_INTAKE_REVERSE_CURR_DETECT = 40;
@@ -115,15 +111,15 @@ public class Constants {
 	public static final int GEAR_HANG_THRESHOLD = 0;
 	
 	//Distance Controller
-	public static final double DIST_CONTROLLER_P = 0.000040; //0.0000[23]5
-	public static final double DIST_CONTROLLER_D = 0.00001;
-	public static final double DIST_CONTROLLER_SMALL_P = 0.000032; //0.00003
-	public static final double DIST_CONTROLLER_SMALL_D = 0.00002; //0
+	public static final double DIST_CONTROLLER_P = 0.000020; //0.0000[23]5
+	public static final double DIST_CONTROLLER_D = 0.0000;
+	public static final double DIST_CONTROLLER_SMALL_P = 0.000016; //0.00003
+	public static final double DIST_CONTROLLER_SMALL_D = 0.00003; //0
 	public static final double DIST_CONTROLLER_PID_THRESH = 5.0;
 	public static final int DIST_CONTROLLER_CYCLE_THRESH = 30;
 /** Distance from the robot's center to each wheel module. */
 	public static final double RADIUS_CENTER_TO_MODULE = Math.sqrt(Math.pow(WHEELBASE_LENGTH/2, 2)+Math.pow(WHEELBASE_WIDTH/2, 2))*DRIVE_TICKS_PER_INCH;
-	
+	public static final double DIST_MAX_POWER = 0.5;
 	//Two Gear Auto
 	public static final double TWO_G_PEG_Y = 58.0;
 	public static final double TWO_G_PEG_X = 0.0;
@@ -180,5 +176,30 @@ public class Constants {
     	kDistanceMap.put(new InterpolatingDouble(75.0), new InterpolatingDouble(0.0));
     	kDistanceMap.put(new InterpolatingDouble(80.0), new InterpolatingDouble(0.25));
     	kDistanceMap.put(new InterpolatingDouble(150.0), new InterpolatingDouble(0.5));     	
+    }
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kDriveDistanceMap = new InterpolatingTreeMap<>();
+    static {        
+    	kDriveDistanceMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(0.0));
+    	kDriveDistanceMap.put(new InterpolatingDouble(2.0), new InterpolatingDouble(0.001));
+    	kDriveDistanceMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(0.05));
+    	kDriveDistanceMap.put(new InterpolatingDouble(10.0), new InterpolatingDouble(0.21));
+    	kDriveDistanceMap.put(new InterpolatingDouble(40.0), new InterpolatingDouble(0.35));
+    	kDriveDistanceMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(0.95));     	
+    }
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kRotationStationary = new InterpolatingTreeMap<>();
+    static {        
+    	kRotationStationary.put(new InterpolatingDouble(0.0), new InterpolatingDouble(0.0));
+    	kRotationStationary.put(new InterpolatingDouble(5.0), new InterpolatingDouble(0.12));
+    	kRotationStationary.put(new InterpolatingDouble(15.0), new InterpolatingDouble(0.2));
+    	kRotationStationary.put(new InterpolatingDouble(90.0), new InterpolatingDouble(0.37));
+    	kRotationStationary.put(new InterpolatingDouble(360.0), new InterpolatingDouble(0.75));   	
+    }
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kRotationTranslational = new InterpolatingTreeMap<>();
+    static {        
+    	kRotationTranslational.put(new InterpolatingDouble(0.0), new InterpolatingDouble(0.0));
+    	kRotationTranslational.put(new InterpolatingDouble(8.0), new InterpolatingDouble(0.1));
+    	kRotationTranslational.put(new InterpolatingDouble(15.0), new InterpolatingDouble(0.15));
+    	kRotationTranslational.put(new InterpolatingDouble(90.0), new InterpolatingDouble(0.25));
+    	kRotationTranslational.put(new InterpolatingDouble(360.0), new InterpolatingDouble(0.35));   	
     }
 }

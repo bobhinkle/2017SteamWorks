@@ -4,6 +4,7 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
+import Helpers.InterpolatingDouble;
 import Utilities.Constants;
 import Utilities.Ports;
 import Utilities.Util;
@@ -22,6 +23,7 @@ public class Swerve{
 	int _printLoops = 0;
 	private Intake intake;
 	private int onTarget = 0;
+	
 	
 	public SwerveDriveModule frontLeft;
 	private SwerveDriveModule frontRight;
@@ -53,8 +55,10 @@ public class Swerve{
 	 * @param rotation whether or not the given heading should be approached with an in-place rotation
 	 *  */
 	public void setHeading(double goal,boolean rotation){		
-		if(rotation)
+		if(rotation){
 			headingController = HeadingController.Rotation;
+			rotationCorrection = Constants.MIN_CYCLES_HEADING_ON_TARGET;
+		}
 		_targetAngle = Util.continousAngle(goal,intake.getCurrentAngle());
 	}
 
@@ -185,14 +189,28 @@ public class Swerve{
 					}
 				}
 				break;
-			case Rotation:		
-				if(angleDiff < 8){
+			case Rotation:	
+				/*
+				if(angleDiff < 8){					
 					rotationCorrection = (getError()) * Constants.SWERVE_SMALL_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_SMALL_TURNING_GAIN_D;
 					rotationCorrection = Util.limit(rotationCorrection, Constants.SWERVE_ROTATION_SMALL_MAX_CORRECTION_RATIO);
 				}else{
 					rotationCorrection = (getError()) * Constants.SWERVE_TURNING_GAIN_P - (intake.currentAngularRate) * Constants.SWERVE_TURNING_GAIN_D;
 					rotationCorrection = Util.limit(rotationCorrection, Constants.SWERVE_ROTATION_MAX_CORRECTION_RATIO);
+				}*/
+				if(x != 0 || y != 0){
+					if(getError() > 0)
+						rotationCorrection = getRotationalInput(angleDiff, true);
+					else
+						rotationCorrection = -getRotationalInput(angleDiff, true);	
+					
+				}else{
+					if(getError() > 0)
+						rotationCorrection = getRotationalInput(angleDiff, false);
+					else
+						rotationCorrection = -getRotationalInput(angleDiff, false);	
 				}
+				
 				if(angleDiff < Constants.SWERVE_ROTATION_HEADING_ON_TARGET_THRESHOLD){
 					rotationOnTarget--;
 					rotationCorrection = 0.0;
@@ -216,7 +234,7 @@ public class Swerve{
 			if(Math.abs(y) < Constants.STICK_DEAD_BAND){
 				y = 0;
 			}
-			if(y ==0 && x == 0){
+			if(y ==0 && x == 0 && headingController == HeadingController.Heading){
 				headingController = HeadingController.Off;
 			}
 			if(headingController == HeadingController.Off) {
@@ -225,8 +243,8 @@ public class Swerve{
 			
 			SmartDashboard.putNumber("ROTATE_CORRECT", rotationCorrection);
 			if(halfPower){
-				y = y * 0.37;
-				x = x * 0.37;			
+				y = y * 0.45;
+				x = x * 0.45;			
 			}else if(lowPower){
 				y = y * 0.3;
 				x = x * 0.3;
@@ -431,21 +449,35 @@ public class Swerve{
 		public void initModule(AnglePresets i){
 			switch(i){
 			case ZERO: //0
+				/**/
+				x = -Constants.RADIUS_CENTER_TO_MODULE * Math.cos(Math.atan(Constants.WHEELBASE_LENGTH/Constants.WHEELBASE_WIDTH)-currentRobotHeading);
+				y = -Constants.RADIUS_CENTER_TO_MODULE * Math.sin(Math.atan(Constants.WHEELBASE_LENGTH/Constants.WHEELBASE_WIDTH)-currentRobotHeading);
+				/*/
 				x = -Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
 				y = Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
-				break;
+		/**/	break;
 			case NINETY: //90
+				y = -Constants.RADIUS_CENTER_TO_MODULE * Math.cos(Math.atan(Constants.WHEELBASE_LENGTH/Constants.WHEELBASE_WIDTH)-currentRobotHeading);
+				x = Constants.RADIUS_CENTER_TO_MODULE * Math.sin(Math.atan(Constants.WHEELBASE_LENGTH/Constants.WHEELBASE_WIDTH)-currentRobotHeading);
+/*/
 				y = Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
 				x = Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
-				break;
+		/**/	break;
 			case ONE_EIGHTY: //180
+				
+				x = Constants.RADIUS_CENTER_TO_MODULE * Math.cos(Math.atan(Constants.WHEELBASE_LENGTH/Constants.WHEELBASE_WIDTH)-currentRobotHeading);
+				y = Constants.RADIUS_CENTER_TO_MODULE * Math.sin(Math.atan(Constants.WHEELBASE_LENGTH/Constants.WHEELBASE_WIDTH)-currentRobotHeading);
+/*/
 				x = Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
 				y = -Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
-				break;
+			/**/break;
 			case TWO_SEVENTY: //270
+				y = Constants.RADIUS_CENTER_TO_MODULE * Math.cos(Math.atan(Constants.WHEELBASE_LENGTH/Constants.WHEELBASE_WIDTH)-currentRobotHeading);
+				x = -Constants.RADIUS_CENTER_TO_MODULE * Math.sin(Math.atan(Constants.WHEELBASE_LENGTH/Constants.WHEELBASE_WIDTH)-currentRobotHeading);
+/*/
 				y = -Constants.RADIUS_CENTER_TO_MODULE*Math.cos(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
 				x = -Constants.RADIUS_CENTER_TO_MODULE*Math.sin(Math.toRadians(intake.getCurrentAngle())+Constants.ANGLE_FRONT_MODULE_CENTER);
-				break;
+			/**/break;
 			}
 	// Second and third lines were not commented
 			/**/
@@ -507,6 +539,8 @@ public class Swerve{
 			SmartDashboard.putNumber("Robot Y (in) ", getRobotYInch());
 			SmartDashboard.putNumber("Robot X (in) offsets", getXWithOffsets());
 			SmartDashboard.putNumber("Robot Y (in) offsets", getYWithOffsets());
+			SmartDashboard.putNumber("WhlToRbtX", Constants.RADIUS_CENTER_TO_MODULE * Math.cos(Math.atan(Constants.WHEELBASE_LENGTH/Constants.WHEELBASE_WIDTH)-currentRobotHeading)/Constants.DRIVE_TICKS_PER_INCH);
+			SmartDashboard.putNumber("WhlToRbtY", Constants.RADIUS_CENTER_TO_MODULE * Math.sin(Math.atan(Constants.WHEELBASE_LENGTH/Constants.WHEELBASE_WIDTH)-currentRobotHeading)/Constants.DRIVE_TICKS_PER_INCH);
 			
 	//		SmartDashboard.putNumber("Target Heading", _targetAngle);
 	//		SmartDashboard.putNumber("turnErr", Util.boundAngleNeg180to180Degrees(Util.boundAngle0to360Degrees(intake.getCurrentAngle())-_targetAngle)); // add bounding to [-180,180]
@@ -635,4 +669,17 @@ public class Swerve{
         x += dx;
         y += dy;*/
 	}
+	public double getRotationalInput(double error, boolean translation) {
+        InterpolatingDouble result;
+        if(translation){
+        	result = Constants.kRotationTranslational.getInterpolated(new InterpolatingDouble(error));
+        }else{
+        	result = Constants.kRotationStationary.getInterpolated(new InterpolatingDouble(error));
+        }
+        if (result != null) {
+            return result.value;
+        } else {
+            return Constants.SWERVE_ROTATION_SCALE_FACTOR_SMALL;
+        }
+    }
 }

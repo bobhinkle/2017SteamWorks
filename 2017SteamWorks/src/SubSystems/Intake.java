@@ -17,6 +17,8 @@ public class Intake {
     private PigeonImu _pidgey;
     boolean angleIsGood = false;
     double currentAngularRate = 0.0;
+    public static int ZERO = 0;
+    
     public enum AnglePresets{
 		ZERO,NINETY,ONE_EIGHTY, TWO_SEVENTY
 	}
@@ -48,8 +50,15 @@ public class Intake {
 			angleIsGood = (_pidgey.GetState() == PigeonState.Ready) ? true : false;
 			currentAngularRate = -xyz_dps[2];
 			SmartDashboard.putNumber(" Heading Angle ", currentAngle); // moved to Swerve.update()
-			SmartDashboard.putNumber(" Pigeon Rate ", currentAngularRate);
+//			SmartDashboard.putNumber(" Pigeon Rate ", currentAngularRate);
 			SmartDashboard.putBoolean(" Pigeon Good ", angleIsGood);
+			
+			short [] ba_xyz = new short [3];
+			_pidgey.GetBiasedAccelerometer(ba_xyz);
+			SmartDashboard.putNumber("AccX", ba_xyz[0]);
+			SmartDashboard.putNumber("AccY", ba_xyz[1]);
+			SmartDashboard.putNumber("AccZ", ba_xyz[2]);
+			
 		}catch(Exception e){
 			System.out.println(e);
 		}
@@ -85,21 +94,8 @@ public class Intake {
 		pigeonUpdate();
 		debugValues();
 	}
-	public void setPresetAngles(AnglePresets i){
-		switch(i){
-		case ZERO:
-			_pidgey.SetFusedHeading(0);
-			break;
-		case ONE_EIGHTY:
-			_pidgey.SetFusedHeading(180);
-			break;
-		case NINETY:
-			_pidgey.SetFusedHeading(270);
-			break;
-		case TWO_SEVENTY:
-			_pidgey.SetFusedHeading(90);
-			break;
-		}
+	public void setPresetAngles(double i){
+		_pidgey.SetFusedHeading(360.0-i);
 	}
 	public void deployWings(){
 		extendIntakes ex = new extendIntakes();

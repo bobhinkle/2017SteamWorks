@@ -14,6 +14,7 @@ public class Turret {
 	private double lockedAngle = 0.0;
 	private double lockedTurretAngle = 0.0;
 	private int onTargetCheck = 0;
+	private double angleOffset = 0;
 //	private int absolutePosition;
 	public Turret(){
 		motor = new CANTalon(Ports.TURRET);
@@ -58,7 +59,6 @@ public class Turret {
 		double newAngle = (motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE) + (input * 3.5);
 		setAngle(newAngle);		
 		onTargetCheck = Constants.TURRET_ONTARGET_THRESH;
-//		motor.set(-input *0.5);
 	}
 	public void setAngle(double angle){
 		if(angle > Constants.TURRET_MAX_ANGLE)
@@ -73,10 +73,10 @@ public class Turret {
 		setAngle(newAngle);
 	}
 	public double getAngle(){
-		return motor.getPosition() * Constants.TURRET_CLICKS_TO_ANGLE;
+		return (motor.getPosition() * Constants.TURRET_CLICKS_TO_ANGLE);
 	}
 	public double getGoal(){
-		return motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE;
+		return (motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE);
 	}
 	public void update(double heading){
 		switch(currentState){
@@ -102,7 +102,7 @@ public class Turret {
 		
 	}
 	public double getError(){
-		return getGoal() - getAngle();
+		return (getGoal() - getAngle());
 	}
 	public boolean onTarget(){
 		if(Math.abs(getError()) < 2.5){
@@ -113,7 +113,7 @@ public class Turret {
 		return onTargetCheck <= 0;
 	}
 	public void resetAngle(double a){
-		motor.setEncPosition((int)(a * Constants.TURRET_CLICKS_TO_ANGLE));
-		motor.setSetpoint(motor.getPosition());
+		motor.setEncPosition((int)a*Constants.TURRET_TICKS_PER_90);
+		motor.set(a/Constants.TURRET_CLICKS_TO_ANGLE);
 	}
 }

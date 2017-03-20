@@ -17,8 +17,10 @@ public class GearIntake {
 	private long timeout = 0;
 	private autoDeploy auto;
 	private Logger logger;
-	private int cyclesPastThresh = 4;
-	private int cyclesThresh = 4;
+	private int cyclesPastThresh = 1;
+	private int cyclesThresh = 1;
+	private boolean isScoring = false;
+	public boolean needsToVibrate = false;
 	public enum State{
 		INTAKE_EXTENDED, INTAKING, INTAKE_RETRACTED, GEAR_DETECT,
 		GEAR_DETECTED, CLIMB_DETECT, CLIMB_DETECTED, SCORE_GEAR_1,SCORE_GEAR_2,INTAKE_TUCK,INTAKE_EXTENDED_OFF,INTAKE_RETRACTED_WITH_GEAR,
@@ -32,7 +34,7 @@ public class GearIntake {
 		//gear.setVoltageRampRate(36);
 		gear.enableBrakeMode(true);
 		gear.changeControlMode(TalonControlMode.Current);
-		gear.setPID(0.09, 0.00, 0, 0.08, 0, 0.0, 0);
+		gear.setPID(0.06, 0.00, 0, 0.08, 0, 0.0, 0);
 		gear.reverseOutput(true);
 		gear.setCloseLoopRampRate(12);
 		gearCylinder = new Solenoid(20,solPort);
@@ -75,25 +77,28 @@ public class GearIntake {
 	
 			case GEAR_DETECT:
 				if(gear.getOutputCurrent() > Constants.GEAR_INTAKE_CURR_DETECT){
-					if(cyclesPastThresh <=0){
+					/*if(cyclesPastThresh <=0){
 //						gear.changeControlMode(TalonControlMode.PercentVbus);
-//						gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);
+//						gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);*/
 						state = State.GEAR_DETECTED;
-					}else{
+					/*}else{
 						cyclesPastThresh--;
 					}
 					
 				}else{
-					cyclesPastThresh = cyclesThresh;
+					cyclesPastThresh = cyclesThresh;*/
 				}
 				SmartDashboard.putString(" Gear Intake Status ", "WAITING FOR GEAR");
 				break;
 	
 			case GEAR_DETECTED:
+				gear.changeControlMode(TalonControlMode.PercentVbus);
+				gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);
 				if(gear.getOutputCurrent() < Constants.GEAR_PRESENT){
 					state = State.GEAR_LOST_EXTENDED;
 				}
 				SmartDashboard.putString(" Gear Intake Status ", "GEAR DETECTED");
+				needsToVibrate = false;
 				break;
 			case GEAR_LOST_EXTENDED:
 //				state = State.INTAKING;
@@ -103,8 +108,10 @@ public class GearIntake {
 				SmartDashboard.putString(" Gear Intake Status ", "GEAR LOST");
 				break;
 			case SCORE_GEAR_1:
-				autoDep();
-				state = State.SCORE_GEAR_2;
+				SmartDashboard.putString(" Gear Intake Status ", "SCORE GEAR 1");
+				if(!isScoring){
+					autoDep();
+				}
 				break;
 	
 			case SCORE_GEAR_2:
@@ -120,8 +127,8 @@ public class GearIntake {
 				break;
 			case INTAKE_RETRACTED_GEAR_DETECTED:
 				if(gear.getOutputCurrent() > Constants.GEAR_INTAKE_CURR_DETECT){
-					//gear.changeControlMode(TalonControlMode.PercentVbus);
-					//gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);
+					gear.changeControlMode(TalonControlMode.PercentVbus);
+					gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);
 					state = State.INTAKE_RETRACTED_WITH_GEAR;
 				}
 				break;
@@ -146,11 +153,17 @@ public class GearIntake {
 		}else{
 			state  = State.INTAKE_RETRACTED_WITH_GEAR;
 		}
+		gear.changeControlMode(TalonControlMode.PercentVbus);
+		gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);
 	}
 	public void grabGear(){
 		if(state != State.INTAKE_RETRACTED){
 			state = State.INTAKING;
+		}else{
+			gearCylinder.set(false);
+			state = State.INTAKING;
 		}
+		needsToVibrate = true;
 	}
 	public void scoreGear(){
 		if(state != State.SCORE_GEAR_1)
@@ -158,10 +171,10 @@ public class GearIntake {
 	}
 	public void forward(){
 		gear.set(0);
-		gear.changeControlMode(TalonControlMode.Current);
+		gear.changeControlMode(TalonControlMode.PercentVbus);
 		
 		
-		gear.set(Constants.GEAR_INTAKE_POWER);
+		gear.set(-Constants.GEAR_INTAKE_POWER);
 		//gear.setProfile(0);
 	}
 	public void reverse(){
@@ -188,14 +201,16 @@ public class GearIntake {
 	}
 	public class autoDeploy extends Thread{
 		public void run(){
-			state = GearIntake.State.GEAR_AUTO;
+			isScoring = true;
 			gear.set(0);
 			Timer.delay(0.1);
 			gear.changeControlMode(TalonControlMode.Current);
 			//gear.setProfile(0);
-			gear.set(-17.5);
-			Timer.delay(1);
+			gear.set(-12);
+			Timer.delay(0.25);
 			gearCylinder.set(false);
+			state = GearIntake.State.INTAKE_EXTENDED_OFF;
+			isScoring = false;
 		}
 	}
 	

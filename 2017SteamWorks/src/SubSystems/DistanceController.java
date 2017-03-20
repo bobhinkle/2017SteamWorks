@@ -1,5 +1,6 @@
 package SubSystems;
 
+import Helpers.InterpolatingDouble;
 import IO.Logger;
 import Utilities.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,7 +24,8 @@ public class DistanceController {
 	private boolean isEnabled = false;
 	private double timeout = 0;
 	private Logger logger;
-	private double inputCap = 0.7;
+	private double inputCap = 1.0;
+	private double minCap  = 0.005;
 	public DistanceController(){
 		dt = Swerve.getInstance();
 		logger = Logger.getInstance();
@@ -47,6 +49,8 @@ public class DistanceController {
 		SmartDashboard.putNumber(" Dist Y Position ", currentPositionY/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber(" Dist X Error ", (targetX - currentPositionX)/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber(" Dist Y Error ", (targetY - currentPositionY)/Constants.DRIVE_TICKS_PER_INCH);
+		
+		logger.writeToLog("Distance Controller Y Target: " + Double.toString(targetY/Constants.DRIVE_TICKS_PER_INCH) + "Distance Controller X Target: " + Double.toString(targetX/Constants.DRIVE_TICKS_PER_INCH));
 	 
 		SmartDashboard.putNumber("distInputY", inputY); // this and next line were around line 60 or so,
 		SmartDashboard.putNumber("distInputX", inputX); //  after an else block
@@ -55,10 +59,30 @@ public class DistanceController {
 			if(timeout >= System.currentTimeMillis()){
 				if(!isOnTarget()){
 					cyclesOnTarget = cyclesToCheck;	
-					if(Math.abs(targetY - currentPositionY) > Constants.DIST_CONTROLLER_PID_THRESH * Constants.DRIVE_TICKS_PER_INCH){
+					double[] ee = getError();
+					/*
+					if(targetY - currentPositionY > 0){
+						inputY = getInput(Math.abs(targetY - currentPositionY));
+					}
+					else{
+						inputY = -getInput(Math.abs(targetY - currentPositionY));
+					}
+					if(targetX - currentPositionX > 0){
+						inputX = getInput(Math.abs(targetX - currentPositionX));
+					}
+					else{
+						inputX = -getInput(Math.abs(targetX - currentPositionX));
+					}*/
+					
+					/*if(Math.abs(targetY - currentPositionY) > Constants.DIST_CONTROLLER_PID_THRESH * Constants.DRIVE_TICKS_PER_INCH){
 						inputY = (targetY - currentPositionY) * Constants.DIST_CONTROLLER_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_D;
 					}else{
 						inputY = (targetY - currentPositionY) * Constants.DIST_CONTROLLER_SMALL_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_D;
+					}*/
+					if(ee[0]>0){
+						inputY = getInput(Math.abs(ee[0]));
+					}else{
+						inputY = -getInput(Math.abs(ee[0]));
 					}
 					if(Math.abs(targetX - currentPositionX) > Constants.DIST_CONTROLLER_PID_THRESH * Constants.DRIVE_TICKS_PER_INCH){
 						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_D;
@@ -66,15 +90,18 @@ public class DistanceController {
 						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_SMALL_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_D;
 					}
 					
+					logger.writeToLog("error:" + Double.toString(ee[0]) +"tree:" + Double.toString(getInput(Math.abs(ee[0]))));
+					logger.writeToLog("DIST: " + Double.toString(currentPositionY/Constants.DRIVE_TICKS_PER_INCH) + ": " + Double.toString(currentPositionX/Constants.DRIVE_TICKS_PER_INCH) + " INPUTY: " + Double.toString(inputY) + " INPUTX:" + Double.toString(inputX));
 
 					dt.sendInput(inputCap(inputX),inputCap(inputY) , 0, 0, false, false, false, false); // second false was true
 					lastDistanceY = currentPositionY;
 					lastDistanceX = currentPositionX;
 				}else{
+					logger.writeToLog("DIST: " + Double.toString(currentPositionY/Constants.DRIVE_TICKS_PER_INCH) + ": " + Double.toString(currentPositionX/Constants.DRIVE_TICKS_PER_INCH));
 					dt.sendInput(0, 0, 0, 0, false, false, false, false); // second false was true
 					if(cyclesOnTarget <= 0){
 						onTarget = true;
-						logger.writeToLog("Distance Controller Reached Target");
+						logger.writeToLog("Distance Controller Reached Target:" + Double.toString(timeout-System.currentTimeMillis()));
 						disable();
 					}else{
 						cyclesOnTarget--;
@@ -83,7 +110,7 @@ public class DistanceController {
 			}else{
 				dt.sendInput(0, 0, 0, 0, false, false, false, false);
 				onTarget = true;
-				logger.writeToLog("Distance Controller Timed Out");
+				logger.writeToLog("Distance Controller Timed Out:" + Double.toString(currentPositionY/Constants.DRIVE_TICKS_PER_INCH) + " " + Double.toString(currentPositionX/Constants.DRIVE_TICKS_PER_INCH));
 				disable();
 			}
 		}
@@ -94,7 +121,12 @@ public class DistanceController {
 	public boolean onTarget(){
 		return onTarget;
 	}
-
+	public double[] getError(){
+		double[] error = new double[2];
+		error[0] = (targetY-currentPositionY)/Constants.DRIVE_TICKS_PER_INCH;
+		error[1] = (targetX-currentPositionX)/Constants.DRIVE_TICKS_PER_INCH;
+		return error;
+	}
 	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput, int checks){
 		reset();
 		targetY = _goalY*Constants.DRIVE_TICKS_PER_INCH;// + currentPositionY;//dt.frontLeft.getY();
@@ -149,9 +181,20 @@ public class DistanceController {
 		}else if(value < -inputCap){
 			return -inputCap;
 		}
+		if(value > -minCap && value < minCap)
+			return 0;
 		return value;
 	}
 	public boolean isEnabled(){
 		return isEnabled;
 	}
+	public double getInput(double error) {
+        InterpolatingDouble result;
+        result = Constants.kDriveDistanceMap.getInterpolated(new InterpolatingDouble(error));
+        if (result != null) {
+            return result.value;
+        } else {
+            return Constants.DIST_MAX_POWER;
+        }
+    }
 }

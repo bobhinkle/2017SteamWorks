@@ -108,8 +108,8 @@ public class TeleController
     		}
     	}
     	if(coDriver.leftTrigger.isPressed()){
-//    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
-//    		robot.turret.setState(Turret.State.GyroComp);
+    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
+    		robot.turret.setState(Turret.State.GyroComp);
     		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
     		robot.shooter.setState(Shooter.Status.STARTED);
     	}
@@ -161,22 +161,22 @@ public class TeleController
     public void driver() {
     	
     	if(driver.aButton.isPressed()){       
-    		robot.dt.setHeading(180,true);
+    		robot.dt.setHeading(90,true);
         }
     	if(driver.bButton.isPressed()){  
-    		robot.dt.setHeading(90,true); //90 degrees
+    		robot.dt.setHeading(0,true); //90 degrees
         }
     	if(driver.bButton.buttonHoldTime() > 2 && driver.bButton.isHeld()){
     		//robot.dt.setHeading(120,true);
     	}
     	if(driver.xButton.isPressed()){
-    		robot.dt.setHeading(270,true);
+    		robot.dt.setHeading(180,true);
         }
     	if(driver.xButton.buttonHoldTime() > 2 && driver.xButton.isHeld()){
     		//robot.dt.setHeading(240,true);
     	}
     	if(driver.yButton.isPressed()){
-        	robot.dt.setHeading(0,true);
+        	robot.dt.setHeading(270,true);
         }
     	if(driver.rightTrigger.isPressed()){
     		robot.gearIntake.scoreGear();
@@ -218,7 +218,7 @@ public class TeleController
         }
         
         if(driver.backButton.isHeld()){ 
-        	robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+        	robot.intake.setPresetAngles(0);
         	robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
         	dist.disable();    
         	robot.dt.setHeading(0, false);
@@ -233,7 +233,7 @@ public class TeleController
         }*/
         
         if(driver.rightCenterClick.isPressed()){
-//        	robot.shooter.setSpeed(3300); //3475 far shot, 3000 closeshot
+//        	robot.shooter.setSpeed(3300); //3475 far shot, 3000 close shot
         }
         if(driver.getPOV() == 0){
 //        	robot.shooter.bumpUp(100);
@@ -258,12 +258,10 @@ public class TeleController
     public void update(){	
     	driver();
     	coDriver();
-    	if(robot.gearIntake.getState() == GearIntake.State.GEAR_LOST_EXTENDED || robot.gearIntake.getState() == GearIntake.State.GEAR_LOST_RETRACTED){
-    		//startVibration(1);
-    	}else if(robot.gearIntake.getState() == GearIntake.State.GEAR_DETECTED){
+    	if(robot.gearIntake.getState() == GearIntake.State.GEAR_DETECTED){
     		startVibration(0);
     	}else if(robot.turret.onTarget() && robot.turret.getCurrentState() == Turret.State.VisionTracking && fsm.getTargetVisibility()){
-    		startVibration(2);
+    		//startVibration(2);	// Uncomment for Roger
     	}else{
     		startVibration(-1);
     	}
@@ -287,12 +285,12 @@ public class TeleController
     		switch(pulseType){
     		case 0:
     			for(int i = 0; i < 2; i++){
-        			coDriver.setRumble(RumbleType.kLeftRumble, 0.4);
-        			driver.setRumble(RumbleType.kLeftRumble, 0.4);
+        			coDriver.setRumble(RumbleType.kLeftRumble, 1.0);
+        			driver.setRumble(RumbleType.kLeftRumble, 1.0);
             		Timer.delay(0.5);
             		coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
             		driver.setRumble(RumbleType.kLeftRumble, 0.0);
-        		}    
+    			}
     			break;
     		case 1:
     			switch(robot.gearIntake.getState()){
@@ -324,10 +322,16 @@ public class TeleController
     		case 2:
     			for(int i = 0; i < 2; i++){
         			coDriver.setRumble(RumbleType.kLeftRumble, 0.7);
-        			Timer.delay(0.5);
+        			Timer.delay(1);
             		coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
     			}
         		break;
+    		case -127:
+    			coDriver.setRumble(RumbleType.kRightRumble, 0.0);
+    			coDriver.setRumble(RumbleType.kLeftRumble, 0.0);
+    			driver.setRumble(RumbleType.kRightRumble, 0.0);
+    			driver.setRumble(RumbleType.kLeftRumble, 0.0);
+    			break;
     		default:
     			coDriver.setRumble(RumbleType.kRightRumble, 0.0);
     			coDriver.setRumble(RumbleType.kLeftRumble, 0.0);

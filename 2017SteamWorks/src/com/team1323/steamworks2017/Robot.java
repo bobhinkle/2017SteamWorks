@@ -41,7 +41,7 @@ public class Robot extends SampleRobot {
 	final String red = "Red";
 	long timeToWaitMs = 5500;
 	public final int BLUE = 1;
-	public final int RED  = 0;
+	public final int RED  = -1;
 	/** {@link SmartDashboard} field for selecting an autonomous subroutine to run */
 	SendableChooser autoSelect;
 	SendableChooser allianceSelect;
@@ -99,38 +99,39 @@ public class Robot extends SampleRobot {
         controllers = TeleController.getInstance();
         fsm = FSM.getInstance();
         dist = DistanceController.getInstance();
-        robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+        robot.intake.setPresetAngles(0);
         Timer.delay(0.1);
         robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
         Timer.delay(0.1);
-        
+    //    robot.intake.setPresetAngles(90);
     	/** Autonomous subroutine that the user has selected to run */
     	String autoSelected = (String) autoSelect.getSelected();
     	SmartDashboard.putString(" Auto Selected ", autoSelected);
 /*    		switch(autoSelected){
     			case one_gear:
-    	            robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+    	            robot.intake.setPresetAngles(180);
     	        	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
     				break;
     			case two_gear:
-    	            robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+    	            robot.intake.setPresetAngles(180);
     	        	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);
     				break;
     			case near_hopper:
-    	            robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
+    	            robot.intake.setPresetAngles(270);
     	        	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
     				break;
     			case far_hopper:
-    	            robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
+    	            robot.intake.setPresetAngles(270);
     	        	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
     				break;
     			case off:
-    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+    				robot.intake.setPresetAngles(0);
     				robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
     				break;
     	*///	}
     	
     	logger = Logger.getInstance();
+    	robot.turret.resetAngle(90);
     }
 
 	@Override
@@ -147,156 +148,120 @@ public class Robot extends SampleRobot {
 //    	robot.intake._pidgey.SetFusedHeading(180.0);
 //    	robot.dt.resetCoord(AnglePresets.ONE_EIGHTY);
 //    	robot.dt.setHeading(0.0);
+    	int alliance = BLUE;
+    	switch(allianceSelected){
+	    	case blue:
+	    		alliance = BLUE;
+	    		break;
+	    	case red:
+	    		alliance = RED;
+	    		break;
+	    	default:
+	    		alliance = BLUE;
+	    		break;
+    	}
     		switch(autoSelected){
     			case one_gear:
-    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
+    				robot.intake.setPresetAngles(0);
     		        Timer.delay(0.1);
     		        robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
     	            Timer.delay(0.1);
-    	            robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+    	            robot.intake.setPresetAngles(180);
     	            Timer.delay(0.1);
     	            robot.turret.setState(Turret.State.VisionTracking);
-    	            switch(allianceSelected){
-    	            	case blue:
-    	            		executeAuto(AUTO.ONE_GEAR, 1);
-    	            		break;
-    	            	case red:
-    	            		executeAuto(AUTO.ONE_GEAR, -1);
-    	            		break;
-    	            	default:
-    	            		executeAuto(AUTO.ONE_GEAR, 1);
-    	            		break;
-    	            }
+    	            executeAuto(AUTO.ONE_GEAR, alliance);
     				
     				break;
     			case two_gear:
-    	        //    robot.intake.setPresetAngles(Intake.AnglePresets.ONE_EIGHTY);
+    	        //    robot.intake.setPresetAngles(180);
     	      //  	robot.dt.resetCoord(Swerve.AnglePresets.ONE_EIGHTY);			
-    				switch(allianceSelected){
-	            	case blue:
-	            		executeAuto(AUTO.TWO_GEAR, 1);
-	            		break;
-	            	case red:
-	            		executeAuto(AUTO.TWO_GEAR, -1);
-	            		break;
-	            	default:
-	            		executeAuto(AUTO.TWO_GEAR, 1);
-	            		break;
-	            }
+    				executeAuto(AUTO.TWO_GEAR, alliance);
     				break;
     			case near_hopper:
-    	    //        robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
-    	  //      	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
-    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
-    		        Timer.delay(0.1);
-    		        robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
-    	            Timer.delay(0.1);
     	            switch(allianceSelected){
 	            	case blue:
-	            		robot.intake.setPresetAngles(Intake.AnglePresets.NINETY);
+	            		initHeading(90);
 	    	            Timer.delay(0.1);
-	            		executeAuto(AUTO.NEAR_HOPPER, 1);
+	            		executeAuto(AUTO.NEAR_HOPPER, BLUE);
 	            		break;
 	            	case red:
-	            		robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
+	            		initHeading(270);
 	    	            Timer.delay(0.1);
-	            		executeAuto(AUTO.NEAR_HOPPER, -1);
+	            		executeAuto(AUTO.NEAR_HOPPER, RED);
 	            		break;
 	            	default:
-	            		robot.intake.setPresetAngles(Intake.AnglePresets.NINETY);
+	            		initHeading(90);
 	    	            Timer.delay(0.1);
-	            		executeAuto(AUTO.NEAR_HOPPER, 1);
+	            		executeAuto(AUTO.NEAR_HOPPER, BLUE);
 	            		break;
 	            }
     				break;
     			case near_hopper_inside:
-    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
-    		        Timer.delay(0.1);
-    		        robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
-    	            Timer.delay(0.1);
-    	            robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
-    	            Timer.delay(0.1);
     	            switch(allianceSelected){
 	            	case blue:
-	            		executeAuto(AUTO.NEAR_HOPPER_INSIDE, 1);
+	            		initHeading(90);
+	            		executeAuto(AUTO.NEAR_HOPPER_INSIDE, BLUE);
 	            		break;
 	            	case red:
-	            		executeAuto(AUTO.NEAR_HOPPER_INSIDE, -1);
+	            		initHeading(270);
+	            		executeAuto(AUTO.NEAR_HOPPER_INSIDE, RED);
 	            		break;
 	            	default:
-	            		executeAuto(AUTO.NEAR_HOPPER_INSIDE, 1);
+	            		initHeading(90);
+	            		executeAuto(AUTO.NEAR_HOPPER_INSIDE, BLUE);
 	            		break;
 	            }
     			case near_hopper_close_inside:
-    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
-    		        Timer.delay(0.1);
-    		        robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
-    	            Timer.delay(0.1);
     	            switch(allianceSelected){
 	            	case blue:
-	            		robot.intake.setPresetAngles(Intake.AnglePresets.NINETY);
-	            		Timer.delay(0.1);
-	            		executeAuto(AUTO.NEAR_HOPPER_CLOSE_INSIDE, 1);
+	            		initHeading(90);
+	            		executeAuto(AUTO.NEAR_HOPPER_CLOSE_INSIDE, BLUE);
 	            		break;
 	            	case red:
-	            		robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
-	    	            Timer.delay(0.1);
-	            		executeAuto(AUTO.NEAR_HOPPER_CLOSE_INSIDE, -1);
-	            		
+	            		initHeading(270);
+	            		executeAuto(AUTO.NEAR_HOPPER_CLOSE_INSIDE, RED);
 	            		break;
 	            	default:
-	            		robot.intake.setPresetAngles(Intake.AnglePresets.NINETY);
-	    	            Timer.delay(0.1);
-	            		executeAuto(AUTO.NEAR_HOPPER_CLOSE_INSIDE, 1);
+	            		initHeading(90);
+	            		executeAuto(AUTO.NEAR_HOPPER_CLOSE_INSIDE, BLUE);
 	            		
 	            		break;
 	            }
     				break;
     			case near_hopper_outside:
-    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
-    		        Timer.delay(0.1);
-    		        robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
-    	            Timer.delay(0.1);
-    	            robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
-    	            Timer.delay(0.1);
     	            switch(allianceSelected){
 	            	case blue:
-	            		executeAuto(AUTO.NEAR_HOPPER_OUTSIDE, 1);
+	            		initHeading(90);
+	            		executeAuto(AUTO.NEAR_HOPPER_OUTSIDE, BLUE);
 	            		break;
 	            	case red:
-	            		executeAuto(AUTO.NEAR_HOPPER_OUTSIDE, -1);
+	            		initHeading(270);
+	            		executeAuto(AUTO.NEAR_HOPPER_OUTSIDE, RED);
 	            		break;
 	            	default:
-	            		executeAuto(AUTO.NEAR_HOPPER_OUTSIDE, 1);
+	            		initHeading(90);
+	            		executeAuto(AUTO.NEAR_HOPPER_OUTSIDE, BLUE);
 	            		break;
 	            }
     				break;
     			case near_hopper_receive:
-    				robot.intake.setPresetAngles(Intake.AnglePresets.ZERO);
-    		        Timer.delay(0.1);
-    		        robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
-    	            Timer.delay(0.1);
-    	            
     	            switch(allianceSelected){
 	            	case blue:
-	            		robot.intake.setPresetAngles(Intake.AnglePresets.NINETY);
-	    	            Timer.delay(0.1);
-	            		executeAuto(AUTO.NEAR_HOPPER_RECEIVE, 1);
+	            		initHeading(90);
+	            		executeAuto(AUTO.NEAR_HOPPER_RECEIVE, BLUE);
 	            		break;
 	            	case red:
-	            		robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
-	    	            Timer.delay(0.1);
-	            		executeAuto(AUTO.NEAR_HOPPER_RECEIVE, -1);
+	            		initHeading(270);
+	            		executeAuto(AUTO.NEAR_HOPPER_RECEIVE, RED);
 	            		break;
 	            	default:
-	            		robot.intake.setPresetAngles(Intake.AnglePresets.NINETY);
-	    	            Timer.delay(0.1);
-	            		executeAuto(AUTO.NEAR_HOPPER_RECEIVE, 1);
+	            		initHeading(90);
+	            		executeAuto(AUTO.NEAR_HOPPER_RECEIVE, BLUE);
 	            		break;
 	            }
     				break;
     			case far_hopper:
-    	//            robot.intake.setPresetAngles(Intake.AnglePresets.TWO_SEVENTY);
+    	//            robot.intake.setPresetAngles(270);
     //	        	robot.dt.resetCoord(Swerve.AnglePresets.TWO_SEVENTY);
     				executeAuto(AUTO.FAR_HOPPER, 1);
     				break;
@@ -513,49 +478,47 @@ public class Robot extends SampleRobot {
     		break;
     	case NEAR_HOPPER_CLOSE_INSIDE:
     		
-    		dist.setGoal(robot.dt.getX(), Constants.NEAR_HOPPER_DEPLOY_Y-14, 4.0, 2.25, 0.7, 10);
+    		dist.setGoal(robot.dt.getX(), /*/Constants.NEAR_HOPPER_DEPLOY_Y-14/*/84, 2.5, 5.0, .9, 10);
     		
     		if(team == BLUE){
-    		robot.dt.setHeading(90, true);
+    			robot.dt.setHeading(90, true);
+    			robot.turret.setAngle(105);
     		}else{
     			robot.dt.setHeading(270, true);
+    			robot.turret.setAngle(-85);
     		}
     		delay();
-    		//robot.turret.setAngle(90 * team);
-    		dist.setGoal(robot.dt.getX()+((-45)*team), robot.dt.getY(), 3.0, 1.75, 0.7, 10);
-    		/*while(robot.intake.getCurrentAngularRate() < 20 && isAutonomous()){
-    			Timer.delay(0.01);
-    		}*/
+    		robot.turret.setState(Turret.State.VisionTracking);
+    		dist.setGoal(robot.dt.getX()+((-55)*team), 84, 2.0, 1.0, 1.0, 5);
     		delay();
     		logger.writeToLog("AUTO POS1 X:" + Double.toString(robot.dt.getX()) + " Y:"+ Double.toString(robot.dt.getY()));
-    		/*dist.setGoal(robot.dt.getX() + (-6*team), robot.dt.getY() - 18 - 4 , 1.0, 1.5, 0.7, 10);
-    		robot.turret.setState(Turret.State.VisionTracking);
-    		delay();*/
     		 
     		InterpolatingDouble power = Constants.kDistanceMap.getInterpolated(new InterpolatingDouble(fsm.getTargetDistance()));
     		robot.dt.sendInput(0.0, -power.value, 0.0, 0.0, false, false, false, false);
-    		if(team == 1){
-        		robot.dt.setHeading(90, true);
-        		}else{
-        			robot.dt.setHeading(270, true);
-        		}
-    		long timeout = System.currentTimeMillis();
     		if(team == BLUE){
-	    		while(!fsm.isAtDistance(81) && isAutonomous() && (System.currentTimeMillis() - timeout) < 3000){
-	    			power = Constants.kDistanceMap.getInterpolated(new InterpolatingDouble(fsm.getTargetDistance()));
-	        		robot.dt.sendInput(0.0, -power.value, 0.0, 0.0, false, false, false, false);
-	        		logger.writeToLog("Vision " + Boolean.toString(fsm.getTargetVisibility()));
-	        		logger.writeToLog("Vision Distance: " + Double.toString(fsm.getTargetDistance()));
-	    			Timer.delay(0.01);    			
-	    		}
+    			robot.dt.setHeading(90, true);
     		}else{
-    			while(!fsm.isAtDistance(81) && isAutonomous() && (System.currentTimeMillis() - timeout) < 3000){
-	    			power = Constants.kDistanceMap.getInterpolated(new InterpolatingDouble(fsm.getTargetDistance()));
-	        		robot.dt.sendInput(0.0, -power.value, 0.0, 0.0, false, false, false, false);
-	        		logger.writeToLog("Vision " + Boolean.toString(fsm.getTargetVisibility()));
-	        		logger.writeToLog("Vision Distance: " + Double.toString(fsm.getTargetDistance()));
-	    			Timer.delay(0.01);    			
-	    		}
+    			robot.dt.setHeading(270, true);
+    		}
+    		long timeout = System.currentTimeMillis();
+    		double currentDist = robot.dt.getRobotYInch();
+    		while((!fsm.isAtDistance(81) || (currentDist - robot.dt.getRobotYInch()<2)) && isAutonomous() && (System.currentTimeMillis() - timeout) < 1000){
+    			if(fsm.getTargetVisibility()){
+    				power = Constants.kDistanceMap.getInterpolated(new InterpolatingDouble(fsm.getTargetDistance()));
+    				robot.dt.sendInput(0.015, -power.value, 0.0, 0.0, false, false, false, false);
+    			}
+    			else{
+    				robot.dt.sendInput(0.0, -0.3, 0.0, 0.0, false, false, false, false);
+    			}
+        		
+        		logger.writeToLog("Vision " + Boolean.toString(fsm.getTargetVisibility()));
+        		logger.writeToLog("Vision Distance: " + Double.toString(fsm.getTargetDistance()));
+    			Timer.delay(0.01);    			
+    		}
+    		if(!fsm.getTargetVisibility()){
+    			if(team == BLUE){
+    				robot.turret.setAngle(105+(90-Util.boundAngle0to360Degrees(robot.intake.getCurrentAngle())));
+    			}
     		}
     		logger.writeToLog("Vision distance Auto: " + Double.toString(fsm.getTargetDistance()) + " Power: " + Double.toString(power.value));
     		robot.dt.sendInput(0, 0.3, 0, 0, false, false, false, false);
@@ -712,6 +675,13 @@ public class Robot extends SampleRobot {
     	while(isAutonomous())
     	{Timer.delay(0.1);}
     }/**/
+    
+    private void initHeading(double angle){
+    	robot.intake.setPresetAngles(angle);
+        Timer.delay(0.1);
+        robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
+        Timer.delay(0.1);
+    }
     
     public void operatorControl() {
     	dist.disable();
