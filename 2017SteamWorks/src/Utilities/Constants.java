@@ -29,7 +29,7 @@ public class Constants {
     public static final double REAR_LEFT_TURN_OFFSET   = 263.1-6.0;//pbot 138.1+1.5; //289.3
     public static final double REAR_RIGHT_TURN_OFFSET  = 45.5-0.5;//pbot 131.6+3.4; //140.0; //172.6
     
-    public static final double DRIVE_TICKS_PER_INCH =  (13.0*5760.0)/(16.0*Math.PI)/2.0*.957;//36/25542; //0.00200635031508792675265469178699;//0.00163990667972621570986118595697; //0.00150603674668734095803578302171;//60.0/40462.0; //
+    public static final double DRIVE_TICKS_PER_INCH =  790;//(13.0*5760.0)/(16.0*Math.PI)/2.0*.957;//36/25542; //0.00200635031508792675265469178699;//0.00163990667972621570986118595697; //0.00150603674668734095803578302171;//60.0/40462.0; //
     public static final double TURN_KP = 0.02; //0.020
     public static final double TURN_KI = 0.00;
     public static final double TURN_KD = 0.02;//0.02
@@ -180,26 +180,29 @@ public class Constants {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kDriveDistanceMap = new InterpolatingTreeMap<>();
     static {        
     	kDriveDistanceMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(0.0));
-    	kDriveDistanceMap.put(new InterpolatingDouble(2.0), new InterpolatingDouble(0.001));
-    	kDriveDistanceMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(0.05));
-    	kDriveDistanceMap.put(new InterpolatingDouble(10.0), new InterpolatingDouble(0.21));
-    	kDriveDistanceMap.put(new InterpolatingDouble(40.0), new InterpolatingDouble(0.35));
-    	kDriveDistanceMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(0.95));     	
+    	kDriveDistanceMap.put(new InterpolatingDouble(2.0), new InterpolatingDouble(0.07));
+    	kDriveDistanceMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(0.11));
+    	kDriveDistanceMap.put(new InterpolatingDouble(10.0), new InterpolatingDouble(0.20));
+    	kDriveDistanceMap.put(new InterpolatingDouble(20.0), new InterpolatingDouble(0.23));
+    	kDriveDistanceMap.put(new InterpolatingDouble(40.0), new InterpolatingDouble(0.45));
+    	kDriveDistanceMap.put(new InterpolatingDouble(60.0), new InterpolatingDouble(0.7));
+    	kDriveDistanceMap.put(new InterpolatingDouble(80.0), new InterpolatingDouble(0.9));
+    	kDriveDistanceMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(1.0));     	
     }
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kRotationStationary = new InterpolatingTreeMap<>();
     static {        
     	kRotationStationary.put(new InterpolatingDouble(0.0), new InterpolatingDouble(0.0));
-    	kRotationStationary.put(new InterpolatingDouble(5.0), new InterpolatingDouble(0.12));
-    	kRotationStationary.put(new InterpolatingDouble(15.0), new InterpolatingDouble(0.2));
-    	kRotationStationary.put(new InterpolatingDouble(90.0), new InterpolatingDouble(0.37));
+    	kRotationStationary.put(new InterpolatingDouble(5.0), new InterpolatingDouble(0.1));
+    	kRotationStationary.put(new InterpolatingDouble(15.0), new InterpolatingDouble(0.1));
+    	kRotationStationary.put(new InterpolatingDouble(90.0), new InterpolatingDouble(0.25));
     	kRotationStationary.put(new InterpolatingDouble(360.0), new InterpolatingDouble(0.75));   	
     }
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kRotationTranslational = new InterpolatingTreeMap<>();
     static {        
     	kRotationTranslational.put(new InterpolatingDouble(0.0), new InterpolatingDouble(0.0));
-    	kRotationTranslational.put(new InterpolatingDouble(8.0), new InterpolatingDouble(0.1));
-    	kRotationTranslational.put(new InterpolatingDouble(15.0), new InterpolatingDouble(0.15));
-    	kRotationTranslational.put(new InterpolatingDouble(90.0), new InterpolatingDouble(0.25));
-    	kRotationTranslational.put(new InterpolatingDouble(360.0), new InterpolatingDouble(0.35));   	
+    	kRotationTranslational.put(new InterpolatingDouble(8.0), new InterpolatingDouble(0.05));
+    	kRotationTranslational.put(new InterpolatingDouble(15.0), new InterpolatingDouble(0.2));
+    	kRotationTranslational.put(new InterpolatingDouble(90.0), new InterpolatingDouble(0.4));
+    	kRotationTranslational.put(new InterpolatingDouble(360.0), new InterpolatingDouble(0.5));   	
     }
 }

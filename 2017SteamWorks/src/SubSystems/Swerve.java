@@ -23,7 +23,14 @@ public class Swerve{
 	int _printLoops = 0;
 	private Intake intake;
 	private int onTarget = 0;
-	
+
+	private double lastYPos = 0.0;
+	private double lastXPos = 0.0;
+	private double lastYVel = 0.0;
+	private double lastXVel = 0.0;
+	private double AccelX = 0.0;
+	private double AccelY = 0.0;
+	private int cyclesSinceLastUpdate = 0;
 	
 	public SwerveDriveModule frontLeft;
 	private SwerveDriveModule frontRight;
@@ -535,6 +542,21 @@ public class Swerve{
 			rearRight.updateCoord();
 			rearLeft.updateCoord();
 			findRobotCenter();
+			if(cyclesSinceLastUpdate > 10){
+
+				AccelX = (getX() - lastXPos) - lastXVel;
+				AccelY = (getY() - lastYPos) - lastYVel;
+				lastXVel = getX() - lastXPos;
+				lastYVel = getY() - lastYPos;
+				lastXPos = getX();
+				lastYPos = getY();
+				SmartDashboard.putNumber("X Velocity", lastXVel);
+				SmartDashboard.putNumber("Y Velocity", lastYVel);
+				SmartDashboard.putNumber("X Acceleration", AccelX);
+				SmartDashboard.putNumber("Y Acceleration", AccelY);
+				cyclesSinceLastUpdate = 0;
+			}
+			cyclesSinceLastUpdate++;
 			SmartDashboard.putNumber("Robot X (in) ", getRobotXInch());
 			SmartDashboard.putNumber("Robot Y (in) ", getRobotYInch());
 			SmartDashboard.putNumber("Robot X (in) offsets", getXWithOffsets());
@@ -613,6 +635,7 @@ public class Swerve{
 //				SmartDashboard.putNumber(" Heading Angle ", currentRobotHeading); // imported from Intake
 				SmartDashboard.putNumber(" Heading Set Point ", _targetAngle); // added from Swerve.sendInput()
 				SmartDashboard.putNumber(" Heading Error ", getError());
+				
 			}
 		//}
 	}	
@@ -682,4 +705,10 @@ public class Swerve{
             return Constants.SWERVE_ROTATION_SCALE_FACTOR_SMALL;
         }
     }
+	public double getXVelocity(){
+		return lastXVel;
+	}
+	public double getYVelocity(){
+		return lastYVel;
+	}
 }

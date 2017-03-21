@@ -86,14 +86,14 @@ public class TeleController
     	if(coDriver.leftBumper.isPressed()){
     		robot.intake.intakeReverse();
     	}
-    	if(coDriver.backButton.isPressed()){
+    	if(coDriver.backButton.isPressed()){    		
     		robot.intake.intakeStop();
     		robot.shooter.stop();  		
     		robot.sweeper.stopRoller();
     		robot.sweeper.stopSweeper();
     		canReverseSweeper = true;
     		robot.turret.setState(Turret.State.VisionTracking);
-    		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED && robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED_WITH_GEAR && robot.gearIntake.getState() != GearIntake.State.GEAR_LOST_RETRACTED)
+    		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED || robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED_WITH_GEAR || robot.gearIntake.getState() != GearIntake.State.GEAR_LOST_RETRACTED)
     			robot.gearIntake.setState(GearIntake.State.INTAKE_EXTENDED_OFF);
     		robot.hanger.stop();
     	}
@@ -261,7 +261,7 @@ public class TeleController
     	if(robot.gearIntake.getState() == GearIntake.State.GEAR_DETECTED){
     		startVibration(0);
     	}else if(robot.turret.onTarget() && robot.turret.getCurrentState() == Turret.State.VisionTracking && fsm.getTargetVisibility()){
-    		//startVibration(2);	// Uncomment for Roger
+    		startVibration(2);	// Uncomment for Roger
     	}else{
     		startVibration(-1);
     	}

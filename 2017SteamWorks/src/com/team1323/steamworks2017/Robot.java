@@ -478,7 +478,7 @@ public class Robot extends SampleRobot {
     		break;
     	case NEAR_HOPPER_CLOSE_INSIDE:
     		
-    		dist.setGoal(robot.dt.getX(), /*/Constants.NEAR_HOPPER_DEPLOY_Y-14/*/84, 2.5, 5.0, .9, 10);
+    		dist.setGoal(robot.dt.getX(), /*/Constants.NEAR_HOPPER_DEPLOY_Y-14/*/84, 2.2, 2.1, .9, 2);
     		
     		if(team == BLUE){
     			robot.dt.setHeading(90, true);
@@ -489,10 +489,10 @@ public class Robot extends SampleRobot {
     		}
     		delay();
     		robot.turret.setState(Turret.State.VisionTracking);
-    		dist.setGoal(robot.dt.getX()+((-55)*team), 84, 2.0, 1.0, 1.0, 5);
+    		dist.setGoal(robot.dt.getX()+((-65)*team), 84, 2.0, 1.35, 1.0, 5);
     		delay();
     		logger.writeToLog("AUTO POS1 X:" + Double.toString(robot.dt.getX()) + " Y:"+ Double.toString(robot.dt.getY()));
-    		 
+    		
     		InterpolatingDouble power = Constants.kDistanceMap.getInterpolated(new InterpolatingDouble(fsm.getTargetDistance()));
     		robot.dt.sendInput(0.0, -power.value, 0.0, 0.0, false, false, false, false);
     		if(team == BLUE){
@@ -525,6 +525,7 @@ public class Robot extends SampleRobot {
     		Timer.delay(0.25);
     		robot.dt.sendInput(0, 0.0, 0, 0, false, false, false, false);
     		logger.writeToLog("AUTO POS1 X:" + Double.toString(robot.dt.getX()) + " Y:"+ Double.toString(robot.dt.getY()));
+    		/* 
     		while(!robot.turret.onTarget() && isAutonomous()){
     			Timer.delay(0.01);
     		}    		
@@ -545,7 +546,7 @@ public class Robot extends SampleRobot {
     		robot.sweeper.stopRoller();
     		robot.sweeper.stopSweeper();
     		robot.intake.intakeStop();
-    		robot.shooter.setState(Shooter.Status.OFF);
+    		robot.shooter.setState(Shooter.Status.OFF);*/
     		break;
     	case NEAR_HOPPER_OUTSIDE:
     		robot.turret.setAngle(-75);

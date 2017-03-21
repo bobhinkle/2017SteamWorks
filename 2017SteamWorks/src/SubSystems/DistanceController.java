@@ -59,7 +59,7 @@ public class DistanceController {
 			if(timeout >= System.currentTimeMillis()){
 				if(!isOnTarget()){
 					cyclesOnTarget = cyclesToCheck;	
-					double[] ee = getError();
+					double[] errorMap = getError();
 					/*
 					if(targetY - currentPositionY > 0){
 						inputY = getInput(Math.abs(targetY - currentPositionY));
@@ -79,18 +79,24 @@ public class DistanceController {
 					}else{
 						inputY = (targetY - currentPositionY) * Constants.DIST_CONTROLLER_SMALL_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_D;
 					}*/
-					if(ee[0]>0){
-						inputY = getInput(Math.abs(ee[0]));
+					if(errorMap[1]>0){
+						inputY = getInput(Math.abs(errorMap[1]));
 					}else{
-						inputY = -getInput(Math.abs(ee[0]));
+						inputY = -getInput(Math.abs(errorMap[1]));
 					}
+					if(errorMap[0]>0){
+						inputX = getInput(Math.abs(errorMap[0]));
+					}else{
+						inputX = -getInput(Math.abs(errorMap[0]));
+					}
+					/*
 					if(Math.abs(targetX - currentPositionX) > Constants.DIST_CONTROLLER_PID_THRESH * Constants.DRIVE_TICKS_PER_INCH){
 						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_D;
 					}else{
 						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_SMALL_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_D;
-					}
+					}*/
 					
-					logger.writeToLog("error:" + Double.toString(ee[0]) +"tree:" + Double.toString(getInput(Math.abs(ee[0]))));
+					logger.writeToLog("error:" + "X:" + Double.toString((float)errorMap[0]) +"tree:" + Double.toString(getInput(Math.abs((float)errorMap[0]))) + "Y:" + Double.toString(errorMap[1]) +"tree:" + Double.toString(getInput(Math.abs(errorMap[1]))));
 					logger.writeToLog("DIST: " + Double.toString(currentPositionY/Constants.DRIVE_TICKS_PER_INCH) + ": " + Double.toString(currentPositionX/Constants.DRIVE_TICKS_PER_INCH) + " INPUTY: " + Double.toString(inputY) + " INPUTX:" + Double.toString(inputX));
 
 					dt.sendInput(inputCap(inputX),inputCap(inputY) , 0, 0, false, false, false, false); // second false was true
@@ -123,8 +129,8 @@ public class DistanceController {
 	}
 	public double[] getError(){
 		double[] error = new double[2];
-		error[0] = (targetY-currentPositionY)/Constants.DRIVE_TICKS_PER_INCH;
-		error[1] = (targetX-currentPositionX)/Constants.DRIVE_TICKS_PER_INCH;
+		error[0] = (targetX-currentPositionX)/Constants.DRIVE_TICKS_PER_INCH;
+		error[1] = (targetY-currentPositionY)/Constants.DRIVE_TICKS_PER_INCH;
 		return error;
 	}
 	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput, int checks){
