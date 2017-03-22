@@ -35,7 +35,7 @@ public class Swerve{
 	public SwerveDriveModule frontLeft;
 	private SwerveDriveModule frontRight;
 	private SwerveDriveModule rearLeft;
-	private SwerveDriveModule rearRight;
+	public SwerveDriveModule rearRight;
 	private boolean disableUpdates = false;
 	
 	public enum AnglePresets{
@@ -331,39 +331,52 @@ public class Swerve{
 			return getCurrentDriveEncoderPosition() - relativeTickZero;
 		}
 		
-		public void updateCoord(){			
-			setCurrentDriveEncoderPosition(driveMotor.getEncPosition());
-			setCurrentIntakeAngle(intake.getCurrentAngle());
-			setCurrentModuleAngle(rotationMotor.get()-offSet);
-//			SmartDashboard.putString("updateCoord():setCurrentModule"+Integer.toString(moduleID)+"Angle", Double.toString(Util.boundAngle0to360Degrees(getCurrentModuleAngle()))+" / "+Double.toString(Util.boundAngle0to360Degrees(rotationMotor.get())));
-			double distanceTravelled = -(getCurrentDriveEncoderPosition()-lastEncPosition);// * Constants.DRIVE_INCHES_PER_CLICK; //0.00180143;*Constants.DRIVE_CLICKS_PER_INCH; // inches
-	        totalDistanceTravelled -= distanceTravelled; // inches
-//	        SmartDashboard.putNumber("distanceTravelled"+Integer.toString(moduleID), distanceTravelled);
-//	        SmartDashboard.putBoolean(Integer.toString(moduleID) + " Travelling ", isTravelling());
-//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Distance (in) ", totalDistanceTravelled);
-//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " cos = ", Math.cos(Math.toRadians(360-rotationMotor.get()+90)));
-//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " sin = ", Math.sin(Math.toRadians(360-rotationMotor.get()+90)));
-	        //should be negative for the comp bot, positive for the pbot
-	        double dx = distanceTravelled * Math.cos(Math.toRadians(getCurrentIntakeAngle()+getCurrentModuleAngle()+90));	// should be ``double dx = distanceTravelled * Math.cos(Math.toRadians(90-(getCurrentIntakeAngle()+getCurrentModuleAngle())));''
-	        //should be positive for comp bot, negative for the pbot
-	        double dy = -distanceTravelled * Math.sin(Math.toRadians(getCurrentIntakeAngle()+getCurrentModuleAngle()+90));	// should be ``double dx = distanceTravelled * Math.sin(Math.toRadians(90-(getCurrentIntakeAngle()+getCurrentModuleAngle())));''
-	        x += dx;
-	        y += dy;
-//	        SmartDashboard.putNumber("DRV_X" + Integer.toString(moduleID), x);
-//	        SmartDashboard.putNumber("DRV_Y" + Integer.toString(moduleID), y);
-//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " dX ", dx*1000);
-//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " dY ", dy*1000);
-	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (tick) ", x);
-	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (tick) ", y);
- 	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (in) ", x/Constants.DRIVE_TICKS_PER_INCH);
-	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", y/Constants.DRIVE_TICKS_PER_INCH);
-	        
-			lastEncPosition = getCurrentDriveEncoderPosition();			
+		public void updateCoord(){		
+			if(moduleID != 4){
+				setCurrentDriveEncoderPosition(driveMotor.getEncPosition());
+				setCurrentIntakeAngle(intake.getCurrentAngle());
+				setCurrentModuleAngle(rotationMotor.get()-offSet);
+	//			SmartDashboard.putString("updateCoord():setCurrentModule"+Integer.toString(moduleID)+"Angle", Double.toString(Util.boundAngle0to360Degrees(getCurrentModuleAngle()))+" / "+Double.toString(Util.boundAngle0to360Degrees(rotationMotor.get())));
+				double distanceTravelled = -(getCurrentDriveEncoderPosition()-lastEncPosition);// * Constants.DRIVE_INCHES_PER_CLICK; //0.00180143;*Constants.DRIVE_CLICKS_PER_INCH; // inches
+		        totalDistanceTravelled -= distanceTravelled; // inches
+	//	        SmartDashboard.putNumber("distanceTravelled"+Integer.toString(moduleID), distanceTravelled);
+	//	        SmartDashboard.putBoolean(Integer.toString(moduleID) + " Travelling ", isTravelling());
+	//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " Distance (in) ", totalDistanceTravelled);
+	//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " cos = ", Math.cos(Math.toRadians(360-rotationMotor.get()+90)));
+	//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " sin = ", Math.sin(Math.toRadians(360-rotationMotor.get()+90)));
+		        //should be negative for the comp bot, positive for the pbot
+		        double dx = distanceTravelled * Math.cos(Math.toRadians(getCurrentIntakeAngle()+getCurrentModuleAngle()+90));	// should be ``double dx = distanceTravelled * Math.cos(Math.toRadians(90-(getCurrentIntakeAngle()+getCurrentModuleAngle())));''
+		        //should be positive for comp bot, negative for the pbot
+		        double dy = -distanceTravelled * Math.sin(Math.toRadians(getCurrentIntakeAngle()+getCurrentModuleAngle()+90));	// should be ``double dx = distanceTravelled * Math.sin(Math.toRadians(90-(getCurrentIntakeAngle()+getCurrentModuleAngle())));''
+		        x += dx;
+		        y += dy;
+	//	        SmartDashboard.putNumber("DRV_X" + Integer.toString(moduleID), x);
+	//	        SmartDashboard.putNumber("DRV_Y" + Integer.toString(moduleID), y);
+	//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " dX ", dx*1000);
+	//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " dY ", dy*1000);
+		        if(moduleID == 3){
+			        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (tick) ", x);
+			        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (tick) ", y);
+		 	        SmartDashboard.putNumber(Integer.toString(moduleID) + " X (in) ", x/Constants.DRIVE_TICKS_PER_INCH);
+			        SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", y/Constants.DRIVE_TICKS_PER_INCH);
+		        }
+		        
+				lastEncPosition = getCurrentDriveEncoderPosition();			
+			}else{
+				setCurrentDriveEncoderPosition(driveMotor.getEncPosition());
+				setCurrentIntakeAngle(intake.getCurrentAngle());
+				setCurrentModuleAngle(rotationMotor.get()-offSet);
+				y = driveMotor.getEncPosition();
+				SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (tick) ", driveMotor.getEncPosition());
+				SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", getY()/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH);
+				SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) Graph", getY()/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH);
+			}
 		}
 		public double getX(){return x;}
 		public double getY(){return y;}
 		public double getXInch(){return x/Constants.DRIVE_TICKS_PER_INCH;}
 		public double getYInch(){return y/Constants.DRIVE_TICKS_PER_INCH;}
+		public double getFollowerWheelInches(){return y/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH;}
 		public void resetCoord(AnglePresets i){
 			x = 0;
 			y = 0;
@@ -379,7 +392,7 @@ public class Swerve{
 			if(wheelError() >= Constants.TURNING_DETECT_THRESHOLD) {isRotating = true;} else {isRotating = false;}
 			if(isRotating || Math.abs(getCurrentDriveEncoderPosition()-lastEncPosition) <= Constants.DRIVING_DETECT_THRESHOLD /*clicks*/) {isTravelling = false;} else {isTravelling = true;}
 			//Note #3
-			SmartDashboard.putNumber(Integer.toString(moduleID) + " Current", driveMotor.getOutputCurrent());
+			//SmartDashboard.putNumber(Integer.toString(moduleID) + " Current", driveMotor.getOutputCurrent());
 			SmartDashboard.putNumber(Integer.toString(moduleID) + " Rotation Angle (deg) ", Util.boundAngle0to360Degrees(getCurrentModuleAngle()));
 //			SmartDashboard.putNumber("DRV_" + Integer.toString(moduleID), driveMotor.get());
 //			SmartDashboard.putNumber(Integer.toString(moduleID) + " Bearing ", Util.boundAngle0to360Degrees(getCurrentAngle()-offSet)); // `-offSet' was commented out
@@ -397,7 +410,11 @@ public class Swerve{
 			driveMotor = new CANTalon(driveMotorPort);
 	    	driveMotor.setEncPosition(0);
 	    	driveMotor.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-	    	driveMotor.reverseSensor(false);
+	    	if(moduleID != 4){
+	    		driveMotor.reverseSensor(false);
+	    	}else{
+	    		driveMotor.reverseSensor(true);
+	    	}
 	    	driveMotor.configEncoderCodesPerRev(360);
 	    	driveMotor.configNominalOutputVoltage(+0f, -0f);
 	    	driveMotor.configPeakOutputVoltage(+12f, 0);

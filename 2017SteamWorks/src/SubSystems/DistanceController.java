@@ -26,6 +26,7 @@ public class DistanceController {
 	private Logger logger;
 	private double inputCap = 1.0;
 	private double minCap  = 0.005;
+	public boolean useFollower = true;
 	public DistanceController(){
 		dt = Swerve.getInstance();
 		logger = Logger.getInstance();
@@ -44,13 +45,22 @@ public class DistanceController {
 
 	
 		SmartDashboard.putNumber(" Dist X Set Point ", targetX/Constants.DRIVE_TICKS_PER_INCH);
-		SmartDashboard.putNumber(" Dist Y Set Point ", targetY/Constants.DRIVE_TICKS_PER_INCH);
+		if(useFollower){
+			SmartDashboard.putNumber(" Dist Y Set Point ", targetY/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH);
+			SmartDashboard.putNumber(" Dist Y Position ", currentPositionY/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH);
+			SmartDashboard.putNumber(" Dist Y Error ", (targetY - currentPositionY)/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH);
+			logger.writeToLog("DIST Y Target: " + Double.toString(targetY/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH) + "\tDIST X Target: " + Double.toString(targetX/Constants.DRIVE_TICKS_PER_INCH));
+		}else{
+			SmartDashboard.putNumber(" Dist Y Set Point ", targetY/Constants.DRIVE_TICKS_PER_INCH);
+			SmartDashboard.putNumber(" Dist Y Position ", currentPositionY/Constants.DRIVE_TICKS_PER_INCH);
+			SmartDashboard.putNumber(" Dist Y Error ", (targetY - currentPositionY)/Constants.DRIVE_TICKS_PER_INCH);
+			logger.writeToLog("DIST Y Target: " + Double.toString(targetY/Constants.DRIVE_TICKS_PER_INCH) + "\tDIST X Target: " + Double.toString(targetX/Constants.DRIVE_TICKS_PER_INCH));
+		}
 		SmartDashboard.putNumber(" Dist X Position ", currentPositionX/Constants.DRIVE_TICKS_PER_INCH);
-		SmartDashboard.putNumber(" Dist Y Position ", currentPositionY/Constants.DRIVE_TICKS_PER_INCH);
 		SmartDashboard.putNumber(" Dist X Error ", (targetX - currentPositionX)/Constants.DRIVE_TICKS_PER_INCH);
-		SmartDashboard.putNumber(" Dist Y Error ", (targetY - currentPositionY)/Constants.DRIVE_TICKS_PER_INCH);
 		
-		logger.writeToLog("Distance Controller Y Target: " + Double.toString(targetY/Constants.DRIVE_TICKS_PER_INCH) + "Distance Controller X Target: " + Double.toString(targetX/Constants.DRIVE_TICKS_PER_INCH));
+		
+		
 	 
 		SmartDashboard.putNumber("distInputY", inputY); // this and next line were around line 60 or so,
 		SmartDashboard.putNumber("distInputX", inputX); //  after an else block
@@ -59,7 +69,7 @@ public class DistanceController {
 			if(timeout >= System.currentTimeMillis()){
 				if(!isOnTarget()){
 					cyclesOnTarget = cyclesToCheck;	
-					double[] errorMap = getError();
+					//double[] errorMap = getError();
 					/*
 					if(targetY - currentPositionY > 0){
 						inputY = getInput(Math.abs(targetY - currentPositionY));
@@ -74,12 +84,24 @@ public class DistanceController {
 						inputX = -getInput(Math.abs(targetX - currentPositionX));
 					}*/
 					
-					/*if(Math.abs(targetY - currentPositionY) > Constants.DIST_CONTROLLER_PID_THRESH * Constants.DRIVE_TICKS_PER_INCH){
-						inputY = (targetY - currentPositionY) * Constants.DIST_CONTROLLER_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_D;
+					//if(Math.abs(targetY - currentPositionY) > Constants.DIST_CONTROLLER_PID_THRESH_Y * Constants.FOLLOWER_WHEEL_TICKS_PER_INCH){
+					if(useFollower){
+						if(targetY - currentPositionY > 0){
+							inputY = ((targetY - currentPositionY) * Constants.DIST_CONTROLLER_Y_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_Y_D) + Constants.DIST_CONTROLLER_F_GAIN;
+						}else{
+							inputY = ((targetY - currentPositionY) * Constants.DIST_CONTROLLER_Y_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_Y_D) - Constants.DIST_CONTROLLER_F_GAIN;
+						}
 					}else{
-						inputY = (targetY - currentPositionY) * Constants.DIST_CONTROLLER_SMALL_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_D;
-					}*/
-					if(errorMap[1]>0){
+						if(targetY - currentPositionY > 0){
+							inputY = ((targetY - currentPositionY) * Constants.DIST_CONTROLLER_Y_P_NO_FOLLOWER - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_Y_D_NO_FOLLOWER) + Constants.DIST_CONTROLLER_F_GAIN;
+						}else{
+							inputY = ((targetY - currentPositionY) * Constants.DIST_CONTROLLER_Y_P_NO_FOLLOWER - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_Y_D_NO_FOLLOWER) - Constants.DIST_CONTROLLER_F_GAIN;
+						}
+					}
+					//}else{
+						//inputY = /*((targetY - currentPositionY) * Constants.DIST_CONTROLLER_SMALL_Y_P - (yDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_Y_D) + */Constants.DIST_CONTROLLER_F_GAIN;
+					//}
+					/*if(errorMap[1]>0){
 						inputY = getInput(Math.abs(errorMap[1]));
 					}else{
 						inputY = -getInput(Math.abs(errorMap[1]));
@@ -88,26 +110,25 @@ public class DistanceController {
 						inputX = getInput(Math.abs(errorMap[0]));
 					}else{
 						inputX = -getInput(Math.abs(errorMap[0]));
-					}
-					/*
-					if(Math.abs(targetX - currentPositionX) > Constants.DIST_CONTROLLER_PID_THRESH * Constants.DRIVE_TICKS_PER_INCH){
-						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_D;
-					}else{
-						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_SMALL_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_D;
 					}*/
 					
-					logger.writeToLog("error:" + "X:" + Double.toString((float)errorMap[0]) +"tree:" + Double.toString(getInput(Math.abs((float)errorMap[0]))) + "Y:" + Double.toString(errorMap[1]) +"tree:" + Double.toString(getInput(Math.abs(errorMap[1]))));
-					logger.writeToLog("DIST: " + Double.toString(currentPositionY/Constants.DRIVE_TICKS_PER_INCH) + ": " + Double.toString(currentPositionX/Constants.DRIVE_TICKS_PER_INCH) + " INPUTY: " + Double.toString(inputY) + " INPUTX:" + Double.toString(inputX));
+					if(Math.abs(targetX - currentPositionX) > Constants.DIST_CONTROLLER_PID_THRESH_X * Constants.DRIVE_TICKS_PER_INCH){
+						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_X_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_X_D;
+					}else{
+						inputX = (targetX - currentPositionX) * Constants.DIST_CONTROLLER_SMALL_X_P - (xDistanceTravelled()) * Constants.DIST_CONTROLLER_SMALL_X_D;
+					}
+					
+					//logger.writeToLog("DIST: " + Double.toString(currentPositionY/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH) + ": " + Double.toString(currentPositionX/Constants.DRIVE_TICKS_PER_INCH) + " INPUTY: " + Double.toString(inputY) + " INPUTX:" + Double.toString(inputX));
 
 					dt.sendInput(inputCap(inputX),inputCap(inputY) , 0, 0, false, false, false, false); // second false was true
 					lastDistanceY = currentPositionY;
 					lastDistanceX = currentPositionX;
 				}else{
-					logger.writeToLog("DIST: " + Double.toString(currentPositionY/Constants.DRIVE_TICKS_PER_INCH) + ": " + Double.toString(currentPositionX/Constants.DRIVE_TICKS_PER_INCH));
+					logger.writeToLog("DIST: " + Double.toString(currentPositionY/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH) + ": " + Double.toString(currentPositionX/Constants.DRIVE_TICKS_PER_INCH));
 					dt.sendInput(0, 0, 0, 0, false, false, false, false); // second false was true
 					if(cyclesOnTarget <= 0){
 						onTarget = true;
-						logger.writeToLog("Distance Controller Reached Target:" + Double.toString(timeout-System.currentTimeMillis()));
+						logger.writeToLog("DIST Reached Target: " + Double.toString(timeout-System.currentTimeMillis()) + " ms to spare");
 						disable();
 					}else{
 						cyclesOnTarget--;
@@ -116,7 +137,7 @@ public class DistanceController {
 			}else{
 				dt.sendInput(0, 0, 0, 0, false, false, false, false);
 				onTarget = true;
-				logger.writeToLog("Distance Controller Timed Out:" + Double.toString(currentPositionY/Constants.DRIVE_TICKS_PER_INCH) + " " + Double.toString(currentPositionX/Constants.DRIVE_TICKS_PER_INCH));
+				logger.writeToLog("DIST Timed Out: Current Y == \t" + Double.toString(Math.floor(currentPositionY/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH)) + "; Current X == \t " + Double.toString(currentPositionX/Constants.DRIVE_TICKS_PER_INCH));
 				disable();
 			}
 		}
@@ -130,14 +151,33 @@ public class DistanceController {
 	public double[] getError(){
 		double[] error = new double[2];
 		error[0] = (targetX-currentPositionX)/Constants.DRIVE_TICKS_PER_INCH;
-		error[1] = (targetY-currentPositionY)/Constants.DRIVE_TICKS_PER_INCH;
+		error[1] = (targetY-currentPositionY)/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH;
 		return error;
+	}
+	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput, int checks, boolean useFollowerWheel){
+		reset();
+		if(useFollowerWheel){
+			targetY = _goalY*Constants.FOLLOWER_WHEEL_TICKS_PER_INCH;
+			allowableError = error*Constants.FOLLOWER_WHEEL_TICKS_PER_INCH;
+		}else{
+			targetY = _goalY*Constants.DRIVE_TICKS_PER_INCH;
+			allowableError = error*Constants.DRIVE_TICKS_PER_INCH;
+		}
+		targetX = _goalX*Constants.DRIVE_TICKS_PER_INCH;
+		//allowableError = error*Constants.DRIVE_TICKS_PER_INCH;
+		timeout = (timeLimit * 1000) + System.currentTimeMillis();
+		inputCap = maxInput;
+		cyclesToCheck = cyclesOnTarget = checks;
+		useFollower = useFollowerWheel;
+		enable();
 	}
 	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput, int checks){
 		reset();
-		targetY = _goalY*Constants.DRIVE_TICKS_PER_INCH;// + currentPositionY;//dt.frontLeft.getY();
+		//targetY = _goalY*Constants.DRIVE_TICKS_PER_INCH;// + currentPositionY;//dt.frontLeft.getY();
+		targetY = _goalY*Constants.FOLLOWER_WHEEL_TICKS_PER_INCH;
 		targetX = _goalX*Constants.DRIVE_TICKS_PER_INCH;// + currentPositionX;//dt.frontLeft.getX();
-		allowableError = error*Constants.DRIVE_TICKS_PER_INCH;
+		//allowableError = error*Constants.DRIVE_TICKS_PER_INCH;
+		allowableError = error*Constants.FOLLOWER_WHEEL_TICKS_PER_INCH;
 		timeout = (timeLimit * 1000) + System.currentTimeMillis();
 		inputCap = maxInput;
 		cyclesToCheck = cyclesOnTarget = checks;
@@ -164,7 +204,12 @@ public class DistanceController {
 		inputX = 0.0;
 	}
 	private void updateCurrentPos(){
-		currentPositionY = dt.getRobotY();
+		//currentPositionY = dt.getRobotY();
+		if(useFollower){
+			currentPositionY = dt.rearRight.getY();
+		}else{
+			currentPositionY = dt.getRobotY();
+		}
 		currentPositionX = dt.getRobotX();
 	}
 	private double yDistanceTravelled(){

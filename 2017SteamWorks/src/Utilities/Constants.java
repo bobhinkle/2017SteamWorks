@@ -30,6 +30,7 @@ public class Constants {
     public static final double REAR_RIGHT_TURN_OFFSET  = 45.5-0.5;//pbot 131.6+3.4; //140.0; //172.6
     
     public static final double DRIVE_TICKS_PER_INCH =  790;//(13.0*5760.0)/(16.0*Math.PI)/2.0*.957;//36/25542; //0.00200635031508792675265469178699;//0.00163990667972621570986118595697; //0.00150603674668734095803578302171;//60.0/40462.0; //
+    public static final double FOLLOWER_WHEEL_TICKS_PER_INCH = 15808/88.4;
     public static final double TURN_KP = 0.02; //0.020
     public static final double TURN_KI = 0.00;
     public static final double TURN_KD = 0.02;//0.02
@@ -43,7 +44,7 @@ public class Constants {
     public static final double TURN_KP_TURN = 0.08;
     
     public static final double SWEEPER_JAM_CURRENT = 75;
-    public static final double SWEEPER_FORWARD = 0.75;
+    public static final double SWEEPER_FORWARD = 0.6;
     public static final double SWEEPER_REDUCED_FORWARD = .75;
     public static final double SWEEPER_REVERSE = -1;
     public static final double SWEEPER_ROLLER_FORWARD = 65.0;//1.0;
@@ -111,11 +112,22 @@ public class Constants {
 	public static final int GEAR_HANG_THRESHOLD = 0;
 	
 	//Distance Controller
-	public static final double DIST_CONTROLLER_P = 0.000020; //0.0000[23]5
-	public static final double DIST_CONTROLLER_D = 0.0000;
-	public static final double DIST_CONTROLLER_SMALL_P = 0.000016; //0.00003
-	public static final double DIST_CONTROLLER_SMALL_D = 0.00003; //0
-	public static final double DIST_CONTROLLER_PID_THRESH = 5.0;
+	public static final double DIST_CONTROLLER_X_P = 0.00002; //0.00002
+	public static final double DIST_CONTROLLER_X_D = 0.0000;//0.0
+	public static final double DIST_CONTROLLER_SMALL_X_P = 0.000016; //0.00003
+	public static final double DIST_CONTROLLER_SMALL_X_D = 0.00003; //0
+	
+	public static final double DIST_CONTROLLER_Y_P_NO_FOLLOWER = 0.000008; //0.00002
+	public static final double DIST_CONTROLLER_Y_D_NO_FOLLOWER = 0.000016;//0.0
+	public static final double DIST_CONTROLLER_Y_P = 0.00007; //0.0000[23]5
+	public static final double DIST_CONTROLLER_Y_D = 0.00035;
+	public static final double DIST_CONTROLLER_SMALL_Y_P = 0.00022; //0.00003
+	public static final double DIST_CONTROLLER_SMALL_Y_D = 0.000;
+	
+	public final static double DIST_CONTROLLER_F_GAIN = 0.2;
+	
+	public static final double DIST_CONTROLLER_PID_THRESH_X = 5.0;
+	public static final double DIST_CONTROLLER_PID_THRESH_Y = 24.0;
 	public static final int DIST_CONTROLLER_CYCLE_THRESH = 30;
 /** Distance from the robot's center to each wheel module. */
 	public static final double RADIUS_CENTER_TO_MODULE = Math.sqrt(Math.pow(WHEELBASE_LENGTH/2, 2)+Math.pow(WHEELBASE_WIDTH/2, 2))*DRIVE_TICKS_PER_INCH;
@@ -142,7 +154,7 @@ public class Constants {
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 16;
     public static double kCameraPitchAngleDegrees = 34; // calibrated 4/22  35.75
-    public static double kCameraYawAngleDegrees = 3;  //2.5 //positive moves the turret to the left
+    public static double kCameraYawAngleDegrees = 2.5;  //2.5 //positive moves the turret to the left
     public static double kCameraDeadband = 0.0;
     
     public static double kCenterOfTargetHeight = 86.0; // inches       
@@ -160,15 +172,11 @@ public class Constants {
 
     static {        
     	
-    	/*kShooterMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(2610.0));
-    	kShooterMap.put(new InterpolatingDouble(65.8), new InterpolatingDouble(2650.0));
-    	kShooterMap.put(new InterpolatingDouble(73.7), new InterpolatingDouble(2700.0));
-    	kShooterMap.put(new InterpolatingDouble(78.5), new InterpolatingDouble(2750.0)); 
-    	kShooterMap.put(new InterpolatingDouble(82.0), new InterpolatingDouble(2800.0));
-    	kShooterMap.put(new InterpolatingDouble(94.0), new InterpolatingDouble(3050.0)); */
-    	
-    	//73.7 : 2750
-    	//65.8, 2650
+    	kShooterMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(2610.0));
+    	kShooterMap.put(new InterpolatingDouble(73.2), new InterpolatingDouble(2650.0));
+    	kShooterMap.put(new InterpolatingDouble(82.3), new InterpolatingDouble(2950.0));
+    	kShooterMap.put(new InterpolatingDouble(85.7), new InterpolatingDouble(2950.0));
+    	kShooterMap.put(new InterpolatingDouble(94.0), new InterpolatingDouble(3100.0));
     }
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kDistanceMap = new InterpolatingTreeMap<>();
     static {        

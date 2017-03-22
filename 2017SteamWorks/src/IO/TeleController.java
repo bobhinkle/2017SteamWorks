@@ -96,6 +96,7 @@ public class TeleController
     		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED || robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED_WITH_GEAR || robot.gearIntake.getState() != GearIntake.State.GEAR_LOST_RETRACTED)
     			robot.gearIntake.setState(GearIntake.State.INTAKE_EXTENDED_OFF);
     		robot.hanger.stop();
+    		robot.deployBallFlap();
     	}
     	if(coDriver.rightCenterClick.isPressed()){
     		robot.turret.setAngle(0);
@@ -115,6 +116,7 @@ public class TeleController
     	}
     	if(coDriver.startButton.isPressed()){
     		robot.hanger.setState(Hanger.State.HANGING);
+    		robot.retractBallFlap();
     	}
     	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > Constants.STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -Constants.STICK_DEAD_BAND){
     		robot.turret.setState(Turret.State.Manual);

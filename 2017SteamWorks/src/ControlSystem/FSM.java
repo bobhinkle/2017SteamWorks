@@ -49,6 +49,10 @@ public class FSM extends SampleRobot {
     public boolean getTargetVisibility() {return targetVisibility;}
     private int cyclesOnTarget = 1;
     private int cyclesOnTargetDefault = 1;
+    private double angleToTarget = 0;
+    public double getTargetAngle(){
+    	return angleToTarget;
+    }
     
     public static FSM getInstance()
     {
@@ -101,7 +105,6 @@ public class FSM extends SampleRobot {
         robot.gearIntake.gearCurrent();
         lights.update();
         robot.hanger.update();
-        
         if(System.currentTimeMillis()>this.nextPosUpdate){
         	logger.writePosition(robot.dt.getX(),robot.dt.getY());
         	nextPosUpdate = System.currentTimeMillis()+2000;
@@ -187,6 +190,7 @@ public class FSM extends SampleRobot {
                     long now = System.currentTimeMillis();
                     SmartDashboard.putNumber(" Vision Latency ", now-lastVisionUpdate);
                     lastVisionUpdate = now;
+                    angleToTarget = angle.getDegrees();
 //                    field_to_goals.add(field_to_camera
  //                           .transformBy(RigidTransform2d
  //                                   .fromTranslation(new Translation2d(distance * angle.cos(), distance * angle.sin())))
@@ -208,6 +212,7 @@ public class FSM extends SampleRobot {
             	robot.turret.setAngle(robotAdjustedAngle);
             targetDistance = 82;
             SmartDashboard.putNumber(" Target Distance ",0);
+            angleToTarget = 0;
         }
         
         synchronized (this) {
