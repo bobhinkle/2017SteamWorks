@@ -27,6 +27,9 @@ public class DistanceController {
 	private double inputCap = 1.0;
 	private double minCap  = 0.005;
 	public boolean useFollower = true;
+	private int RED = -1;
+	private int BLUE = 1;
+	private int alliance = BLUE;
 	public DistanceController(){
 		dt = Swerve.getInstance();
 		logger = Logger.getInstance();
@@ -154,7 +157,7 @@ public class DistanceController {
 		error[1] = (targetY-currentPositionY)/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH;
 		return error;
 	}
-	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput, int checks, boolean useFollowerWheel){
+	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput, int checks, boolean useFollowerWheel, int team){
 		reset();
 		if(useFollowerWheel){
 			targetY = _goalY*Constants.FOLLOWER_WHEEL_TICKS_PER_INCH;
@@ -169,6 +172,7 @@ public class DistanceController {
 		inputCap = maxInput;
 		cyclesToCheck = cyclesOnTarget = checks;
 		useFollower = useFollowerWheel;
+		alliance = team;
 		enable();
 	}
 	public void setGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput, int checks){
@@ -181,6 +185,7 @@ public class DistanceController {
 		timeout = (timeLimit * 1000) + System.currentTimeMillis();
 		inputCap = maxInput;
 		cyclesToCheck = cyclesOnTarget = checks;
+		useFollower = true;
 		enable();
 	}
 	public void setOffsetGoal(double _goalX, double _goalY, double error, double timeLimit, double maxInput){
@@ -206,7 +211,11 @@ public class DistanceController {
 	private void updateCurrentPos(){
 		//currentPositionY = dt.getRobotY();
 		if(useFollower){
-			currentPositionY = dt.rearRight.getY();
+			if(alliance == BLUE){
+				currentPositionY = dt.rearRight.getY();
+			}else{
+				currentPositionY = -dt.rearRight.getY();
+			}
 		}else{
 			currentPositionY = dt.getRobotY();
 		}

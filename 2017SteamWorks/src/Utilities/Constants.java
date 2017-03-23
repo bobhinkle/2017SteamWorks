@@ -47,7 +47,7 @@ public class Constants {
     public static final double SWEEPER_FORWARD = 0.6;
     public static final double SWEEPER_REDUCED_FORWARD = .75;
     public static final double SWEEPER_REVERSE = -1;
-    public static final double SWEEPER_ROLLER_FORWARD = 65.0;//1.0;
+    public static final double SWEEPER_ROLLER_FORWARD = 1.0;//65.0;//1.0;
     public static final double SWEEPER_ROLLER_REVERSE = -65.0;
     
 	//Swerve Turning Gains
@@ -96,7 +96,7 @@ public class Constants {
 	public static final int    TURRET_ONTARGET_THRESH  = 5;
 	public static final double STICK_DEAD_BAND = 0.2;
 	
-	public static final double SHOOTING_SPEED = 3000;//2675;//2850
+	public static final double SHOOTING_SPEED = 2675;//2675;//2850
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 200;
 

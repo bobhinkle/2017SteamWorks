@@ -366,10 +366,10 @@ public class Swerve{
 				setCurrentDriveEncoderPosition(driveMotor.getEncPosition());
 				setCurrentIntakeAngle(intake.getCurrentAngle());
 				setCurrentModuleAngle(rotationMotor.get()-offSet);
-				y = driveMotor.getEncPosition();
-				SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (tick) ", driveMotor.getEncPosition());
-				SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", getY()/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH);
-				SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) Graph", getY()/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH);
+				y = -driveMotor.getEncPosition();
+				SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (tick) ", y);
+				SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) ", getFollowerWheelInches());
+				SmartDashboard.putNumber(Integer.toString(moduleID) + " Y (in) Graph", getFollowerWheelInches());
 			}
 		}
 		public double getX(){return x;}
@@ -424,6 +424,7 @@ public class Swerve{
 	    	}else{
 	    		driveMotor.reverseSensor(false);
 	    	}/**/
+			driveMotor.reverseOutput(false);
 		}
 		public void enableBreakMode(){
 			driveMotor.enableBrakeMode(true);

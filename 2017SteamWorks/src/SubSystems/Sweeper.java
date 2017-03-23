@@ -22,8 +22,8 @@ public class Sweeper {
 		sweeper = new CANTalon(Ports.SWEEPER);
 		sweeper.setVoltageRampRate(48);
 		sweeper_roller = new CANTalon(Ports.SWEEPER_ROLLER);
-		sweeper_roller.changeControlMode(TalonControlMode.Current);
-		sweeper_roller.setPID(0.06, 0.00, 0, 0.0175, 0, 0.0, 0);
+		//sweeper_roller.changeControlMode(TalonControlMode.Current);
+		//sweeper_roller.setPID(0.06, 0.00, 0, 0.0175, 0, 0.0, 0);
 		//sweeper_roller.setVoltageRampRate(48);
 		log = Logger.getInstance();
 	}
