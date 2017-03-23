@@ -25,7 +25,7 @@ public class Constants {
 	
     // 2017-03-05 Added little adjustments to the offsets
     public static final double FRONT_RIGHT_TURN_OFFSET = 344;//pbot 283.0+1.3; //281.2
-    public static final double FRONT_LEFT_TURN_OFFSET  = 191.5-6.5;//pbot 170.5-0.5; //171.2
+    public static final double FRONT_LEFT_TURN_OFFSET  = 191.5-6.5 + 128.2 + 269.6;//pbot 170.5-0.5; //171.2
     public static final double REAR_LEFT_TURN_OFFSET   = 263.1-6.0;//pbot 138.1+1.5; //289.3
     public static final double REAR_RIGHT_TURN_OFFSET  = 45.5-0.5;//pbot 131.6+3.4; //140.0; //172.6
     
@@ -61,7 +61,7 @@ public class Constants {
 	public static final double SWERVE_ROTATION_SCALE_FACTOR_SMALL = 0.225; //.225
 	public static final double SWERVE_ROTATION_SCALE_FACTOR_BIG = 0.35;  
 	// TODO Tune kP Gain to prevent drift while driving
-	public static final double SWERVE_HEADING_GAIN_P = 0.003; // 0.003; 0.002
+	public static final double SWERVE_HEADING_GAIN_P = 0.002; // 0.003; 0.002
 	public static final double SWERVE_HEADING_GAIN_D = 0.0005; // 0.001
 	public static final double SWERVE_HEADING_BIG_P = 0.012;
 	public static final double SWERVE_HEADING_BIG_D = 0;
@@ -96,7 +96,7 @@ public class Constants {
 	public static final int    TURRET_ONTARGET_THRESH  = 5;
 	public static final double STICK_DEAD_BAND = 0.2;
 	
-	public static final double SHOOTING_SPEED = 2650;//2675;//2850
+	public static final double SHOOTING_SPEED = 3000;//2675;//2850
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 200;
 

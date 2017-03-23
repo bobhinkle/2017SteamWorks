@@ -410,11 +410,6 @@ public class Swerve{
 			driveMotor = new CANTalon(driveMotorPort);
 	    	driveMotor.setEncPosition(0);
 	    	driveMotor.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-	    	if(moduleID != 4){
-	    		driveMotor.reverseSensor(false);
-	    	}else{
-	    		driveMotor.reverseSensor(true);
-	    	}
 	    	driveMotor.configEncoderCodesPerRev(360);
 	    	driveMotor.configNominalOutputVoltage(+0f, -0f);
 	    	driveMotor.configPeakOutputVoltage(+12f, 0);
@@ -424,6 +419,11 @@ public class Swerve{
 			loadProperties();
 			moduleID = moduleNum;        
 			offSet = _offSet;
+			/*/if(moduleID == 4){
+	    		driveMotor.reverseSensor(false);
+	    	}else{
+	    		driveMotor.reverseSensor(false);
+	    	}/**/
 		}
 		public void enableBreakMode(){
 			driveMotor.enableBrakeMode(true);

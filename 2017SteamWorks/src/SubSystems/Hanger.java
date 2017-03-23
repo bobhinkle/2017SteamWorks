@@ -37,25 +37,22 @@ public class Hanger {
 				break;
 			case HANGING:
 				climber.changeControlMode(TalonControlMode.Current);
-				climber.set(-Constants.GEAR_HANG_CURRENT);
+				on();
+				//cyclesOnThreshold = cyclesCheck;
 				state = State.HANG_WAITING;
 				SmartDashboard.putString(" Hanger Status ", "Hanging");
 				break;
 			case HANG_WAITING:
 				if(climber.getOutputCurrent()>Constants.GEAR_HANG_CURRENT_THRESHOLD){
-					cyclesOnThreshold--;
-				}else{
-					cyclesOnThreshold = cyclesCheck;
-				}
-				if(cyclesOnThreshold <= 0){
+					//cyclesOnThreshold--;
 					state = State.HANG_DETECTED;
 				}
 				SmartDashboard.putString(" Hanger Status ", "Hanging Waiting");
-				logger.writeToLog("Climber Current: " + Double.toString(climber.getOutputCurrent()));
+				//logger.writeToLog("Climber Current: " + Double.toString(climber.getOutputCurrent()));
 				break;
 			case HANG_DETECTED:
 				climber.changeControlMode(TalonControlMode.PercentVbus);
-				climber.set(0);
+				stop();
 				SmartDashboard.putString(" Hanger Status ", "Hang Detected");
 				break;
 		}
@@ -65,6 +62,10 @@ public class Hanger {
 	
 	public void stop(){
 		climber.set(0);
+	}
+	public void on(){
+		climber.changeControlMode(TalonControlMode.Current);
+		climber.set(-Constants.GEAR_HANG_CURRENT);
 	}
 	public State getState(){
 		return state;

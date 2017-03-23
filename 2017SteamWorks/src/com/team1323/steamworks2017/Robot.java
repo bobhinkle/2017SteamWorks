@@ -140,7 +140,7 @@ public class Robot extends SampleRobot {
     		robot.turret.resetAngle(90);
     		break;
     	case red:
-    		robot.turret.resetAngle(270);
+    		robot.turret.resetAngle(-90);
     		break;
     	default:
     		robot.turret.resetAngle(90);
@@ -170,7 +170,7 @@ public class Robot extends SampleRobot {
 	    		break;
 	    	case red:
 	    		alliance = RED;
-	    		robot.turret.resetAngle(270);
+	    		robot.turret.resetAngle(-90);
 	    		break;
 	    	default:
 	    		alliance = BLUE;
@@ -181,8 +181,6 @@ public class Robot extends SampleRobot {
     			case one_gear:
 	            	initHeading(180);
 	            	executeAuto(AUTO.ONE_GEAR, alliance);
-	      
-    				
     				break;
     			case gear_and_shoot:
     				initHeading(180);
@@ -347,7 +345,7 @@ public class Robot extends SampleRobot {
     		}
     		dist.setGoal(robot.dt.getX(), robot.dt.getY() - 45, 2.0, 2.5, 0.5, 10, false);
     		delay();
-    		dist.setGoal(robot.dt.getX() - 90, robot.dt.getY() - 5, 4.0, 2.0, 0.7, 1, false);
+    		dist.setGoal(robot.dt.getX() - (90*team), robot.dt.getY() - 5, 4.0, 2.0, 0.7, 1, false);
     		delay();
     		Timer.delay(0.5);
     		logger.writeToLog("Vision distance Auto: " + Double.toString(fsm.getTargetDistance()));
@@ -473,7 +471,7 @@ public class Robot extends SampleRobot {
     		break;
     	case NEAR_HOPPER_CLOSE_INSIDE:
     		
-    		dist.setGoal(robot.dt.getX(), 84, 3.0, 2.0, .9, 10);
+    		dist.setGoal(robot.dt.getX(), 84, 3.0, 2.0, .9, 10, false);
     		
     		if(team == BLUE){
     			robot.dt.setHeading(90, true);
@@ -483,10 +481,10 @@ public class Robot extends SampleRobot {
     			robot.turret.setAngle(-85);
     		}
     		robot.turret.setState(Turret.State.VisionTracking);
-    		
+    		robot.deployBallFlap();
     		delay();
     		logger.writeToLog("Vision Distance: " + Double.toString(fsm.getTargetDistance()));
-    		dist.setGoal(robot.dt.getX()+((-65)*team), 84, 2.0, 1.35, 1.0, 5);
+    		dist.setGoal(robot.dt.getX()+((-65)*team), 84, 2.0, 1.35, 1.0, 5, false);
     		delay();
     		logger.writeToLog("AUTO POS1 X:" + Double.toString(robot.dt.getX()) + " Y:"+ Double.toString(robot.dt.rearRight.getYInch()/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH));
     		logger.writeToLog("Vision Distance: " + Double.toString(fsm.getTargetDistance()));
@@ -510,7 +508,7 @@ public class Robot extends SampleRobot {
     			}
     			else{*/
     		
-			while(robot.dt.rearRight.getY()/Constants.FOLLOWER_WHEEL_TICKS_PER_INCH > 80){
+			/*while(robot.dt.rearRight.getFollowerWheelInches() > 80){
 				robot.dt.sendInput(0.0, -0.375, 0.0, 0.0, false, false, false, false);
 			//}
 			}
@@ -518,6 +516,8 @@ public class Robot extends SampleRobot {
     		if(!fsm.getTargetVisibility()){
     			if(team == BLUE){
     				robot.turret.setAngle(105+(90-Util.boundAngle0to360Degrees(robot.intake.getCurrentAngle())));
+    			}else{
+    				robot.turret.setAngle(-75+(90-Util.boundAngle0to360Degrees(robot.intake.getCurrentAngle())));
     			}
     		}
     		robot.dt.sendInput(0, 0.3, 0, 0, false, false, false, false);
@@ -549,7 +549,7 @@ public class Robot extends SampleRobot {
     		robot.sweeper.stopRoller();
     		robot.sweeper.stopSweeper();
     		robot.intake.intakeStop();
-    		robot.shooter.setState(Shooter.Status.OFF);
+    		robot.shooter.setState(Shooter.Status.OFF);*/
     		break;
     	case NEAR_HOPPER_OUTSIDE:
     		robot.turret.setAngle(-75);

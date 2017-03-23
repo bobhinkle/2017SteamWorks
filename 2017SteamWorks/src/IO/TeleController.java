@@ -95,7 +95,8 @@ public class TeleController
     		robot.turret.setState(Turret.State.VisionTracking);
     		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED || robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED_WITH_GEAR || robot.gearIntake.getState() != GearIntake.State.GEAR_LOST_RETRACTED)
     			robot.gearIntake.setState(GearIntake.State.INTAKE_EXTENDED_OFF);
-    		robot.hanger.stop();
+    		robot.hanger.setState(Hanger.State.OFF);
+    		//robot.hanger.stop();
     		robot.deployBallFlap();
     	}
     	if(coDriver.rightCenterClick.isPressed()){
@@ -111,11 +112,12 @@ public class TeleController
     	if(coDriver.leftTrigger.isPressed()){
     		robot.turret.lockAngle(robot.intake.getCurrentAngle());
     		robot.turret.setState(Turret.State.GyroComp);
-    		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()));
+    		robot.shooter.setGoal(Constants.SHOOTING_SPEED);
     		robot.shooter.setState(Shooter.Status.STARTED);
     	}
     	if(coDriver.startButton.isPressed()){
     		robot.hanger.setState(Hanger.State.HANGING);
+    		//robot.hanger.on();
     		robot.retractBallFlap();
     	}
     	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > Constants.STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -Constants.STICK_DEAD_BAND){
@@ -185,6 +187,8 @@ public class TeleController
     	}
         if(driver.startButton.isPressed()){
         	robot.hanger.setState(Hanger.State.HANGING);
+        	//robot.hanger.on();
+        	robot.retractBallFlap();
         }
         if(!dist.isEnabled()){ 
         	/*	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
