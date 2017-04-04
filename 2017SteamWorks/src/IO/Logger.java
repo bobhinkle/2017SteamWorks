@@ -15,7 +15,7 @@ public class Logger {
     private BufferedWriter out, posOut;
 	public Logger(){
 		try{
-			Date date = new Date() ;
+			/*Date date = new Date() ;
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss") ;
 			file = new File(path + "Log.txt");
 			posFile = new File(path + "Position.txt");
@@ -27,31 +27,32 @@ public class Logger {
 			
 			posOut.write("}{");
 			posOut.newLine();
-			posOut.flush();
+			posOut.flush();*/
 		}catch (Exception e) {
 	        // TODO Auto-generated catch block
 	        System.out.println(e);
 	    }
 	}
 	public void writeToLog(String item){
-		try {			
+		System.out.println(item);
+		/*try {			
 			out.append(item);
 			out.newLine();
 			out.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.print(e);
-		}
+		}*/
 	}
 	public void writePosition(double X, double Y){
-		try {
+		/*try {
 			posOut.append(",("+Double.toString(Math.floor(X))+","+Double.toString(Math.floor(Y))+","+Long.toString(System.currentTimeMillis())+")");
 			posOut.newLine();
 			posOut.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.print(e);
-		}
+		}*/
 	}
 	public static Logger getInstance(){
 		if( instance == null )

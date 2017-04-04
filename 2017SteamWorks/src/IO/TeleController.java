@@ -93,11 +93,12 @@ public class TeleController
     		robot.sweeper.stopSweeper();
     		canReverseSweeper = true;
     		robot.turret.setState(Turret.State.VisionTracking);
-    		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED || robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED_WITH_GEAR || robot.gearIntake.getState() != GearIntake.State.GEAR_LOST_RETRACTED)
+    		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED && robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED_WITH_GEAR && robot.gearIntake.getState() != GearIntake.State.GEAR_LOST_RETRACTED)
     			robot.gearIntake.setState(GearIntake.State.INTAKE_EXTENDED_OFF);
     		robot.hanger.setState(Hanger.State.OFF);
     		//robot.hanger.stop();
     		robot.deployBallFlap();
+    		robot.dt.stopHanging();
     	}
     	if(coDriver.rightCenterClick.isPressed()){
     		robot.turret.setAngle(0);
@@ -110,7 +111,7 @@ public class TeleController
     		}
     	}
     	if(coDriver.leftTrigger.isPressed()){
-    		robot.turret.lockAngle(robot.intake.getCurrentAngle());
+    		robot.turret.lockAngle(robot.intake.getCurrentAngle(),robot.turret.getAngle());
     		robot.turret.setState(Turret.State.GyroComp);
     		robot.shooter.setGoal(Constants.SHOOTING_SPEED);
     		robot.shooter.setState(Shooter.Status.STARTED);
@@ -119,6 +120,7 @@ public class TeleController
     		robot.hanger.setState(Hanger.State.HANGING);
     		//robot.hanger.on();
     		robot.retractBallFlap();
+    		robot.dt.startHanging();
     	}
     	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > Constants.STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -Constants.STICK_DEAD_BAND){
     		robot.turret.setState(Turret.State.Manual);
@@ -129,9 +131,9 @@ public class TeleController
     		robot.turret.setAngle(-90);
     	
     	if(coDriver.getPOV() == 0)
-    		robot.gearIntake.forward();
+    		//robot.gearIntake.forward();
     		//robot.turret.resetAngle(90);
-    		//robot.turret.setAngle(0);
+    		robot.turret.setAngle(0);
     		/*if(!isBumpedUp && robot.shooter.getStatus() != Shooter.Status.OFF){
     			robot.shooter.setGoal(robot.shooter.getTarget() + 100);
     			robot.shooter.setState(Shooter.Status.STARTED);
@@ -145,7 +147,9 @@ public class TeleController
     	if(coDriver.getPOV() == 90)
     		robot.turret.setAngle(90);
     	if(coDriver.getPOV() == 180){
-    		robot.gearIntake.reverse();
+    		robot.turret.lockAngle(-180,99);
+    		robot.turret.setState(Turret.State.GyroComp);
+    		//robot.gearIntake.reverse();
     		//robot.turret.setAngle(-2);
 /*    		if(!isBumpedDown && robot.shooter.getStatus() != Shooter.Status.OFF){
     			robot.shooter.setGoal(robot.shooter.getTarget() - 100);
@@ -164,24 +168,22 @@ public class TeleController
     
     public void driver() {
     	
-    	if(driver.aButton.isPressed()){       
-    		robot.dt.setHeading(90,true);
-        }
-    	if(driver.bButton.isPressed()){  
-    		robot.dt.setHeading(0,true); //90 degrees
-        }
-    	if(driver.bButton.buttonHoldTime() > 2 && driver.bButton.isHeld()){
-    		//robot.dt.setHeading(120,true);
-    	}
-    	if(driver.xButton.isPressed()){
+    	if(driver.aButton.isPressed() || driver.aButton.isHeld()){       
     		robot.dt.setHeading(180,true);
+    		robot.dt.enableRotation();
+        }else if(driver.bButton.isPressed() || driver.bButton.isHeld()){  
+    		robot.dt.setHeading(90,true); //90 degrees
+    		robot.dt.enableRotation();
+        }else if(driver.xButton.isPressed() || driver.xButton.isHeld()){
+    		robot.dt.setHeading(270,true);
+    		robot.dt.enableRotation();
+        }else if(driver.yButton.isPressed() || driver.yButton.isHeld()){
+        	robot.dt.setHeading(0,true);
+        	robot.dt.enableRotation();
+        }else{
+        	robot.dt.disableRotation();
         }
-    	if(driver.xButton.buttonHoldTime() > 2 && driver.xButton.isHeld()){
-    		//robot.dt.setHeading(240,true);
-    	}
-    	if(driver.yButton.isPressed()){
-        	robot.dt.setHeading(270,true);
-        }
+    	
     	if(driver.rightTrigger.isPressed()){
     		robot.gearIntake.scoreGear();
     	}
@@ -189,6 +191,7 @@ public class TeleController
         	robot.hanger.setState(Hanger.State.HANGING);
         	//robot.hanger.on();
         	robot.retractBallFlap();
+        	robot.dt.startHanging();
         }
         if(!dist.isEnabled()){ 
         	/*	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
@@ -206,11 +209,6 @@ public class TeleController
                 		 false, driver.leftBumper.isPressed() || driver.leftBumper.isHeld());
         	}
         
-        
-        if(driver.rightTrigger.isPressed()) {
-//        	dist.setGoal(0, 10, 0, 4, 0.7); // added this line to help with putting the robot back after testing
-        }
-        
         if(driver.leftBumper.isPressed()){
 //        	robotCentric = false;
         	//dist.setGoal(-30, DistanceController.Direction.X);
@@ -226,7 +224,7 @@ public class TeleController
         if(driver.backButton.isHeld()){ 
         	robot.intake.setPresetAngles(0);
         	robot.dt.resetCoord(Swerve.AnglePresets.ZERO);
-        	dist.disable();    
+        	//dist.disable();    
         	robot.dt.setHeading(0, false);
         }
         if(driver.backButton.isPressed()){

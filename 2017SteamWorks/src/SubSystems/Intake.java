@@ -24,10 +24,11 @@ public class Intake {
 	}
 	public Intake(){
 		intakeMotor = new CANTalon(Ports.INTAKE_MOTOR);
-		intakeMotor.changeControlMode(TalonControlMode.Current);
-		intakeMotor.setPID(0.01, 0.00, 0, 0.0175, 0, 0.0, 0);
-		intakeMotor.reverseOutput(false);
-		intakeMotor.setCloseLoopRampRate(24);
+		intakeMotor.changeControlMode(TalonControlMode.PercentVbus);
+		//intakeMotor.setPID(/*0.01*/0.02, 0.00, 0, 0.0175, 0, 0.0, 0);
+		intakeMotor.reverseOutput(true);
+		//intakeMotor.setCloseLoopRampRate(24);
+		intakeMotor.setVoltageRampRate(24);
 		try{
 			_pidgey = new PigeonImu(intakeMotor);
 		}catch(Exception e){
@@ -50,14 +51,14 @@ public class Intake {
 			angleIsGood = (_pidgey.GetState() == PigeonState.Ready) ? true : false;
 			currentAngularRate = -xyz_dps[2];
 			SmartDashboard.putNumber(" Heading Angle ", currentAngle); // moved to Swerve.update()
-//			SmartDashboard.putNumber(" Pigeon Rate ", currentAngularRate);
+			SmartDashboard.putNumber(" Pigeon Rate ", currentAngularRate);
 			SmartDashboard.putBoolean(" Pigeon Good ", angleIsGood);
 			
 			short [] ba_xyz = new short [3];
 			_pidgey.GetBiasedAccelerometer(ba_xyz);
-			SmartDashboard.putNumber("AccX", ba_xyz[0]);
-			SmartDashboard.putNumber("AccY", ba_xyz[1]);
-			SmartDashboard.putNumber("AccZ", ba_xyz[2]);
+			//SmartDashboard.putNumber("AccX", ba_xyz[0]);
+			//SmartDashboard.putNumber("AccY", ba_xyz[1]);
+			//SmartDashboard.putNumber("AccZ", ba_xyz[2]);
 			
 		}catch(Exception e){
 			System.out.println(e);
@@ -74,13 +75,13 @@ public class Intake {
 		return currentAngularRate;
 	}
 	public void intakeForward(){
-		intakeMotor.set(20); 
+		intakeMotor.set(0.7); 
 	}
 	public void reducedForward(){
-		intakeMotor.set(10);
+		intakeMotor.set(0.7);
 	}
 	public void intakeReverse(){
-		intakeMotor.set(-20);
+		intakeMotor.set(-0.7);
 	}
 	public void intakeStop(){
 		intakeMotor.set(0);

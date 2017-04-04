@@ -50,13 +50,13 @@ public class Turret {
 		return currentState;
 	}
 	
-	public void lockAngle(double newAngle){
+	public void lockAngle(double newAngle,double turretAngle){
 		lockedAngle = newAngle;
-		lockedTurretAngle = getAngle();
+		lockedTurretAngle = turretAngle;
 	}
 	
 	public void manualControl(double input){
-		double newAngle = (motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE) + (input * 3.5);
+		double newAngle = (motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE) + (input * 2);
 		setAngle(newAngle);		
 		onTargetCheck = Constants.TURRET_ONTARGET_THRESH;
 	}
@@ -79,6 +79,11 @@ public class Turret {
 		return (motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE);
 	}
 	public void update(double heading){
+		if(Math.abs(getError()) < Constants.TURRET_SMALL_PID_THRESH){
+			motor.setProfile(1);
+		}else{
+			motor.setProfile(0);
+		}
 		switch(currentState){
 		case GyroComp:
 			setAngle(lockedTurretAngle + (lockedAngle - heading));
@@ -99,7 +104,6 @@ public class Turret {
 //		Util.sdVerboseClosedLoop("Turret", "Angle", getAngle(), getGoal(),motor.getOutputCurrent()); // *** NEW! ***
 		SmartDashboard.putNumber("TURRET_CURR", motor.getOutputCurrent());
 		SmartDashboard.putNumber("TURRET_VOLTAGE", motor.getOutputVoltage());
-		
 	}
 	public double getError(){
 		return (getGoal() - getAngle());

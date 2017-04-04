@@ -134,8 +134,8 @@ public class FSM extends SampleRobot {
         if (!(vision_update == null || vision_update.isEmpty())) {
         	
         	for (TargetInfo target : vision_update) {
-            	SmartDashboard.putNumber("TargetX", target.getZ());
-                SmartDashboard.putNumber("TargetY", target.getY());
+            	//SmartDashboard.putNumber("TargetX", target.getZ());
+                //SmartDashboard.putNumber("TargetY", target.getY());
                 double ydeadband = (target.getY() > -Constants.kCameraDeadband
                         && target.getY() < Constants.kCameraDeadband) ? 0.0 : target.getY();
 
@@ -166,15 +166,15 @@ public class FSM extends SampleRobot {
                    
                     double x_offset = Constants.kBlueSideHopperX + (Dx); // s/+/-/
                     double y_offset = Constants.kBlueSideHopperY + (Dy);// s/+/-/
-                    SmartDashboard.putNumber("AbsTurretHead", mathAbsoluteHeadingOfTurret);
+                    //SmartDashboard.putNumber("AbsTurretHead", mathAbsoluteHeadingOfTurret);
                     SmartDashboard.putNumber(" Vision X ", x_offset); // uncommented this and following after breaking stuff
                     SmartDashboard.putNumber(" Vision Y ", y_offset);
                     SmartDashboard.putNumber("Angle to Target", targetDirection);
-                    SmartDashboard.putNumber("Target Sine", sine);
-                    SmartDashboard.putNumber("Target Cosine", cosine);
-                    SmartDashboard.putNumber("Dx",Dx);
-                    SmartDashboard.putNumber("Dy", Dy);
-                    SmartDashboard.putNumber(" angle.getDegrees ", angle.getDegrees());
+                    //SmartDashboard.putNumber("Target Sine", sine);
+                    //SmartDashboard.putNumber("Target Cosine", cosine);
+                    //SmartDashboard.putNumber("Dx",Dx);
+                    //SmartDashboard.putNumber("Dy", Dy);
+                    //SmartDashboard.putNumber(" angle.getDegrees ", angle.getDegrees());
                     if(mathAbsoluteHeadingOfTurret > 180)
                     	robot.dt.setOffsets(x_offset, y_offset);
                     if(robot.turret.getCurrentState() == Turret.State.VisionTracking){
@@ -188,7 +188,7 @@ public class FSM extends SampleRobot {
                     SmartDashboard.putNumber(" Target Distance ", distance);
                     SmartDashboard.putNumber("Vision Shot Speed", robot.shooter.getShooterSpeedForRange(distance));
                     long now = System.currentTimeMillis();
-                    SmartDashboard.putNumber(" Vision Latency ", now-lastVisionUpdate);
+                    //SmartDashboard.putNumber(" Vision Latency ", now-lastVisionUpdate);
                     lastVisionUpdate = now;
                     angleToTarget = angle.getDegrees();
 //                    field_to_goals.add(field_to_camera
@@ -200,8 +200,8 @@ public class FSM extends SampleRobot {
         }else{
         	setTargetVisibility(false);
             
-        	SmartDashboard.putNumber("TargetX", 0);
-        	SmartDashboard.putNumber("TargetY", 0);
+        	//SmartDashboard.putNumber("TargetX", 0);
+        	//SmartDashboard.putNumber("TargetY", 0);
             SmartDashboard.putBoolean("Vision Target Seen", false);
             
             double calculatedAngle = Math.atan((robot.dt.getXWithOffsets()-Constants.kBlueSideHopperX)/(robot.dt.getYWithOffsets()-Constants.kBlueSideHopperY));
@@ -210,7 +210,7 @@ public class FSM extends SampleRobot {
 //            SmartDashboard.putNumber("RobAdjustAngle", robotAdjustedAngle);
             if(robot.turret.getCurrentState() == Turret.State.CalculatedTracking)
             	robot.turret.setAngle(robotAdjustedAngle);
-            targetDistance = 82;
+            targetDistance = 76;
             SmartDashboard.putNumber(" Target Distance ",0);
             angleToTarget = 0;
         }

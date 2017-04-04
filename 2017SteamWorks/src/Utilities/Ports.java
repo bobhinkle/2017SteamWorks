@@ -7,14 +7,14 @@ package Utilities;
 public class Ports {
     
     //Swerve CAN ID's
-    public static final int FRONT_RIGHT_ROTATION= 5; 
-    public static final int FRONT_RIGHT_DRIVE   = 3; 
-    public static final int FRONT_LEFT_ROTATION = 4;
-    public static final int FRONT_LEFT_DRIVE    = 2; 
-    public static final int REAR_LEFT_ROTATION  = 11;
-    public static final int REAR_LEFT_DRIVE     = 13;
-    public static final int REAR_RIGHT_ROTATION = 10;
-    public static final int REAR_RIGHT_DRIVE    = 12;
+    public static final int FRONT_RIGHT_ROTATION= 10; 
+    public static final int FRONT_RIGHT_DRIVE   = 12; 
+    public static final int FRONT_LEFT_ROTATION = 5;
+    public static final int FRONT_LEFT_DRIVE    = 3; 
+    public static final int REAR_LEFT_ROTATION  = 4;
+    public static final int REAR_LEFT_DRIVE     = 2;
+    public static final int REAR_RIGHT_ROTATION = 11;
+    public static final int REAR_RIGHT_DRIVE    = 13;
     
     public static final int SHOOTER_MOTOR_MASTER= 0;
     public static final int SHOOTER_MOTOR_SLAVE = 1;
@@ -34,4 +34,13 @@ public class Ports {
     
     public static final int INTAKE_ARM  		= 0;
     public static final int BALL_FLAP			= 1;
+    
+    /*public static final int FRONT_RIGHT_ROTATION= 5; 
+    public static final int FRONT_RIGHT_DRIVE   = 3; 
+    public static final int FRONT_LEFT_ROTATION = 4;
+    public static final int FRONT_LEFT_DRIVE    = 2; 
+    public static final int REAR_LEFT_ROTATION  = 11;
+    public static final int REAR_LEFT_DRIVE     = 13;
+    public static final int REAR_RIGHT_ROTATION = 10;
+    public static final int REAR_RIGHT_DRIVE    = 12;*/
 }

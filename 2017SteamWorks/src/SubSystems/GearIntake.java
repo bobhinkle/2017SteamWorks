@@ -16,6 +16,7 @@ public class GearIntake {
 	private long solenoidTime = 500;
 	private long timeout = 0;
 	private autoDeploy auto;
+	private autoPickup pickup;
 	private Logger logger;
 	private int cyclesPastThresh = 1;
 	private int cyclesThresh = 1;
@@ -32,7 +33,7 @@ public class GearIntake {
 		gear = new CANTalon(canPort);
 		//gear.setCurrentLimit(40);
 		//gear.setVoltageRampRate(36);
-		gear.enableBrakeMode(true);
+		gear.enableBrakeMode(false);
 		gear.changeControlMode(TalonControlMode.Current);
 		gear.setPID(0.06, 0.00, 0, 0.08, 0, 0.0, 0);
 		gear.reverseOutput(true);
@@ -77,16 +78,8 @@ public class GearIntake {
 	
 			case GEAR_DETECT:
 				if(gear.getOutputCurrent() > Constants.GEAR_INTAKE_CURR_DETECT){
-					/*if(cyclesPastThresh <=0){
-//						gear.changeControlMode(TalonControlMode.PercentVbus);
-//						gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);*/
 						state = State.GEAR_DETECTED;
-					/*}else{
-						cyclesPastThresh--;
-					}
-					
-				}else{
-					cyclesPastThresh = cyclesThresh;*/
+						System.out.println("Gear Detected");
 				}
 				SmartDashboard.putString(" Gear Intake Status ", "WAITING FOR GEAR");
 				break;
@@ -170,7 +163,6 @@ public class GearIntake {
 			state = State.SCORE_GEAR_1;
 	}
 	public void forward(){
-		gear.set(0);
 		gear.changeControlMode(TalonControlMode.PercentVbus);
 		
 		
@@ -199,6 +191,10 @@ public class GearIntake {
 		auto = new autoDeploy();
 		auto.start();
 	}
+	public void initiateAutoPickup(){
+		pickup = new autoPickup();
+		pickup.start();
+	}
 	public class autoDeploy extends Thread{
 		public void run(){
 			isScoring = true;
@@ -209,11 +205,37 @@ public class GearIntake {
 			gear.set(-12);
 			Timer.delay(0.25);
 			gearCylinder.set(false);
+			Timer.delay(0.75);
 			state = GearIntake.State.INTAKE_EXTENDED_OFF;
 			isScoring = false;
 		}
 	}
-	
+	public class autoPickup extends Thread{
+		public void run(){
+			state = GearIntake.State.INTAKING;
+			Timer.delay(0.125);
+			forward();
+			state = GearIntake.State.GEAR_DETECT;
+			Timer.delay(0.125);
+			forward();
+			state = GearIntake.State.GEAR_DETECT;
+			long timeout = System.currentTimeMillis() + 1000;
+			while(System.currentTimeMillis() < timeout && state != GearIntake.State.GEAR_DETECTED){
+				Timer.delay(0.005);
+			}
+			forward();
+			state = GearIntake.State.GEAR_DETECT;
+			timeout = System.currentTimeMillis() + 500;
+			while(System.currentTimeMillis() < timeout && state != GearIntake.State.GEAR_DETECTED){
+				Timer.delay(0.005);
+			}
+			Timer.delay(0.25);
+			gear.changeControlMode(TalonControlMode.PercentVbus);
+			gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);
+			state = GearIntake.State.INTAKE_RETRACTED_WITH_GEAR;
+			System.out.println("Gear intake Retracted");
+		}
+	}
 	public void gearExtender(){
 		gearCylinder.set(true);
 	}
