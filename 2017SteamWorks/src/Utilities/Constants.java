@@ -58,7 +58,7 @@ public class Constants {
 	public static final double SWERVE_TURNING_GAIN_D = 0.003; // 0.00425percent throttle per angular velocity dps 0.00425
 	public static final double SWERVE_TURNING_GAIN_FF = 0.2;
 	public static final double SWERVE_ROTATION_INPUT_CAP = 0.7; //0.75
-	public static final int MIN_CYCLES_HEADING_ON_TARGET = 2;
+	public static final int MIN_CYCLES_HEADING_ON_TARGET = 5;
 	
 	//Swerve Head Controller - Actual
 	public static final double SWERVE_HEADING_BIG_P = 0.008;//0.012
@@ -188,5 +188,20 @@ public class Constants {
     	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y - 10), new InterpolatingDouble(2850.0));
     	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y), new InterpolatingDouble(2950.0));
     	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y + 10), new InterpolatingDouble(3050.0));
+    }
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kTurretDistanceMap = new InterpolatingTreeMap<>();
+
+    static {        
+    	kTurretDistanceMap.put(new InterpolatingDouble(-6.0), new InterpolatingDouble(-2.0));
+    	kTurretDistanceMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(-5.0));
+    	kTurretDistanceMap.put(new InterpolatingDouble(6.0), new InterpolatingDouble(-8.0));
+    	kTurretDistanceMap.put(new InterpolatingDouble(12.0), new InterpolatingDouble(-11.0));
+    }
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHeadingMap = new InterpolatingTreeMap<>();
+
+    static {        
+    	kHeadingMap.put(new InterpolatingDouble(-4.0), new InterpolatingDouble(63.0));
+    	kHeadingMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(60.0));
+    	kHeadingMap.put(new InterpolatingDouble(4.0), new InterpolatingDouble(57.0));
     }
 }

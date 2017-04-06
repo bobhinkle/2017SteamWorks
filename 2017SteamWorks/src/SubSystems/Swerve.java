@@ -27,7 +27,7 @@ public class Swerve{
 	double rotationCorrection;
 	int _printLoops = 0;
 	private Intake intake;
-	private int onTarget = 0;
+	private int onTarget = Constants.MIN_CYCLES_HEADING_ON_TARGET;
 
 	private double lastYPos = 0.0;
 	private double lastXPos = 0.0;
@@ -171,17 +171,12 @@ public class Swerve{
 	}
 	/**/
 	
-	
-	
 	public void sendInput(double x, double y, double rotateX,double rotateY,boolean halfPower,boolean robotCentric,boolean moonManeuver,boolean lowPower){
 
 /*		SmartDashboard.putNumber("X StickL", x);
 		SmartDashboard.putNumber("Y StickL", y);
 		SmartDashboard.putNumber("X Stick", rotateX);
 		SmartDashboard.putNumber("Y Stick", rotateY);*/
-		if(enableRotation){
-			headingController = HeadingController.Rotation;
-		}
 		if(moonManeuver){
 			headingController = HeadingController.Off;
 			yInput = 0.0;
@@ -207,10 +202,14 @@ public class Swerve{
 			}
 			double angle = intake.getCurrentAngle()/180.0*Math.PI; // radians
 			double angleDiff = Math.abs(getError());
+			if(enableRotation){
+				headingController = HeadingController.Rotation;
+			}
 			switch(headingController){
 			case Off:
 				rotationCorrection = 0.0;
 				rotateInput *= 0.5;
+				SmartDashboard.putString(" Heading Controller Mode ", "OFF");
 				break;
 			case Heading:
 				if(angleDiff >=5){
@@ -222,6 +221,7 @@ public class Swerve{
 						rotationCorrection = 0.0;
 					}
 				}
+				SmartDashboard.putString(" Heading Controller Mode ", "Heading");
 				break;
 			case Rotation:	
 				
@@ -236,9 +236,10 @@ public class Swerve{
 				}else{
 					rotationOnTarget = Constants.MIN_CYCLES_HEADING_ON_TARGET;
 				}
+				SmartDashboard.putString(" Heading Controller Mode ", "rotation");
 				break;
 			case Reset:
-				
+				SmartDashboard.putString(" Heading Controller Mode ", "reset");
 				break;
 			default:
 				
@@ -253,17 +254,14 @@ public class Swerve{
 			if(y ==0 && x == 0 && headingController == HeadingController.Heading){
 				headingController = HeadingController.Off;
 			}
-			if(headingController == HeadingController.Off) {
-				rotationCorrection = 0;
-			}		
 			if((y != 0 || x != 0) && headingController == HeadingController.Rotation ){
-//				_targetAngle = intake.getCurrentAngle();
 				headingController = HeadingController.Heading;
 			}
 			SmartDashboard.putNumber("ROTATE_CORRECT", rotationCorrection);
 			if(halfPower || isHanging){
 				y = y * 0.45;
-				x = x * 0.45;			
+				x = x * 0.45;	
+				rotateInput *= 0.75;
 			}else if(lowPower){
 				y = y * 0.3;
 				x = x * 0.3;
@@ -285,13 +283,6 @@ public class Swerve{
 		}
 		SmartDashboard.putNumber("Rotation Input", rotateInput);
 		SmartDashboard.putNumber(" Heading Set Point ", _targetAngle); // moved to Swerve.update()
-		switch(headingController){
-			case Off: SmartDashboard.putString(" Heading Controller Mode ", "OFF"); break;
-			case Rotation: SmartDashboard.putString(" Heading Controller Mode ", "rotation"); break;
-			case Heading: SmartDashboard.putString(" Heading Controller Mode ", "Heading"); break;
-			case Reset: SmartDashboard.putString(" Heading Controller Mode ", "reset"); break;
-			default: SmartDashboard.putString(" Heading Controller Mode ", "default"); break;
-		}
 	}
 	
 	

@@ -47,21 +47,11 @@ public class RoboSystem{
     	gearIntake = new GearIntake(Ports.GEAR_INTAKE, Ports.INTAKE_ARM);
     	hanger = Hanger.getInstance();
     	ballFlap = new Solenoid(20, Ports.BALL_FLAP);
-    	cam = CameraServer.getInstance();
+    	/*cam = CameraServer.getInstance();
     	UsbCamera usbCamera = new UsbCamera("USB Camera 0", 0);
     	usbCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
-    	
-    	//MjpegServer mjpegServer1 = new MjpegServer("serve_USB Camera 0", 1181);
-    	//mjpegServer1.setSource(usbCamera);
-    	
-//    	CvSink cvSink = new CvSink("opencv_USB Camera 0");
-//    	cvSink.setSource(usbCamera);
-
-//    	CvSource outputStream = new CvSource("Blur", PixelFormat.kMJPEG, 640, 480, 30);
-//    	CvSource outputStream = new CvSource("Blur", PixelFormat.kMJPEG, 800, 600, 30);
-
     	MjpegServer mjpegServer2 = new MjpegServer("serve_Blur", 1182);
-    	mjpegServer2.setSource(usbCamera);
+    	mjpegServer2.setSource(usbCamera);*/
     } 
     public void deployBallFlap(){
     	ballFlap.set(true);

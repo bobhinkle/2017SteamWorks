@@ -4,6 +4,7 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
+import Helpers.InterpolatingDouble;
 import Utilities.Constants;
 import Utilities.Ports;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added
@@ -120,4 +121,15 @@ public class Turret {
 		motor.setEncPosition((int)a*Constants.TURRET_TICKS_PER_90);
 		motor.set(a/Constants.TURRET_CLICKS_TO_ANGLE);
 	}
+	public void stop(){
+		motor.setSetpoint(motor.getPosition());
+	}
+	public double getTurretAngleForRange(double range) {
+        InterpolatingDouble result = Constants.kTurretDistanceMap.getInterpolated(new InterpolatingDouble(range));
+        if (result != null) {
+            return result.value;
+        } else {
+            return -5.0;
+        }
+    }
 }

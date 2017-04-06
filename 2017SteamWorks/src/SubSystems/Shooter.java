@@ -140,7 +140,7 @@ public class Shooter {
     	//motor2.set(-speed);
     }
     public void setState(Status newState){
-    	status = Status.STARTED;
+    	status = newState;
     }
     public Status getStatus(){
     	return status;

@@ -121,6 +121,7 @@ public class TeleController
     		//robot.hanger.on();
     		robot.retractBallFlap();
     		robot.dt.startHanging();
+    		robot.gearIntake.retract();
     	}
     	if(coDriver.getButtonAxis(Controller.RIGHT_STICK_X) > Constants.STICK_DEAD_BAND || coDriver.getButtonAxis(Controller.RIGHT_STICK_X) < -Constants.STICK_DEAD_BAND){
     		robot.turret.setState(Turret.State.Manual);
@@ -192,6 +193,7 @@ public class TeleController
         	//robot.hanger.on();
         	robot.retractBallFlap();
         	robot.dt.startHanging();
+        	robot.gearIntake.retract();
         }
         if(!dist.isEnabled()){ 
         	/*	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 

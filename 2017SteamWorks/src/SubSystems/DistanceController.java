@@ -31,6 +31,7 @@ public class DistanceController {
 	private SynchronousPID xPID;
 	private SynchronousPID yPID;
 	private boolean followerNegated = false;
+	private boolean robotCentric = false;
 	public enum ControlWheel{
 		SWERVE, FOLLOWER
 	}
@@ -75,7 +76,7 @@ public class DistanceController {
 				if(!isOnTarget()){
 					cyclesOnTarget = cyclesToCheck;	
 					//System.out.println("X input: " + Double.toString(xPID.get()) + " Y Input: " + Double.toString(yPID.get()));
-					dt.sendInput(xPID.get(), yPID.get(), 0.0, 0.0, false, false, false, false);
+					dt.sendInput(xPID.get(), yPID.get(), 0.0, 0.0, false, robotCentric, false, false);
 				}else{
 					dt.sendInput(0, 0, 0, 0, false, false, false, false); // second false was true					
 					if(cyclesOnTarget <= 0){						
@@ -150,6 +151,7 @@ public class DistanceController {
 		inputCap = maxInput;
 		cyclesToCheck = cyclesOnTarget = checks;
 		followerNegated = followNegated;
+		robotCentric = false;
 		logger.writeToLog("DIST Y Target: " + Double.toString(_goalY) + "\tDIST X Target: " + Double.toString(_goalX));
 		xPID.reset();
 		yPID.reset();
@@ -159,20 +161,28 @@ public class DistanceController {
 		yPID.setSetpoint(_goalY);
 		enable();
 	}
-	/*public void setGoal(double _goalX, ControlWheel _xWheel, double _goalY, ControlWheel _yWheel, double error, double timeLimit, double maxInput, int checks, int team){
+	public void setGoal(double _goalX, ControlWheel _xWheel, double _goalY, ControlWheel _yWheel, double error, double timeLimit, double maxInput, int checks, boolean followNegated, boolean rCentric){
 		reset();
 		yWheel = _yWheel;
-		targetY = _goalY*Constants.FOLLOWER_WHEEL_TICKS_PER_INCH;
-		allowableErrorY = error*Constants.FOLLOWER_WHEEL_TICKS_PER_INCH;
-		targetX = _goalX*Constants.DRIVE_TICKS_PER_INCH;
-		allowableErrorX = error*Constants.DRIVE_TICKS_PER_INCH;
+		xWheel = _xWheel;
+		targetY = _goalY;
+		allowableErrorY = error;
+		targetX = _goalX;
+		allowableErrorX = error;
 		timeout = (timeLimit * 1000) + System.currentTimeMillis();
 		inputCap = maxInput;
 		cyclesToCheck = cyclesOnTarget = checks;
-		alliance = team;
+		followerNegated = followNegated;
+		robotCentric = rCentric;
 		logger.writeToLog("DIST Y Target: " + Double.toString(_goalY) + "\tDIST X Target: " + Double.toString(_goalX));
+		xPID.reset();
+		yPID.reset();
+		xPID.setOutputRange(-maxInput, maxInput);
+		yPID.setOutputRange(-maxInput, maxInput);
+		xPID.setSetpoint(_goalX);
+		yPID.setSetpoint(_goalY);
 		enable();
-	}*/
+	}
 	public void reset(){
 		cyclesOnTarget = Constants.DIST_CONTROLLER_CYCLE_THRESH;
 		onTarget = false;
@@ -180,7 +190,7 @@ public class DistanceController {
 		inputY = 0.0;
 		inputX = 0.0;
 	}
-	private void updateCurrentPos(){		
+	public void updateCurrentPos(){		
 		if(followerNegated){
 			currentPositionY = dt.frontRight.getNegatedFollowerWheelInches();
 		}else{
