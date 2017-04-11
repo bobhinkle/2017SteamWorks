@@ -9,11 +9,10 @@ import SubSystems.Sweeper;
 import SubSystems.Swerve;
 import SubSystems.Turret;
 import Utilities.Ports;
-import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode.PixelFormat;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Solenoid;
 
@@ -28,7 +27,7 @@ public class RoboSystem{
 	public Hanger hanger;
 	public Solenoid ballFlap;
 	public CameraServer cam;
-
+	public AnalogInput ultrasonic;
     public static RoboSystem getInstance()
     {
         if( instance == null )
@@ -47,16 +46,22 @@ public class RoboSystem{
     	gearIntake = new GearIntake(Ports.GEAR_INTAKE, Ports.INTAKE_ARM);
     	hanger = Hanger.getInstance();
     	ballFlap = new Solenoid(20, Ports.BALL_FLAP);
-    	/*cam = CameraServer.getInstance();
-    	UsbCamera usbCamera = new UsbCamera("USB Camera 0", 0);
-    	usbCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
-    	MjpegServer mjpegServer2 = new MjpegServer("serve_Blur", 1182);
-    	mjpegServer2.setSource(usbCamera);*/
+    	ultrasonic = new AnalogInput(0);
     } 
     public void deployBallFlap(){
     	ballFlap.set(true);
     }
     public void retractBallFlap(){
     	ballFlap.set(false);
+    }
+    public double getDistance(){
+    	return ultrasonic.getVoltage()*097.7;
+    }
+    public void initCamera(){
+    	cam = CameraServer.getInstance();
+    	UsbCamera usbCamera = new UsbCamera("USB Camera 0", 0);
+    	usbCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
+    	MjpegServer mjpegServer2 = new MjpegServer("serve_Blur", 1182);
+    	mjpegServer2.setSource(usbCamera);
     }
 }

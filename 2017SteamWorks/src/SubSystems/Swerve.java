@@ -189,11 +189,11 @@ public class Swerve{
 			if(!intake.pidgeyGood()){
 				headingController = HeadingController.Off;
 			}
-			if(Math.abs(rotateX) >= Constants.STICK_DEAD_BAND){
+			if(Math.abs(rotateX) > Constants.STICK_DEAD_BAND){
 				headingController = HeadingController.Off;
 					rotateInput = rotateX;
 					
-			}else if(Math.abs(rotateX) < Constants.STICK_DEAD_BAND && headingController == HeadingController.Off){
+			}else if(Math.abs(rotateX) == Constants.STICK_DEAD_BAND && headingController == HeadingController.Off){
 				headingController = HeadingController.Heading;
 				_targetAngle = intake.getCurrentAngle();
 				rotateInput = 0.0;
@@ -245,10 +245,10 @@ public class Swerve{
 				
 				break;
 			}
-			if(Math.abs(x) < Constants.STICK_DEAD_BAND){
+			if(Math.abs(x) == Constants.STICK_DEAD_BAND){
 				x = 0;
 			}
-			if(Math.abs(y) < Constants.STICK_DEAD_BAND){
+			if(Math.abs(y) == Constants.STICK_DEAD_BAND){
 				y = 0;
 			}
 			if(y ==0 && x == 0 && headingController == HeadingController.Heading){
@@ -338,7 +338,7 @@ public class Swerve{
 		}
 		
 		public void updateCoord(){		
-			if(moduleID != Constants.FOLLOWER_WHEEL_MODULE_ID){
+			if(moduleID == Constants.SWERVE_ENCODER_MODULE_ID){
 				setCurrentDriveEncoderPosition(driveMotor.getEncPosition());
 				setCurrentIntakeAngle(intake.getCurrentAngle());
 				setCurrentModuleAngle(rotationMotor.get()-offSet);
@@ -370,7 +370,7 @@ public class Swerve{
 				//SmartDashboard.putNumber(Integer.toString(moduleID) + "ROT_VOL", rotationMotor.getOutputVoltage());
 				SmartDashboard.putBoolean(Integer.toString(moduleID) + "reversePower", reversePower);
 				lastEncPosition = getCurrentDriveEncoderPosition();			
-			}else{
+			}else if(moduleID == Constants.FOLLOWER_WHEEL_MODULE_ID){
 				setCurrentDriveEncoderPosition(driveMotor.getEncPosition());
 				setCurrentIntakeAngle(intake.getCurrentAngle());
 				setCurrentModuleAngle(rotationMotor.get()-offSet);
@@ -488,7 +488,7 @@ public class Swerve{
 	    }
 	    
 	    public void setTeleRampRate(){
-	    	driveMotor.setVoltageRampRate(48.0);
+	    	driveMotor.setVoltageRampRate(36.0);
 	    }
 	    public void setAutoRamprate(){
 	    	driveMotor.setVoltageRampRate(0.0);

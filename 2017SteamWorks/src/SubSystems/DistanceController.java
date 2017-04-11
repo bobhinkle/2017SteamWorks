@@ -254,4 +254,7 @@ public class DistanceController {
 	public void positiveFollowerWheel(){
 		followerNegated = false;
 	}
+	public void blowUpTimeout(){
+		timeout = System.currentTimeMillis() + 5000;
+	}
 }

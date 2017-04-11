@@ -134,6 +134,9 @@ public class GearIntake {
 		SmartDashboard.putNumber("Gear Intake Error" ,gear.getSetpoint()-gear.getOutputCurrent());
 		SmartDashboard.putNumber("Gear Intake Voltage" ,gear.getOutputVoltage());
 	}
+	public void firePiston(){
+		gearCylinder.set(true);
+	}
 	public void extend(){
 		if(state == State.GEAR_LOST_EXTENDED || state == State.GEAR_LOST_RETRACTED || state == State.INTAKING || state == State.GEAR_DETECT || state == State.INTAKE_EXTENDED_OFF)
 			state = State.INTAKING;
@@ -213,10 +216,10 @@ public class GearIntake {
 	public class autoPickup extends Thread{
 		public void run(){
 			state = GearIntake.State.INTAKING;
-			Timer.delay(0.125);
+			Timer.delay(0.1);
 			forward();
 			state = GearIntake.State.GEAR_DETECT;
-			Timer.delay(0.125);
+			Timer.delay(0.1);
 			forward();
 			state = GearIntake.State.GEAR_DETECT;
 			long timeout = System.currentTimeMillis() + 1000;
@@ -229,7 +232,7 @@ public class GearIntake {
 			while(System.currentTimeMillis() < timeout && state != GearIntake.State.GEAR_DETECTED){
 				Timer.delay(0.005);
 			}
-			Timer.delay(0.25);
+			Timer.delay(0.1);
 			gear.changeControlMode(TalonControlMode.PercentVbus);
 			gear.set(Constants.GEAR_INTAKE_HOLDING_POWER);
 			state = GearIntake.State.INTAKE_RETRACTED_WITH_GEAR;

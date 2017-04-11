@@ -22,9 +22,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- * The Robot class is based on the {@link SampleRobot}.
- * */
 public class Robot extends SampleRobot {
 	private RoboSystem robot = RoboSystem.getInstance();
 	private TeleController controllers;
@@ -33,47 +30,26 @@ public class Robot extends SampleRobot {
 	final String off = "off";
 	final String one_gear    = "one_gear";
 	final String gear_and_shoot = "gear_and_shoot";
-	final String two_gear    = "two_gear";
 	final String near_hopper = "near_hopper";
-	final String far_hopper  = "far_hopper";
-	final String near_hopper_inside = "near_hopper_inside";
-	final String near_hopper_outside = "near_hopper_outside";
-	final String near_hopper_receive = "near_hopper_receive";
-	final String near_hopper_close_inside = "near_hopper_close_inside";
 	final String blue = "Blue";
 	final String red = "Red";
-	long timeToWaitMs = 5500;
 	public final int BLUE = 1;
 	public final int RED  = -1;
-	/** {@link SmartDashboard} field for selecting an autonomous subroutine to run */
 	SendableChooser autoSelect;
 	SendableChooser allianceSelect;
 	
-	/** {@link DistanceController} for sending autonomous or other pre-programmed
-	 * waypoints to the {@link Swerve drivetrain} */
 	private DistanceController dist;
 	
 	
 	VisionServer mVisionServer = VisionServer.getInstance();
-	/** Enabled looper is called at 100Hz whenever the robot is enabled */
     Looper mEnabledLooper = new Looper();
-    /** Disabled looper is called at 100Hz whenever the robot is disabled */
     Looper mDisabledLooper = new Looper();
     
-    
 	public static enum AUTO{
-    	/** Do not run any autonomous subroutine. */
 		OFF,
-    	/** Start at center position. Move field-forward to score gear. Shoot balls. */
 		ONE_GEAR,
 		GEAR_AND_SHOOT,
-    	/** Start at center position. Move field-forward to score gear. Move field-backward and rotate to 90 or 270 degrees
-    	 *   to face another gear on the field. Intake gear from floor. Rotate to 180 degrees and move field-forward to score
-    	 *   gear. Shoot balls. */
-    	/** Deploy hoppers on boiler side of field. Move under the outside hopper to receive balls. Shoot balls. */
 		NEAR_HOPPER
-    	/** Deploy hoppers on not-boiler side of field. Move under the outside hopper to receive balls. Move to field x-center,
-    	 *    */
     }
 	
     public Robot() {
@@ -82,7 +58,6 @@ public class Robot extends SampleRobot {
         autoSelect.addObject("Off", off);
         autoSelect.addObject("One_Gear", one_gear);
         autoSelect.addObject("Gear and Shoot", gear_and_shoot);
-        
         
         SmartDashboard.putData(" Select Auto ", autoSelect);
         allianceSelect = new SendableChooser();
@@ -129,7 +104,13 @@ public class Robot extends SampleRobot {
 		mVisionServer.addVisionUpdateReceiver(VisionProcessor.getInstance());
 		mEnabledLooper.register(VisionProcessor.getInstance());
 		VisionServer.getInstance();
+		//robot.initCamera();
 		mEnabledLooper.start();
+	}
+	@Override
+	public void disabled(){
+		robot.turret.setState(Turret.State.Off);
+		robot.turret.stop();
 	}
 	public double getHeadingForRange(double range) {
         InterpolatingDouble result = Constants.kHeadingMap.getInterpolated(new InterpolatingDouble(range));
@@ -137,6 +118,22 @@ public class Robot extends SampleRobot {
             return result.value;
         } else {
             return 60.0;
+        }
+    }
+	public double getDistanceToWallCorrection(double range) {
+        InterpolatingDouble result = Constants.kDistanceToWallMap.getInterpolated(new InterpolatingDouble(range));
+        if (result != null) {
+            return result.value;
+        } else {
+            return 0.0;
+        }
+    }
+	public double getUltrasonicCorrection(double range) {
+        InterpolatingDouble result = Constants.kDistanceToWallUltraMap.getInterpolated(new InterpolatingDouble(range));
+        if (result != null) {
+            return result.value;
+        } else {
+            return 35.0;
         }
     }
     /** The autonomous routine, which calls the selected autonomous subroutine */
@@ -193,19 +190,31 @@ public class Robot extends SampleRobot {
 	            }
     				break;
     			case off:
-    				executeAuto(AUTO.OFF, 1);
+    				switch(allianceSelected){
+	            	case blue:
+	            		initHeading(180);
+	    	            Timer.delay(0.1);
+	            		executeAuto(AUTO.OFF, BLUE);
+	            		break;
+	            	case red:
+	            		initHeading(0);
+	    	            Timer.delay(0.1);
+	            		executeAuto(AUTO.OFF, RED);
+	            		break;
+	            	default:
+	            		initHeading(180);
+	    	            Timer.delay(0.1);
+	            		executeAuto(AUTO.OFF, BLUE);
+	            		break;
+	            }
     				break;
     		}
 
     }
-    private void delay2() {
-		while(!dist.onTarget() && isAutonomous() && !dist.isOnTarget()){
-			Timer.delay(0.005);
-		}
-    }
+    
     private void delay() {
 		while(dist.isEnabled() && isAutonomous()){
-			Timer.delay(0.005);
+			Timer.delay(0.01); //.005
 		}
     }
     public void executeAuto(AUTO autoSelect, int team){
@@ -245,10 +254,11 @@ public class Robot extends SampleRobot {
 			dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, 6, ControlWheel.FOLLOWER, 3.0, 1.0, 0.8, 1, false);
 			delay();
 			robot.gearIntake.initiateAutoPickup();
+			robot.dt.setHeading(0, true);
 			Timer.delay(0.15);
     		dist.setYPID(0.015, 0.0, 0.01, Constants.DIST_CONTROLLER_Y_LONG_FF);
     		dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, distanceToPeg - 4, ControlWheel.FOLLOWER, 2.0, 2.5, 0.6, 3, false);
-    		//robot.turret.setState(Turret.State.VisionTracking);
+    		robot.dt.setHeading(0, true);
     		delay();
     		timeout = System.currentTimeMillis() + 1750;
     		robot.dt.setHeading(0, true);
@@ -256,13 +266,19 @@ public class Robot extends SampleRobot {
     			robot.dt.sendInput(0, 0.3, 0, 0, false, false, false, false);
     			Timer.delay(0.01);
     		}
+    		double correctionDirection = 1.0;
+    		if(Util.boundAngle0to360Degrees(robot.intake.getCurrentAngle()) > 0){
+    			correctionDirection = 1.0;
+    		}else{
+    			correctionDirection = -1.0;
+    		}
     		System.out.println("Y before completion check: " + Double.toString(dist.getYInches()));
-    		if(distanceToWall - dist.getYInches() > 3.0){
+    		if(distanceToWall - dist.getYInches() > 1.5){
     			dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, Constants.DIST_CONTROLLER_Y_SHORT_FF);
     			dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, dist.getYInches() - 8, ControlWheel.FOLLOWER, 2.0, 1.0, 0.4, 10, false);
     			delay();
     			System.out.println("Heading before 4 degrees: " + Double.toString(robot.intake.getCurrentAngle()));
-    			robot.dt.setHeading(robot.intake.getCurrentAngle() - 7, true);
+    			robot.dt.setHeading(robot.intake.getCurrentAngle() - (7*correctionDirection), true);
     			System.out.println("Heading after correction: " + Double.toString(robot.intake.getCurrentAngle()));
     			timeout = System.currentTimeMillis() + 1500;
     			while(isAutonomous() && timeout > System.currentTimeMillis() && dist.getYInches() < distanceToWall){
@@ -271,12 +287,12 @@ public class Robot extends SampleRobot {
         		}
     			System.out.println("Y after correction: " + Double.toString(dist.getYInches()));
     		}
-    		if(distanceToWall - dist.getYInches() > 3.0){
+    		if(distanceToWall - dist.getYInches() > 1.5){
     			dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, Constants.DIST_CONTROLLER_Y_SHORT_FF);
     			dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, dist.getYInches() - 8, ControlWheel.FOLLOWER, 2.0, 1.0, 0.4, 10, false);
     			delay();
     			System.out.println("Heading before 4 degrees: " + Double.toString(robot.intake.getCurrentAngle()));
-    			robot.dt.setHeading(robot.intake.getCurrentAngle() - 7, true);
+    			robot.dt.setHeading(robot.intake.getCurrentAngle() - (14*correctionDirection*(-1)), true);
     			System.out.println("Heading before 4 degrees: " + Double.toString(robot.intake.getCurrentAngle()));
     			timeout = System.currentTimeMillis() + 1500;
     			while(isAutonomous() && timeout > System.currentTimeMillis() && dist.getYInches() < distanceToWall){
@@ -302,58 +318,65 @@ public class Robot extends SampleRobot {
     		double sideOffset = 40;
     		double robotDistanceFirst = sideHopperY - sideOffset;
     		double degreesToPeg = 60.0;
-    		double distanceToScore = 30.0;
+    		double distanceToScore = 27.0;
     		double distanceToEdge = distanceToScore - 8;
+    		double ultraScoreDistance = 38.0;
     		robot.gearIntake.setState(GearIntake.State.INTAKE_EXTENDED_OFF);
     		Timer.delay(0.25);
     		robot.gearIntake.retract();
     		
     		
-    		robot.shooter.setGoal(Constants.SHOOTING_SPEED);
-    		robot.shooter.setState(Shooter.Status.STARTED);
+    		//robot.shooter.setGoal(Constants.SHOOTING_SPEED);
+    		//robot.shooter.setState(Shooter.Status.STARTED);
     		
     		dist.setXPID(0.005, 0.0, 0.0, 0.0);
     		dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, Constants.DIST_CONTROLLER_Y_SHORT_FF);
 			dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, 16, ControlWheel.FOLLOWER, 2.0, 1.3, 0.8, 1, false);
 			delay();
-			robot.turret.lockAngle(robot.intake.getCurrentAngle(),-7*team);
+			robot.turret.lockAngle(robot.intake.getCurrentAngle(),-6*team);
     		robot.turret.setState(Turret.State.GyroComp);
 			dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, Constants.DIST_CONTROLLER_Y_SHORT_FF);
 			dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, 2, ControlWheel.FOLLOWER, 3.0, 1.0, 0.8, 1, false);
 			delay();
 			System.out.println("Follower Y for turret calculation: " + Double.toString(dist.getYInches()));
 			System.out.println("Robot heading for turret Adjustment: " + Double.toString(robot.intake.getCurrentAngle()));
-			System.out.println("Calculated Turret angle: " + Double.toString(robot.turret.getTurretAngleForRange(dist.getYInches())));
-			robot.turret.lockAngle(-360.0, robot.turret.getTurretAngleForRange(dist.getYInches()));
-    		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
+			System.out.println("Calculated Turret correction: " + Double.toString(robot.turret.getTurretAngleForRange(dist.getYInches())));
+			dist.disable();
+			robot.turret.lockAngle(-360.0,-6 + robot.turret.getTurretAngleForRange(dist.getYInches()));
+			timeout = System.currentTimeMillis() + 750;
+    		/*while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous() && System.currentTimeMillis() < timeout){
+    			Timer.delay(0.01);
+    		}*/
+    		timeout = System.currentTimeMillis() + 750; 
+    		while(!robot.turret.onTarget() && isAutonomous() && System.currentTimeMillis() < timeout){
     			Timer.delay(0.01);
     		}
+    		System.out.println("Final Turret Angle: " + Double.toString(robot.turret.getAngle()));
     		robot.sweeper.turnSweeperOn();
     		timeout = System.currentTimeMillis() + 1000;
     		while(System.currentTimeMillis() < timeout && isAutonomous()){
     			Timer.delay(0.01);
     		}
-			//robot.gearIntake.initiateAutoPickup();
-			Timer.delay(0.15);
+    		robot.gearIntake.initiateAutoPickup();
 			robot.turret.setState(Turret.State.Off);
 			robot.sweeper.stopRoller();
     		robot.sweeper.stopSweeper();
     		robot.intake.intakeStop();
     		robot.shooter.setState(Shooter.Status.OFF);
-    		robot.gearIntake.initiateAutoPickup();
-			Timer.delay(0.15);
-    		dist.setYPID(0.014, 0.0, 0.01, Constants.DIST_CONTROLLER_Y_LONG_FF);
-    		dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, robotDistanceFirst, ControlWheel.FOLLOWER, 2.0, 2.75, 0.7, 3, false);
+    		//dist.setYPID(0.012, 0.0, Constants.DIST_CONTROLLER_Y_LONG_D, Constants.DIST_CONTROLLER_Y_LONG_FF);
+    		dist.setYPID(0.008, 0.0, 0.04, 0.10);
+    		dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, robotDistanceFirst, ControlWheel.FOLLOWER, 2.0, /*2.75*/3.0, 0.85, 3, false);
     		delay();
     		dist.disable();
     		double firstDistReached = dist.getYInches();
+    		double error = robotDistanceFirst - dist.getYInches();
     		int correctDirection = 1;
     		if(firstDistReached < robotDistanceFirst){
-    			correctDirection = 1;
-    		}else{
     			correctDirection = -1;
+    		}else{
+    			correctDirection = 1;
     		}
-    		degreesToPeg = getHeadingForRange(robotDistanceFirst - dist.getYInches());
+    		degreesToPeg = getHeadingForRange(error);
     		System.out.println("Calculated Peg Rotation: " + Double.toString(degreesToPeg) + " Distance Reached: " + Double.toString(dist.getYInches()));
     		robot.dt.setHeading(degreesToPeg, true);
     		robot.dt.enableRotation();
@@ -363,50 +386,69 @@ public class Robot extends SampleRobot {
     			Timer.delay(0.01);
     		}
     		robot.dt.disableRotation();
-    		double targetY = dist.getYInches() + distanceToScore;
+    		if(robot.dt.getError() > 0){
+    			correctDirection = 1;
+    		}else{
+    			correctDirection = -1;
+    		}
+    		System.out.println("Ultra distance: " + Double.toString(robot.getDistance()));
+    		System.out.println("Calculated Distance To WALL Correction: " + getDistanceToWallCorrection(error));
+    		double targetY = dist.getYInches() + distanceToScore + getDistanceToWallCorrection(error);
     		System.out.println("Calculated Wall Distance: " + Double.toString(targetY));
     		timeout = System.currentTimeMillis() + 2500;
+    		double ultraDistance = getUltrasonicCorrection(robot.intake.getCurrentAngle());
+    		System.out.println("Ultra goal distance3: " + Double.toString(ultraDistance));
+    		System.out.println("actual heading: " + Double.toString(robot.intake.getCurrentAngle()));
     		while(isAutonomous() && System.currentTimeMillis() < timeout && dist.getYInches() < targetY){
-    			robot.dt.sendInput(0, 0.35, 0, 0, false, true, false, false);
+    			robot.dt.sendInput(0, 0.35, 0, 0, false, true, false, false);        		
     			Timer.delay(0.01);
     		}
-    		System.out.println("Y before completion check: " + Double.toString(dist.getYInches()));
-    		if(targetY - dist.getYInches() > 2.0){
+    		robot.dt.sendInput(0, 0.0, 0, 0, false, true, false, false);
+    		//Timer.delay(0.5);
+    		System.out.println("Ultra goal distance: " + Double.toString(ultraDistance) + " Rob Angle: " + robot.intake.getCurrentAngle());
+    		System.out.println("Y before completion check: " + Double.toString(dist.getYInches()) + " Ultra: " + Double.toString(robot.getDistance()));
+    		if(targetY - dist.getYInches() > 0.5/*robot.getDistance() > ultraDistance*/){
     			dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, Constants.DIST_CONTROLLER_Y_SHORT_FF);
     			dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, dist.getYInches() - 8, ControlWheel.FOLLOWER, 2.0, 1.0, 0.4, 10, false, true);
     			delay();
     			System.out.println("Heading before 4 degrees: " + Double.toString(robot.intake.getCurrentAngle()));
-    			robot.dt.setHeading(robot.intake.getCurrentAngle() - (7*correctDirection), true);
+    			robot.dt.setHeading(robot.intake.getCurrentAngle() + (8*correctDirection), true);
     			System.out.println("Heading after correction: " + Double.toString(robot.intake.getCurrentAngle()));
-    			timeout = System.currentTimeMillis() + 1500;
+    			timeout = System.currentTimeMillis() + 1750;
     			while(isAutonomous() && timeout > System.currentTimeMillis() && dist.getYInches() < targetY){
         			robot.dt.sendInput(0.0, 0.3, 0, 0, false, true, false, false);
         			Timer.delay(0.01);
         		}
-    			System.out.println("Y after correction: " + Double.toString(dist.getYInches()));
+    			robot.dt.sendInput(0.0, 0.0, 0, 0, false, true, false, false);
+    			System.out.println("Y after correction: " + Double.toString(dist.getYInches()) + " Ultra: " + Double.toString(robot.getDistance()));
     		}
-    		if(targetY - dist.getYInches() > 2.0){
+    		ultraDistance = getUltrasonicCorrection(robot.intake.getCurrentAngle());
+    		System.out.println("New ultrasonic goal: " + Double.toString(ultraDistance));
+    		if(targetY - dist.getYInches() > 0.5/*robot.getDistance() > ultraDistance*/){
+    			System.out.println("Ultrasonic: " + Double.toString(robot.getDistance()));
     			dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, Constants.DIST_CONTROLLER_Y_SHORT_FF);
     			dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, dist.getYInches() - 8, ControlWheel.FOLLOWER, 2.0, 1.0, 0.4, 10, false, true);
     			delay();
     			System.out.println("Heading before 4 degrees: " + Double.toString(robot.intake.getCurrentAngle()));
-    			robot.dt.setHeading(robot.intake.getCurrentAngle() - (7*correctDirection), true);
+    			robot.dt.setHeading(robot.intake.getCurrentAngle() + (14*correctDirection*(-1)), true);
     			System.out.println("Heading before 4 degrees: " + Double.toString(robot.intake.getCurrentAngle()));
-    			timeout = System.currentTimeMillis() + 1500;
+    			timeout = System.currentTimeMillis() + 1750;
     			while(isAutonomous() && timeout > System.currentTimeMillis() && dist.getYInches() < targetY){
         			robot.dt.sendInput(0.0, 0.3, 0, 0, false, true, false, false);
         			Timer.delay(0.01);
         		}
-    			System.out.println("Y after correction: " + Double.toString(dist.getYInches()));
+    			System.out.println("Y after correction: " + Double.toString(dist.getYInches()) + " Ultrasonic: " + Double.toString(robot.getDistance()));
+    			robot.dt.sendInput(0.0, 0.0, 0, 0, false, true, false, false);
     		}
     		robot.gearIntake.scoreGear();
-    		Timer.delay(0.4);
-    		dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, Constants.DIST_CONTROLLER_Y_SHORT_FF);
+    		/*dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, Constants.DIST_CONTROLLER_Y_SHORT_FF);
 			dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, targetY - 10, ControlWheel.FOLLOWER, 2.0, 1.0, 0.5, 5, false, true);
 			delay();
-			robot.gearIntake.retract();
+			robot.gearIntake.firePiston();
+			Timer.delay(0.25);
+			robot.gearIntake.setState(GearIntake.State.INTAKE_RETRACTED);
 			dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, targetY, ControlWheel.FOLLOWER, 2.0, 1.2, 0.6, 5, false, true);
-			delay();
+			delay();*/
     		dist.setYPID(Constants.DIST_CONTROLLER_Y_LONG_P, 0.0, Constants.DIST_CONTROLLER_Y_LONG_D, Constants.DIST_CONTROLLER_Y_LONG_FF);
     		dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, dist.getYInches() - 35, ControlWheel.FOLLOWER, 2.0, 2.5, 0.5, 10, false, true);
     		delay();
@@ -414,14 +456,14 @@ public class Robot extends SampleRobot {
     	case NEAR_HOPPER:
     		
     		//Step 1
-    		double closeHopperY = 79.0;
+    		double closeHopperY = 76.0;
     		dist.setXPID(0.005, 0.0, 0.0, 0.0);
-    		dist.setYPID(0.011, 0.0, Constants.DIST_CONTROLLER_Y_LONG_D, Constants.DIST_CONTROLLER_Y_LONG_FF);
-    		logger.writeToLog("AUTO Near Hopper Close Inside");
-    		logger.writeToLog("Y distance before: " + Double.toString(robot.dt.frontRight.getNegatedFollowerWheelInches()) + " X distance: " + Double.toString(robot.dt.getX()));
-    		dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, closeHopperY, ControlWheel.FOLLOWER, 2.5, 2.55, .85, 5, true); //2.3 Timeout
-//    		robot.turret.setAngle(103);
-    		robot.turret.lockAngle(robot.intake.getCurrentAngle(),98*team);
+    		dist.setYPID(0.008, 0.0, 0.04, 0.10);
+    		//logger.writeToLog("AUTO Near Hopper Close Inside");
+    		//logger.writeToLog("Y distance before: " + Double.toString(robot.dt.frontRight.getNegatedFollowerWheelInches()) + " X distance: " + Double.toString(robot.dt.getX()));
+    		dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, closeHopperY, ControlWheel.FOLLOWER, 2.0, 3.0, .85, 5, true); //2.3 Timeout
+    		robot.retractBallFlap();
+    		robot.turret.lockAngle(robot.intake.getCurrentAngle(),101*team);
     		robot.turret.setState(Turret.State.GyroComp);
     		switch(team){
 	    		case BLUE:
@@ -438,46 +480,37 @@ public class Robot extends SampleRobot {
     		//delay2();
     		//dist.disable();
     		logger.writeToLog("Y distance: " + Double.toString(robot.dt.frontRight.getNegatedFollowerWheelInches()));
-    		logger.writeToLog("Vision Distance: " + Double.toString(fsm.getTargetDistance()));
+    		//logger.writeToLog("Vision Distance: " + Double.toString(fsm.getTargetDistance()));
     		
     		
     		//Step 2 
     		//Add Timeout 
-    		dist.setXPID(Constants.DIST_CONTROLLER_X_P, 0.0, Constants.DIST_CONTROLLER_X_D, 0.0);
+    		dist.setXPID(Constants.DIST_CONTROLLER_X_P, 0.0, Constants.DIST_CONTROLLER_X_D, Constants.DIST_CONTROLLER_X_FF);
+    		dist.setYPID(0.02, 0.0, 0.0, 0.0);
     		//dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, Constants.DIST_CONTROLLER_Y_SHORT_FF);
-    		dist.setGoal(robot.dt.getX()+((-36)*team), ControlWheel.SWERVE, closeHopperY, ControlWheel.FOLLOWER, 2.0, 1.25, 0.6, 0, true);
+    		dist.setGoal(robot.dt.getX()+((-36)*team), ControlWheel.SWERVE, closeHopperY, ControlWheel.FOLLOWER, 2.0, 0.95, 0.6, 0, true);
     		long time = System.currentTimeMillis();
-    		timeout = System.currentTimeMillis() + 750;
-    		int i = 1;
+    		timeout = System.currentTimeMillis() + 850;
     		while(Math.abs(robot.dt.getX()) < 12 && isAutonomous() && System.currentTimeMillis() < timeout){
-    			if(i < 10){
-    				System.out.println("Inside 12 inch while loop" + Integer.toString(i));
-    			}
-    			i++;
     			Timer.delay(0.01);
     		}
-    		timeout = System.currentTimeMillis() + (1600 - (System.currentTimeMillis() - time));
-    		System.out.println("Line 321 reached");
-    		i = 1;
-    		while(isAutonomous() && System.currentTimeMillis() < timeout && robot.intake.getCurrentAngularRate() < 35){
-    			if(i < 5){
-    				System.out.println("Inside Pigeon Loop " + Integer.toString(i));
-    			}
-    			i++;
-    			Timer.delay(0.005);
+    		timeout = System.currentTimeMillis() + (950 - (System.currentTimeMillis() - time));
+    		while(isAutonomous() && System.currentTimeMillis() < timeout && robot.intake.getCurrentAngularRate() < 30){
+    			Timer.delay(0.01);
     		}
-    		System.out.println("Line 328 reached");
     		dist.disable();
+    		dist.blowUpTimeout();
     		//delay();
-    	
+    		System.out.println("X movement completed in " + Long.toString(System.currentTimeMillis() - time));
     		logger.writeToLog("AUTO POS1 X:" + Double.toString(dist.getXInches()) + " Y:"+ Double.toString(dist.getYInches()));
-    		logger.writeToLog("Vision Distance: " + Double.toString(fsm.getTargetDistance()));
+    		//logger.writeToLog("Vision Distance: " + Double.toString(fsm.getTargetDistance()));
     		
     		//Step 3
     		//Add swerve + turret lock and then feed vision as a correction
-    		dist.setXPID(0.005, 0.0, 0.0, 0.0);
-    		dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, 0.22);
-    		dist.setGoal(robot.dt.getX() + 3, ControlWheel.SWERVE, 70, ControlWheel.FOLLOWER, 2.0, 1.75, 1.0, 10, true); 	
+    		robot.deployBallFlap();
+    		dist.setXPID(0.0005, 0.0, 0.0, 0.1);
+    		dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, 0.25);
+    		dist.setGoal(robot.dt.getX() + (3*team), ControlWheel.SWERVE, Constants.NEAR_HOPPER_Y, ControlWheel.FOLLOWER, 2.0, 1.5, 1.0, 10, true); 	
     		
     		if(fsm.getTargetVisibility()){
     			robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(fsm.getTargetDistance()-3));
@@ -487,38 +520,18 @@ public class Robot extends SampleRobot {
     		robot.shooter.setState(Shooter.Status.STARTED);
     		
     		delay();
-    		robot.deployBallFlap();
-    		//dist.disable();
     		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(dist.getYInches()));
-    		System.out.println("Shooter Target: " + Double.toString(robot.shooter.getTarget()));
     		robot.shooter.setState(Shooter.Status.STARTED);
-    		robot.dt.sendInput(-0.2*team, 0, 0, 0, false, false, false, false);
-    		if(!fsm.getTargetVisibility()){
-    			if(team == BLUE){
-    				logger.writeToLog("Robot Heading: " + Double.toString(robot.intake.getCurrentAngle()));
-    				//robot.turret.setAngle(103+(180-Util.boundAngle0to360Degrees(robot.intake.getCurrentAngle())));
-    			}else{
-    				//robot.turret.setAngle(-75+(180-Util.boundAngle0to360Degrees(robot.intake.getCurrentAngle())));
-    			}
-    		}
     		
     		//Step 4
-    		logger.writeToLog("Distance Y:" + dist.getYInches());
-    		logger.writeToLog("Robot Heading: " + Double.toString(robot.intake.getCurrentAngle()));
-    		logger.writeToLog("Turret Angle: " + Double.toString(robot.turret.getAngle()));
+    		logger.writeToLog("Final Distance Y:" + dist.getYInches());
     		
-    		//robot.turret.lockAngle(robot.intake.getCurrentAngle());
-    		//robot.turret.setState(Turret.State.GyroComp);
     		
-    		//robot.shooter.setGoal(Constants.SHOOTING_SPEED);
-    		logger.writeToLog("Vision Distance Before Shooter: " + Double.toString(fsm.getTargetDistance()));
-    		
-    		robot.intake.intakeForward();
     		while (robot.shooter.getStatus()!=Shooter.Status.READY && isAutonomous()){
     			Timer.delay(0.01);
     		}
     		robot.sweeper.turnSweeperOn();
-    		
+    		robot.intake.intakeForward();
     		while(isAutonomous()){
     			Timer.delay(0.01);
     			
@@ -531,6 +544,13 @@ public class Robot extends SampleRobot {
     		break;
     	case OFF:
     		logger.writeToLog("AUTO *** OFF ***");
+    		//dist.setXPID(0.001, 0.0, 0.0, 0.25);
+    		dist.setYPID(0.008, 0.0, 0.04, 0.1); //.008 - .04 - .10
+    		dist.setXPID(0.005, 0.0, 0.0, 0.0);
+    		logger.writeToLog("Y distance before: " + Double.toString(robot.dt.frontRight.getNegatedFollowerWheelInches()) + " X distance: " + Double.toString(robot.dt.getX()));
+    		dist.setGoal(robot.dt.getX(), ControlWheel.SWERVE, 79.0, ControlWheel.FOLLOWER, 0, 5.0, .85, 10, true);
+    		delay();
+    		logger.writeToLog("Y distance: " + Double.toString(dist.getYInches()));
     		break;
     	default: 
     		logger.writeToLog("AUTO *** DEFAULT ***");

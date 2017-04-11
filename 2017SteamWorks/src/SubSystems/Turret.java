@@ -80,7 +80,7 @@ public class Turret {
 		return (motor.getSetpoint() * Constants.TURRET_CLICKS_TO_ANGLE);
 	}
 	public void update(double heading){
-		if(Math.abs(getError()) < Constants.TURRET_SMALL_PID_THRESH){
+		if(Math.abs(getError()) < Constants.TURRET_SMALL_PID_THRESH && currentState != State.VisionTracking){
 			motor.setProfile(1);
 		}else{
 			motor.setProfile(0);
@@ -129,7 +129,7 @@ public class Turret {
         if (result != null) {
             return result.value;
         } else {
-            return -5.0;
+            return 0.0;
         }
     }
 }

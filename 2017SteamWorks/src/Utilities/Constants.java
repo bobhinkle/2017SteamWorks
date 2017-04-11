@@ -72,7 +72,7 @@ public class Constants {
 	public final static double DIST_CONTROLLER_Y_LONG_FF = 0.0;    //.0
 	
 	public static final double DIST_CONTROLLER_Y_SHORT_P =  0.025;  //.01
-	public static final double DIST_CONTROLLER_Y_SHORT_D =  0.15;   //.0375
+	public static final double DIST_CONTROLLER_Y_SHORT_D =  0.1;   //.0375
 	public final static double DIST_CONTROLLER_Y_SHORT_FF = 0.25;    //.2
 	
 	public static final double DIST_CONTROLLER_X_P =  0.04;  //.008
@@ -94,7 +94,7 @@ public class Constants {
 	
 	
     
-    public static final double TURNING_ADD_POWER_THRESHOLD = 10; //10
+    public static final double TURNING_ADD_POWER_THRESHOLD = 15; //10
     public static final double TURNING_DETECT_THRESHOLD = TURNING_ADD_POWER_THRESHOLD;//1; //10// 3
     public static final int DRIVING_DETECT_THRESHOLD = 1; // clicks
     public static final double ROBOT_ROTATING_DETECT_THRESHOLD = 15;
@@ -119,9 +119,9 @@ public class Constants {
 	public static final double TURRET_SMALL_D = 5.0;
 	public static final double TURRET_SMALL_PID_THRESH = 5;
 	public static final int    TURRET_ONTARGET_THRESH  = 5;
-	public static final double STICK_DEAD_BAND = 0.2;
+	public static final double STICK_DEAD_BAND = 0.0;
 	
-	public static final double SHOOTING_SPEED = 2950;//2675;//2850
+	public static final double SHOOTING_SPEED = 2925;//2675;//2850
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 200;
 
@@ -139,29 +139,13 @@ public class Constants {
 /** Distance from the robot's center to each wheel module. */
 	public static final double RADIUS_CENTER_TO_MODULE = Math.sqrt(Math.pow(WHEELBASE_LENGTH/2, 2)+Math.pow(WHEELBASE_WIDTH/2, 2))*DRIVE_TICKS_PER_INCH;
 	public static final double DIST_MAX_POWER = 0.5;
-	//Two Gear Auto
-	public static final double TWO_G_PEG_Y = 58.0;
-	public static final double TWO_G_PEG_X = 0.0;
-	public static final double TWO_G_PICKUP_Y = 30.0;
-	public static final double TWO_G_PICKUP_X = -30.0;
-	public static final double TWO_G_RETURN_Y = 62.0;
-	public static final double TWO_G_RETURN_X = -5.0;
-	
-	//Near Hopper Auto
-	public static final double NEAR_HOPPER_FIRST_Y = 72.0;
-	public static final double NEAR_HOPPER_FIRST_X = 0.0;
-	public static final double NEAR_HOPPER_PEG_Y = 90.0;
-	public static final double NEAR_HOPPER_PEG_X = 15.0;
-	public static final double NEAR_HOPPER_DEPLOY_X = -34.0;
-	public static final double NEAR_HOPPER_DEPLOY_Y = 112.0;
-	public static final double NEAR_HOPPER_PICKUP_Y = 103.0;
 	
 	// Pose of the camera frame w.r.t. the turret frame
     public static double kCameraXOffset = 0;
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 16;
     public static double kCameraPitchAngleDegrees = 34; // calibrated 4/22  35.75
-    public static double kCameraYawAngleDegrees = 6;  //2.5 //positive moves the turret to the left
+    public static double kCameraYawAngleDegrees = 4;  //2.5 //positive moves the turret to the left
     public static double kCameraDeadband = 0.0;
     
     public static double kCenterOfTargetHeight = 86.0; // inches       
@@ -184,24 +168,40 @@ public class Constants {
 
     static {        
     	
-    	kShooterMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(2750.0));
-    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y - 10), new InterpolatingDouble(2850.0));
-    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y), new InterpolatingDouble(2950.0));
-    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y + 10), new InterpolatingDouble(3050.0));
+    	kShooterMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(SHOOTING_SPEED - 200));
+    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y - 10), new InterpolatingDouble(SHOOTING_SPEED - 100));
+    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y), new InterpolatingDouble(SHOOTING_SPEED));
+    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y + 10), new InterpolatingDouble(SHOOTING_SPEED + 100));
     }
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kTurretDistanceMap = new InterpolatingTreeMap<>();
 
     static {        
-    	kTurretDistanceMap.put(new InterpolatingDouble(-6.0), new InterpolatingDouble(-2.0));
-    	kTurretDistanceMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(-5.0));
-    	kTurretDistanceMap.put(new InterpolatingDouble(6.0), new InterpolatingDouble(-8.0));
-    	kTurretDistanceMap.put(new InterpolatingDouble(12.0), new InterpolatingDouble(-11.0));
+    	kTurretDistanceMap.put(new InterpolatingDouble(-6.0), new InterpolatingDouble(4.0));
+    	kTurretDistanceMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(0.0));
+    	kTurretDistanceMap.put(new InterpolatingDouble(6.0), new InterpolatingDouble(-4.0));
+    	kTurretDistanceMap.put(new InterpolatingDouble(12.0), new InterpolatingDouble(-8.0));
     }
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHeadingMap = new InterpolatingTreeMap<>();
 
-    static {        
-    	kHeadingMap.put(new InterpolatingDouble(-4.0), new InterpolatingDouble(63.0));
+    static {  
+    	kHeadingMap.put(new InterpolatingDouble(-6.0), new InterpolatingDouble(67.0));
     	kHeadingMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(60.0));
-    	kHeadingMap.put(new InterpolatingDouble(4.0), new InterpolatingDouble(57.0));
+    	kHeadingMap.put(new InterpolatingDouble(6.0), new InterpolatingDouble(52.0));
+    }
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kDistanceToWallMap = new InterpolatingTreeMap<>();
+
+    static {  
+    	kDistanceToWallMap.put(new InterpolatingDouble(-10.0), new InterpolatingDouble(-6.0));
+    	kDistanceToWallMap.put(new InterpolatingDouble(-5.0), new InterpolatingDouble(-3.0));
+    	kDistanceToWallMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(0.0));
+    	kDistanceToWallMap.put(new InterpolatingDouble(5.0), new InterpolatingDouble(4.0));
+    	kDistanceToWallMap.put(new InterpolatingDouble(10.0), new InterpolatingDouble(8.0));
+    }
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kDistanceToWallUltraMap = new InterpolatingTreeMap<>();
+
+    static {      	    	
+    	kDistanceToWallUltraMap.put(new InterpolatingDouble(-297.0), new InterpolatingDouble(29.0));
+    	kDistanceToWallUltraMap.put(new InterpolatingDouble(-303.0), new InterpolatingDouble(28.0));
+    	kDistanceToWallUltraMap.put(new InterpolatingDouble(-306.20), new InterpolatingDouble(29.91));
     }
 }

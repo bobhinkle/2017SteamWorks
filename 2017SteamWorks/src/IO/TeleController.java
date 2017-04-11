@@ -92,7 +92,6 @@ public class TeleController
     		robot.sweeper.stopRoller();
     		robot.sweeper.stopSweeper();
     		canReverseSweeper = true;
-    		robot.turret.setState(Turret.State.VisionTracking);
     		if(robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED && robot.gearIntake.getState() != GearIntake.State.INTAKE_RETRACTED_WITH_GEAR && robot.gearIntake.getState() != GearIntake.State.GEAR_LOST_RETRACTED)
     			robot.gearIntake.setState(GearIntake.State.INTAKE_EXTENDED_OFF);
     		robot.hanger.setState(Hanger.State.OFF);
@@ -148,7 +147,7 @@ public class TeleController
     	if(coDriver.getPOV() == 90)
     		robot.turret.setAngle(90);
     	if(coDriver.getPOV() == 180){
-    		robot.turret.lockAngle(-180,99);
+    		robot.turret.lockAngle(-180,100);
     		robot.turret.setState(Turret.State.GyroComp);
     		//robot.gearIntake.reverse();
     		//robot.turret.setAngle(-2);
