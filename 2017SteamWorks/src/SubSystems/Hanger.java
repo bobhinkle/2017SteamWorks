@@ -20,8 +20,9 @@ public class Hanger {
 	private State state = State.OFF;
 	public Hanger(){
 		climber = new CANTalon(Ports.HANGER);
+		
 		climber.reverseOutput(false);
-		climber.enableBrakeMode(false);
+		climber.enableBrakeMode(true);
 	}
 	public static Hanger getInstance(){
 		if(instance == null){

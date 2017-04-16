@@ -71,7 +71,7 @@ public class Constants {
 	public static final double DIST_CONTROLLER_Y_LONG_D =  0.01;   //.02
 	public final static double DIST_CONTROLLER_Y_LONG_FF = 0.0;    //.0
 	
-	public static final double DIST_CONTROLLER_Y_SHORT_P =  0.025;  //.01
+	public static final double DIST_CONTROLLER_Y_SHORT_P =  0.0225;  //.01
 	public static final double DIST_CONTROLLER_Y_SHORT_D =  0.1;   //.0375
 	public final static double DIST_CONTROLLER_Y_SHORT_FF = 0.25;    //.2
 	
@@ -121,13 +121,13 @@ public class Constants {
 	public static final int    TURRET_ONTARGET_THRESH  = 5;
 	public static final double STICK_DEAD_BAND = 0.0;
 	
-	public static final double SHOOTING_SPEED = 2925;//2675;//2850
+	public static final double SHOOTING_SPEED = 2700;
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 200;
 
 	public static final double GEAR_INTAKE_POWER = 0.75;
 	public static final double GEAR_INTAKE_POWER_REVERSE = 12;
-	public static final double GEAR_INTAKE_CURR_DETECT = 25;//24;
+	public static final double GEAR_INTAKE_CURR_DETECT = 23;//24;
 	public static final double GEAR_INTAKE_REVERSE_CURR_DETECT = 40;
 	public static final double GEAR_INTAKE_HOLDING_POWER = -0.27;
 	public static final double GEAR_PRESENT = 3.0;
@@ -162,16 +162,17 @@ public class Constants {
     public static int kDriveBaseLockAllowableError = 10;
     public static int kDriveVelocityAllowableError = 0;
     
-    public static double NEAR_HOPPER_Y = 70.0;
+    public static final double NEAR_HOPPER_Y = 70.0;
+    public static final double SIDE_PEG_SHOOTING_SPEED = 2775;
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kShooterMap = new InterpolatingTreeMap<>();
 
     static {        
     	
     	kShooterMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(SHOOTING_SPEED - 200));
-    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y - 10), new InterpolatingDouble(SHOOTING_SPEED - 100));
+    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y - 12), new InterpolatingDouble(SHOOTING_SPEED - 100));
     	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y), new InterpolatingDouble(SHOOTING_SPEED));
-    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y + 10), new InterpolatingDouble(SHOOTING_SPEED + 100));
+    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y + 12), new InterpolatingDouble(SHOOTING_SPEED + 100));
     }
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kTurretDistanceMap = new InterpolatingTreeMap<>();
 

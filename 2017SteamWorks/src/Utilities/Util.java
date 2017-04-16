@@ -215,4 +215,11 @@ public class Util {
 		return calc;
 	}
     
+    public static double BoundPigeonAngle(double angle){
+    	double newAngle;
+    	newAngle = boundAngle0to360Degrees(angle);
+    	newAngle = 360.0 - newAngle;
+    	return -newAngle;
+    }
+    
 }

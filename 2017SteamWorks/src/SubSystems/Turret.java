@@ -7,6 +7,7 @@ import com.ctre.CANTalon.TalonControlMode;
 import Helpers.InterpolatingDouble;
 import Utilities.Constants;
 import Utilities.Ports;
+import Utilities.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added
 
 public class Turret {
@@ -36,7 +37,7 @@ public class Turret {
 		motor.setNominalClosedLoopVoltage(12);
 	}
 	public enum State{
-		Off, VisionTracking, CalculatedTracking, Manual, GyroComp
+		Off, VisionTracking, CalculatedTracking, Manual, GyroComp, TeleopGyroComp
 	}
 	public State currentState = State.Manual;
 	public static Turret getInstance(){
@@ -88,7 +89,11 @@ public class Turret {
 		switch(currentState){
 		case GyroComp:
 			setAngle(lockedTurretAngle + (lockedAngle - heading));
+			System.out.println("Turret Goal: " + Double.toString(getGoal()));
 			break;
+		case TeleopGyroComp:
+			setAngle(lockedTurretAngle + (lockedAngle - Util.BoundPigeonAngle(heading)));
+			System.out.println("Turret Goal: " + Double.toString(getGoal()));
 		default:
 			break;
 		}
@@ -123,6 +128,7 @@ public class Turret {
 	}
 	public void stop(){
 		motor.setSetpoint(motor.getPosition());
+		setAngle(getAngle());
 	}
 	public double getTurretAngleForRange(double range) {
         InterpolatingDouble result = Constants.kTurretDistanceMap.getInterpolated(new InterpolatingDouble(range));

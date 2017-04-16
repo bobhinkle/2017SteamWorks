@@ -96,7 +96,11 @@ public class Intake {
 		debugValues();
 	}
 	public void setPresetAngles(double i){
-		_pidgey.SetFusedHeading(360.0-i);
+		if(i != 0.0){
+			_pidgey.SetFusedHeading(360.0-i);
+		}else{
+			_pidgey.SetFusedHeading(i);
+		}
 	}
 	public void deployWings(){
 		extendIntakes ex = new extendIntakes();

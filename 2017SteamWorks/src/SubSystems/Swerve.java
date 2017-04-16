@@ -1,18 +1,13 @@
 package SubSystems;
 
-import java.util.Set;
-
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
-import com.sun.glass.ui.Robot;
 
-import Helpers.InterpolatingDouble;
+import Helpers.MotionProfileExample;
 import Utilities.Constants;
 import Utilities.Ports;
 import Utilities.Util;
-import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Swerve{
@@ -119,10 +114,7 @@ public class Swerve{
 	
 	public Swerve(){
 		intake = Intake.getInstance();		
-		frontLeft  = new SwerveDriveModule(Ports.FRONT_LEFT_ROTATION,Ports.FRONT_LEFT_DRIVE,2,Constants.FRONT_LEFT_TURN_OFFSET);
-		frontRight = new SwerveDriveModule(Ports.FRONT_RIGHT_ROTATION,Ports.FRONT_RIGHT_DRIVE,1,Constants.FRONT_RIGHT_TURN_OFFSET);
-		rearLeft   = new SwerveDriveModule(Ports.REAR_LEFT_ROTATION,Ports.REAR_LEFT_DRIVE,3,Constants.REAR_LEFT_TURN_OFFSET);
-		rearRight  = new SwerveDriveModule(Ports.REAR_RIGHT_ROTATION,Ports.REAR_RIGHT_DRIVE,4,Constants.REAR_RIGHT_TURN_OFFSET);
+		declareModules();
 	}
 	public static Swerve getInstance()
     {
@@ -130,7 +122,18 @@ public class Swerve{
             instance = new Swerve();
         return instance;
     }
-	
+	public void declareModules(){
+		frontLeft  = new SwerveDriveModule(Ports.FRONT_LEFT_ROTATION,Ports.FRONT_LEFT_DRIVE,2,Constants.FRONT_LEFT_TURN_OFFSET);
+		frontRight = new SwerveDriveModule(Ports.FRONT_RIGHT_ROTATION,Ports.FRONT_RIGHT_DRIVE,1,Constants.FRONT_RIGHT_TURN_OFFSET);
+		rearLeft   = new SwerveDriveModule(Ports.REAR_LEFT_ROTATION,Ports.REAR_LEFT_DRIVE,3,Constants.REAR_LEFT_TURN_OFFSET);
+		rearRight  = new SwerveDriveModule(Ports.REAR_RIGHT_ROTATION,Ports.REAR_RIGHT_DRIVE,4,Constants.REAR_RIGHT_TURN_OFFSET);
+	}
+	public void resetModules(){
+		frontLeft.loadProperties();
+		frontRight.loadProperties();
+		rearLeft.loadProperties();
+		rearRight.loadProperties();
+	}
 	public void swerveTrack(){
 //		double adjust = intake.getCurrentAngle() - Vision.getAngle();
 //    	setHeading(adjust,false);
@@ -338,7 +341,7 @@ public class Swerve{
 		}
 		
 		public void updateCoord(){		
-			if(moduleID == Constants.SWERVE_ENCODER_MODULE_ID){
+			if(moduleID != Constants.FOLLOWER_WHEEL_MODULE_ID){
 				setCurrentDriveEncoderPosition(driveMotor.getEncPosition());
 				setCurrentIntakeAngle(intake.getCurrentAngle());
 				setCurrentModuleAngle(rotationMotor.get()-offSet);
@@ -484,9 +487,13 @@ public class Swerve{
 	    	driveMotor.configNominalOutputVoltage(+0f, -0f);
 	    	driveMotor.configPeakOutputVoltage(+12f, -0f);
 	    	driveMotor.setAllowableClosedLoopErr(0);
+	    	driveMotor.changeControlMode(TalonControlMode.PercentVbus);
 	    	reversePower = false;
 	    }
-	    
+	    public void enslave(){
+	    	driveMotor.changeControlMode(TalonControlMode.Follower);
+	    	driveMotor.set(Ports.FRONT_RIGHT_DRIVE);
+	    }
 	    public void setTeleRampRate(){
 	    	driveMotor.setVoltageRampRate(36.0);
 	    }
@@ -676,41 +683,16 @@ public class Swerve{
 		        double rearLeftSteeringAngle = Math.atan2(A, D)*180/Math.PI;
 		        double rearRightSteeringAngle = Math.atan2(A, C)*180/Math.PI;
 		        
-		        /*
-		        double inverseAngle = Util.boundAngle0to360Degrees(frontRightSteeringAngle - 180);
-		        if(Math.abs(frontRight.getCurrentAngle() - inverseAngle) < Math.abs(frontRight.getCurrentAngle() - frontRightSteeringAngle)){
-		        	frontRightSteeringAngle = inverseAngle;
-		        	frontRightWheelSpeed = -frontRightWheelSpeed;
-		        }*/
-		        
-				/**if(SmartDashboard.getBoolean("Manual Wheel Headings?", false)) {
-					frontRightSteeringAngle = SmartDashboard.getNumber("Manual Heading 1", 0); 
-			        frontLeftSteeringAngle = SmartDashboard.getNumber("Manual Heading 2", 0);
-			        rearLeftSteeringAngle = SmartDashboard.getNumber("Manual Heading 3", 0);
-			        rearRightSteeringAngle = SmartDashboard.getNumber("Manual Heading 4", 0);
-				}/**/
-		        
 		        frontLeft.setGoal(frontLeftSteeringAngle);
 				frontRight.setGoal(frontRightSteeringAngle);
 				rearLeft.setGoal(rearLeftSteeringAngle);
 				rearRight.setGoal(rearRightSteeringAngle);
-				/**
-				 * 2017-03-05 Added because of a potential logic error:
-				 * <p>
-				 * 	Previously, each module checked independently whether its angle was on target,
-				 *   then applied power to its own drive motor if it was. Suppose that modules 1 and 2
-				 *   are on target, but 3 and 4 are not. 1 and 2 will apply power, moving the robot and
-				 *   the other modules. In the meantime, 3 and 4 do not apply power, but get moved
-				 *   around and thrown off somewhat.</p>
-				 * <p>Proposed solution: Check whether all module angles are on target. If they are,
-				 *   apply power to each of them. (Note that the {@link SubSystems.Swerve.SwerveDriveModule#setDriveSpeed() setDriveSpeed}
-				 *   method checks the angle status another time before applying power.) If they are not,
-				 *   do not apply power to any of the modules' drive motors.</p>
-				 * */
-					frontLeft.setDriveSpeed(frontLeftWheelSpeed);
-					frontRight.setDriveSpeed(-frontRightWheelSpeed);
-					rearLeft.setDriveSpeed(rearLeftWheelSpeed);
-					rearRight.setDriveSpeed(-rearRightWheelSpeed);
+				
+				
+				frontLeft.setDriveSpeed(frontLeftWheelSpeed);
+				frontRight.setDriveSpeed(-frontRightWheelSpeed);
+				rearLeft.setDriveSpeed(rearLeftWheelSpeed);
+				rearRight.setDriveSpeed(-rearRightWheelSpeed);
 				//Util.sdSimpleClosedLoop("Heading", "Angle", currentRobotHeading, _targetAngle);
 				
 //				SmartDashboard.putNumber(" Heading Angle ", currentRobotHeading); // imported from Intake
@@ -812,5 +794,18 @@ public class Swerve{
 		frontLeft.setAutoRamprate();
 		rearRight.setAutoRamprate();
 		rearLeft.setAutoRamprate();
+	}
+	public void enslaveMotors(){
+		rearRight.enslave();
+		frontLeft.enslave();
+		//frontLeft.driveMotor.reverseOutput(true);
+		rearLeft.enslave();
+		//rearLeft.driveMotor.reverseOutput(true);
+	}
+	public void zeroWheels(){
+		frontRight.setGoal(0);
+		frontLeft.setGoal(0);
+		rearRight.setGoal(0);
+		rearLeft.setGoal(0);
 	}
 }

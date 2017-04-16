@@ -28,6 +28,12 @@ public class RoboSystem{
 	public Solenoid ballFlap;
 	public CameraServer cam;
 	public AnalogInput ultrasonic;
+	public static final int BLUE = 1;
+	public static final int RED = -1;
+	public int TeamColor = RED;
+	public void setColor(int color){
+		TeamColor = color;
+	}
     public static RoboSystem getInstance()
     {
         if( instance == null )

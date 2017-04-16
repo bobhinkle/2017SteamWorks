@@ -1,26 +1,28 @@
-package IO;import ControlSystem.FSM;
+package IO;import com.ctre.CANTalon;
+import com.ctre.CANTalon.TalonControlMode;
+
+import ControlSystem.FSM;
 import ControlSystem.RoboSystem;
+import Helpers.MotionProfileExample;
 import SubSystems.DistanceController;
 import SubSystems.GearIntake;
-import SubSystems.GearIntake.State;
 import SubSystems.Hanger;
-import SubSystems.Intake;
 import SubSystems.Shooter;
 import SubSystems.Swerve;
 import SubSystems.Turret;
 import Utilities.Constants;
 import Utilities.Util;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; //added?
+import edu.wpi.first.wpilibj.Timer;
  
 public class TeleController
 {
     
-
+	
     public Controller driver,coDriver;
     private FSM fsm;
     private RoboSystem robot;
+    MotionProfileExample _example;
     private static TeleController instance = null;
     private boolean robotCentric = false;
     private DistanceController dist;
@@ -30,6 +32,7 @@ public class TeleController
     private boolean isBumpedDown = false;
     private boolean isHanging = false;
     private boolean canReverseSweeper = true;
+    private boolean MP_MODE = false;
     public TeleController(){
         driver = new Controller(0);
         driver.start();
@@ -38,6 +41,7 @@ public class TeleController
         robot = RoboSystem.getInstance();
         fsm = FSM.getInstance();
         dist = DistanceController.getInstance();
+        _example = new MotionProfileExample(robot.dt.frontRight.driveMotor);
     }
     public static TeleController getInstance(){
         if(instance == null){
@@ -48,10 +52,11 @@ public class TeleController
  
     public void coDriver(){
     	if(coDriver.aButton.isPressed() || coDriver.aButton.isHeld()){
-    		if(robot.gearIntake.getState() != GearIntake.State.GEAR_DETECTED){
+    		//if(robot.gearIntake.getState() != GearIntake.State.GEAR_DETECTED){
 	    		robot.gearIntake.grabGear();
+	    		
 	    		//robot.gearIntake.extend();	
-    		}
+    		//}
     	}
     	if(coDriver.bButton.isPressed() || coDriver.bButton.isHeld()){
     		robot.gearIntake.retract();
@@ -110,8 +115,10 @@ public class TeleController
     		}
     	}
     	if(coDriver.leftTrigger.isPressed()){
-    		robot.turret.lockAngle(robot.intake.getCurrentAngle(),robot.turret.getAngle());
-    		robot.turret.setState(Turret.State.GyroComp);
+    		if(robot.turret.getCurrentState() == Turret.State.VisionTracking){
+    			robot.turret.lockAngle(robot.intake.getCurrentAngle(),robot.turret.getAngle());
+    			robot.turret.setState(Turret.State.GyroComp);
+    		}
     		robot.shooter.setGoal(Constants.SHOOTING_SPEED);
     		robot.shooter.setState(Shooter.Status.STARTED);
     	}
@@ -127,43 +134,34 @@ public class TeleController
     		robot.turret.manualControl(coDriver.getButtonAxis(Controller.RIGHT_STICK_X));
     	}
     	
-    	if(coDriver.getPOV() == 270)
+    	if(coDriver.getPOV() == 270){
+    		robot.turret.setState(Turret.State.Off);
     		robot.turret.setAngle(-90);
-    	
-    	if(coDriver.getPOV() == 0)
-    		//robot.gearIntake.forward();
-    		//robot.turret.resetAngle(90);
-    		robot.turret.setAngle(0);
-    		/*if(!isBumpedUp && robot.shooter.getStatus() != Shooter.Status.OFF){
-    			robot.shooter.setGoal(robot.shooter.getTarget() + 100);
-    			robot.shooter.setState(Shooter.Status.STARTED);
-    			if(isBumpedDown){
-    				isBumpedUp = false;
-    				isBumpedDown = false;
-    			}else{
-    				isBumpedUp = true;
-    			}
-    		}*/
-    	if(coDriver.getPOV() == 90)
-    		robot.turret.setAngle(90);
-    	if(coDriver.getPOV() == 180){
-    		robot.turret.lockAngle(-180,100);
-    		robot.turret.setState(Turret.State.GyroComp);
-    		//robot.gearIntake.reverse();
-    		//robot.turret.setAngle(-2);
-/*    		if(!isBumpedDown && robot.shooter.getStatus() != Shooter.Status.OFF){
-    			robot.shooter.setGoal(robot.shooter.getTarget() - 100);
-    			robot.shooter.setState(Shooter.Status.STARTED);
-    			if(isBumpedUp){
-    				isBumpedDown = false;
-    				isBumpedUp=  false;
-    			}else{
-    				isBumpedDown = true;
-    			}
-    		}*/
     	}
-    	if(coDriver.rightCenterClick.isPressed())
-    		robot.turret.setAngle(0);   
+    	if(coDriver.getPOV() == 0){
+    		robot.turret.setState(Turret.State.Off);
+    		robot.turret.setAngle(0);
+    	}
+    	if(coDriver.getPOV() == 90){
+    		robot.turret.setState(Turret.State.Off);
+    		robot.turret.setAngle(90);
+    	}
+    	if(coDriver.getPOV() == 180){
+    		if(robot.TeamColor == 1){
+    		robot.turret.lockAngle(-180,100);
+    		}else{
+    			robot.turret.lockAngle(-180,80);
+    		}
+    		robot.turret.setState(Turret.State.TeleopGyroComp);
+    	}
+    	if(coDriver.rightCenterClick.isPressed()){
+    		robot.turret.setState(Turret.State.Off);
+    		robot.turret.setAngle(90);  
+    	}
+    	if(coDriver.leftCenterClick.isPressed()){
+    		robot.turret.setState(Turret.State.Off);
+    		robot.turret.setAngle(90);  
+    	}
     }
     
     public void driver() {
@@ -194,7 +192,7 @@ public class TeleController
         	robot.dt.startHanging();
         	robot.gearIntake.retract();
         }
-        if(!dist.isEnabled()){ 
+        if(!dist.isEnabled() && !MP_MODE){ 
         	/*	robot.dt.sendInput(Util.controlSmoother(driver.getButtonAxis(Xbox.LEFT_STICK_X)), 
                 		Util.controlSmoother(-driver.getButtonAxis(Xbox.LEFT_STICK_Y)),0,
                 		0,
@@ -209,17 +207,19 @@ public class TeleController
                 		robotCentric,
                 		 false, driver.leftBumper.isPressed() || driver.leftBumper.isHeld());
         	}
-        
+        else if(MP_MODE){
+        	setupMP();
+        }
         if(driver.leftBumper.isPressed()){
-//        	robotCentric = false;
-        	//dist.setGoal(-30, DistanceController.Direction.X);
-        	//dist.setGoal(0, 0, 1.0, 10, 0.5);
+        	//setupMP();
+        	//startMP();
+        	//MP_MODE = true;
         }
         
         if(driver.rightBumper.isPressed()){            
-//        	robotCentric = true;
-        	//dist.setGoal(30, DistanceController.Direction.X);
-//        	dist.setGoal(0, 36, 0, 10, 0.5);
+        	//robot.dt.startMP();
+        	//resetToVoltage();
+        	//MP_MODE = false;
         }
         
         if(driver.backButton.isHeld()){ 
@@ -249,18 +249,10 @@ public class TeleController
         	
         }
         if(driver.getPOV() == 180){
-//        	robot.shooter.bumpUp(100);
-        	// This button will now be used to test starting orientations
- //       	robot.intake._pidgey.SetFusedHeading(180.0);
- //       	robot.dt.setHeading(0.0);
- //       	dist.setGoal(0,/*-4*/0, 0, 5, 0.5);
+        	}
         }
-/*        if(robotCentric)
-        	SmartDashboard.putString("RobotControl", "ROBOT");
-        else
-            SmartDashboard.putString("RobotControl","FIELD");
-/**/    }
     public void update(){	
+    	_example.control();
     	driver();
     	coDriver();
     	if(robot.gearIntake.getState() == GearIntake.State.GEAR_DETECTED){
@@ -272,6 +264,37 @@ public class TeleController
     	}
     	
     }
+    
+    
+	public void setupMP(){
+		//robot.dt.frontRight.driveMotor.reverseSensor(false);
+		
+		robot.dt.zeroWheels();
+		
+		robot.dt.frontRight.driveMotor.changeControlMode(TalonControlMode.MotionProfile);
+		
+		robot.dt.frontRight.driveMotor.setF(0.5842);
+		
+		robot.dt.frontRight.driveMotor.setP(0.0);
+		
+		robot.dt.frontRight.driveMotor.setI(0.0);
+		
+		robot.dt.frontRight.driveMotor.setD(0.0);
+		
+		CANTalon.SetValueMotionProfile setOutput = _example.getSetValue();
+				
+		robot.dt.frontRight.driveMotor.set(setOutput.value);
+		
+		robot.dt.enslaveMotors();
+
+	}
+	public void startMP(){
+		_example.startMotionProfile();
+	}
+	public void resetToVoltage(){
+		robot.dt.resetModules();
+		_example.reset();
+	}
     
     private void startVibration(int type){
     	if(!vibrateRunning){

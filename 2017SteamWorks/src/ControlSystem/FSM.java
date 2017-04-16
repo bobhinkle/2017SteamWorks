@@ -50,6 +50,7 @@ public class FSM extends SampleRobot {
     private int cyclesOnTarget = 1;
     private int cyclesOnTargetDefault = 1;
     private double angleToTarget = 0;
+    public boolean auto = false;
     public double getTargetAngle(){
     	return angleToTarget;
     }
@@ -191,7 +192,7 @@ public class FSM extends SampleRobot {
                     long now = System.currentTimeMillis();
                     //SmartDashboard.putNumber(" Vision Latency ", now-lastVisionUpdate);
                     lastVisionUpdate = now;
-                    angleToTarget = angle.getDegrees();
+                    angleToTarget = targetDirection;
 //                    field_to_goals.add(field_to_camera
  //                           .transformBy(RigidTransform2d
  //                                   .fromTranslation(new Translation2d(distance * angle.cos(), distance * angle.sin())))
