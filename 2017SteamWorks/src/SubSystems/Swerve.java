@@ -211,7 +211,7 @@ public class Swerve{
 			switch(headingController){
 			case Off:
 				rotationCorrection = 0.0;
-				rotateInput *= 0.5;
+				rotateInput *= 0.6;
 				SmartDashboard.putString(" Heading Controller Mode ", "OFF");
 				break;
 			case Heading:
@@ -354,9 +354,9 @@ public class Swerve{
 	//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " cos = ", Math.cos(Math.toRadians(360-rotationMotor.get()+90)));
 	//	        SmartDashboard.putNumber(Integer.toString(moduleID) + " sin = ", Math.sin(Math.toRadians(360-rotationMotor.get()+90)));
 		        //should be negative for the comp bot, positive for the pbot
-		        double dx = -distanceTravelled * Math.cos(Math.toRadians(getCurrentIntakeAngle()+getCurrentModuleAngle()+90));	// should be ``double dx = distanceTravelled * Math.cos(Math.toRadians(90-(getCurrentIntakeAngle()+getCurrentModuleAngle())));''
+		        double dx = distanceTravelled * Math.cos(Math.toRadians(getCurrentIntakeAngle()+getCurrentModuleAngle()+90));	// should be ``double dx = distanceTravelled * Math.cos(Math.toRadians(90-(getCurrentIntakeAngle()+getCurrentModuleAngle())));''
 		        //should be positive for comp bot, negative for the pbot
-		        double dy = distanceTravelled * Math.sin(Math.toRadians(getCurrentIntakeAngle()+getCurrentModuleAngle()+90));	// should be ``double dx = distanceTravelled * Math.sin(Math.toRadians(90-(getCurrentIntakeAngle()+getCurrentModuleAngle())));''
+		        double dy = -distanceTravelled * Math.sin(Math.toRadians(getCurrentIntakeAngle()+getCurrentModuleAngle()+90));	// should be ``double dx = distanceTravelled * Math.sin(Math.toRadians(90-(getCurrentIntakeAngle()+getCurrentModuleAngle())));''
 		        x += dx;
 		        y += dy;
 	//	        SmartDashboard.putNumber("DRV_X" + Integer.toString(moduleID), x);
@@ -807,5 +807,11 @@ public class Swerve{
 		frontLeft.setGoal(0);
 		rearRight.setGoal(0);
 		rearLeft.setGoal(0);
+	}
+	public void oneEightyWheels(){
+		frontRight.setGoal(180);
+		frontLeft.setGoal(180);
+		rearRight.setGoal(180);
+		rearLeft.setGoal(180);
 	}
 }

@@ -24,10 +24,10 @@ public class Constants {
 	public static final double ANGLE_FRONT_MODULE_CENTER = Math.atan(WHEELBASE_LENGTH/WHEELBASE_WIDTH);
 	
     // 2017-03-05 Added little adjustments to the offsets
-    public static final double FRONT_RIGHT_TURN_OFFSET = 136.4;//344;//pbot 283.0+1.3; //281.2							//comp bot 189.7
-    public static final double FRONT_LEFT_TURN_OFFSET  = 255.9375;//191.5-6.5 + 128.2 + 269.6;//pbot 170.5-0.5; //171.2	//comp bot 189.4
-    public static final double REAR_LEFT_TURN_OFFSET   = 311.1328;//263.1-6.0;//pbot 138.1+1.5; //289.3						//comp bot 85
-    public static final double REAR_RIGHT_TURN_OFFSET  = 164.8828;//45.5-0.5;//pbot 131.6+3.4; //140.0; //172.6			//comp bot 7.38
+    public static final double FRONT_RIGHT_TURN_OFFSET = 98.43;	// 136.4;						//comp bot 189.7
+    public static final double FRONT_LEFT_TURN_OFFSET  = 97.73;	//255.9375;					//comp bot 189.4
+    public static final double REAR_LEFT_TURN_OFFSET   = 278.43;	//311.1328;					//comp bot 85
+    public static final double REAR_RIGHT_TURN_OFFSET  = 355.43;	//164.8828;					//comp bot 7.38
     
     public static final int FOLLOWER_WHEEL_MODULE_ID = 1;
     public static final int SWERVE_ENCODER_MODULE_ID = 4;
@@ -71,7 +71,7 @@ public class Constants {
 	public static final double DIST_CONTROLLER_Y_LONG_D =  0.01;   //.02
 	public final static double DIST_CONTROLLER_Y_LONG_FF = 0.0;    //.0
 	
-	public static final double DIST_CONTROLLER_Y_SHORT_P =  0.0225;  //.01
+	public static final double DIST_CONTROLLER_Y_SHORT_P =  0.018;  //.01
 	public static final double DIST_CONTROLLER_Y_SHORT_D =  0.1;   //.0375
 	public final static double DIST_CONTROLLER_Y_SHORT_FF = 0.25;    //.2
 	
@@ -116,12 +116,12 @@ public class Constants {
 	public static final int TURRET_I_ZONE = (int) (1023.0 / TURRET_DEFAULT_P);
 	
 	public static final double TURRET_SMALL_P = 10.0;
-	public static final double TURRET_SMALL_D = 5.0;
+	public static final double TURRET_SMALL_D = 10.0;
 	public static final double TURRET_SMALL_PID_THRESH = 5;
 	public static final int    TURRET_ONTARGET_THRESH  = 5;
 	public static final double STICK_DEAD_BAND = 0.0;
 	
-	public static final double SHOOTING_SPEED = 2700;
+	public static final double SHOOTING_SPEED = 2650;
 	public static final double SHOOTING_SPEED_AUTO_MIDDLE = 3550;
 	public static final double SHOOTER_ERROR  = 200;
 
@@ -145,7 +145,7 @@ public class Constants {
     public static double kCameraYOffset = 0.0;
     public static double kCameraZOffset = 16;
     public static double kCameraPitchAngleDegrees = 34; // calibrated 4/22  35.75
-    public static double kCameraYawAngleDegrees = 4;  //2.5 //positive moves the turret to the left
+    public static double kCameraYawAngleDegrees = 3;  //2.5 //positive moves the turret to the left
     public static double kCameraDeadband = 0.0;
     
     public static double kCenterOfTargetHeight = 86.0; // inches       
@@ -170,9 +170,9 @@ public class Constants {
     static {        
     	
     	kShooterMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(SHOOTING_SPEED - 200));
-    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y - 12), new InterpolatingDouble(SHOOTING_SPEED - 100));
+    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y - 12), new InterpolatingDouble(SHOOTING_SPEED - 150));
     	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y), new InterpolatingDouble(SHOOTING_SPEED));
-    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y + 12), new InterpolatingDouble(SHOOTING_SPEED + 100));
+    	kShooterMap.put(new InterpolatingDouble(NEAR_HOPPER_Y + 12), new InterpolatingDouble(SHOOTING_SPEED + 150));
     }
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kTurretDistanceMap = new InterpolatingTreeMap<>();
 

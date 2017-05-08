@@ -26,7 +26,7 @@ public class Intake {
 		intakeMotor = new CANTalon(Ports.INTAKE_MOTOR);
 		intakeMotor.changeControlMode(TalonControlMode.PercentVbus);
 		//intakeMotor.setPID(/*0.01*/0.02, 0.00, 0, 0.0175, 0, 0.0, 0);
-		intakeMotor.reverseOutput(true);
+		intakeMotor.reverseOutput(false);
 		//intakeMotor.setCloseLoopRampRate(24);
 		intakeMotor.setVoltageRampRate(24);
 		try{
@@ -75,13 +75,13 @@ public class Intake {
 		return currentAngularRate;
 	}
 	public void intakeForward(){
-		intakeMotor.set(0.7); 
+		intakeMotor.set(-0.7); 
 	}
 	public void reducedForward(){
-		intakeMotor.set(0.7);
+		intakeMotor.set(-0.7);
 	}
 	public void intakeReverse(){
-		intakeMotor.set(-0.7);
+		intakeMotor.set(0.7);
 	}
 	public void intakeStop(){
 		intakeMotor.set(0);
@@ -107,7 +107,7 @@ public class Intake {
 		ex.start();
 	}
 	public class extendIntakes extends Thread{
-		double delay = 0.5;
+		double delay = 1.0;
 		public void run(){
 			intakeReverse();
 			Timer.delay(delay);

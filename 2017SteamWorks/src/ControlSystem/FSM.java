@@ -111,7 +111,7 @@ public class FSM extends SampleRobot {
         	nextPosUpdate = System.currentTimeMillis()+2000;
         }
         lightsUpdate();
-        SmartDashboard.putNumber("ULTRA", robot.getDistance());
+       // SmartDashboard.putNumber("ULTRA", robot.getDistance());
     }
     public synchronized double getTargetDistance(){
     	return targetDistance;

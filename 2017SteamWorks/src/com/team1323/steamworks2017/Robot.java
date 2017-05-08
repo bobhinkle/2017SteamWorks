@@ -466,18 +466,18 @@ public class Robot extends SampleRobot {
     		robot.dt.zeroWheels();
     		System.out.println("Starting Turret Angle: " + Double.toString(robot.turret.getAngle()));
     		//Step 1
-    		double closeHopperY = 82.0;
+    		double closeHopperY = 82.5;
     		dist.setXPID(0.005, 0.0, 0.0, 0.0);
-    		dist.setYPID(0.009, 0.0, 0.03, 0.1);
+    		dist.setYPID(0.009, 0.0, 0.033, 0.1);
     		//logger.writeToLog("AUTO Near Hopper Close Inside");
     		logger.writeToLog("Y distance before: " + Double.toString(robot.dt.frontRight.getNegatedFollowerWheelInches()) + " X distance: " + Double.toString(robot.dt.getX()));
     		if(team == BLUE){
     			dist.setGoal(robot.dt.getX()-1, ControlWheel.SWERVE, closeHopperY, ControlWheel.FOLLOWER, 1.5, 2.75, .85, 5, true); //2.3 Timeout
-    			robot.turret.lockAngle(robot.intake.getCurrentAngle(),98.5);
+    			robot.turret.lockAngle(robot.intake.getCurrentAngle(),100);
         		robot.turret.setState(Turret.State.GyroComp);
     		}else{
     			dist.setGoal(robot.dt.getX()+1, ControlWheel.SWERVE, closeHopperY, ControlWheel.FOLLOWER, 1.5, 2.75, .85, 5, false);
-    			robot.turret.lockAngle(robot.intake.getCurrentAngle(),-98.5);
+    			robot.turret.lockAngle(robot.intake.getCurrentAngle(),-99.5);
         		robot.turret.setState(Turret.State.GyroComp);
         		
     		}
@@ -529,18 +529,26 @@ public class Robot extends SampleRobot {
     			robot.turret.lockAngle(Util.BoundPigeonAngle(robot.intake.getCurrentAngle()), robot.turret.getAngle());
     			robot.turret.setState(Turret.State.GyroComp);
     		}*/
-    		robot.shooter.setGoal(Constants.SHOOTING_SPEED);
+    		robot.shooter.setGoal(2660);
     		robot.shooter.setState(Shooter.Status.STARTED);
     		robot.deployBallFlap();
+    		if(team == BLUE){
+    			robot.dt.setHeading(180, true); 
+    			robot.dt.zeroWheels();
+    		}else{
+    			robot.dt.setHeading(0, true);
+    			robot.dt.oneEightyWheels();
+    		}
+    		//robot.dt.disableReverse();
     		dist.setXPID(0.0005, 0.0, 0.0, 0.1);
     		dist.setYPID(Constants.DIST_CONTROLLER_Y_SHORT_P, 0.0, Constants.DIST_CONTROLLER_Y_SHORT_D, 0.25);
     		dist.blowUpTimeout();
     		if(team == BLUE){
-    			dist.setGoal(robot.dt.getX() + (2*team), ControlWheel.SWERVE, Constants.NEAR_HOPPER_Y + 4, ControlWheel.FOLLOWER, 3.0, 1.5, 1.0, 10, true); 
+    			dist.setGoal(robot.dt.getX() - 1.1, ControlWheel.SWERVE, Constants.NEAR_HOPPER_Y + 6, ControlWheel.FOLLOWER, 1.0, 1.5, 1.0, 10, true); 
     		}else{
-    			dist.setGoal(robot.dt.getX() + (2*team), ControlWheel.SWERVE, Constants.NEAR_HOPPER_Y + 4, ControlWheel.FOLLOWER, 3.0, 1.5, 1.0, 10, false);
+    			dist.setGoal(robot.dt.getX() + 1.1, ControlWheel.SWERVE, Constants.NEAR_HOPPER_Y + 6, ControlWheel.FOLLOWER, 1.0, 1.5, 1.0, 10, false);
     		}
-    		timeout = System.currentTimeMillis() + 1250;
+    		timeout = System.currentTimeMillis() + 1500;
     		while(isAutonomous() && System.currentTimeMillis() < timeout){
     			Timer.delay(0.01);
     		}
@@ -548,7 +556,7 @@ public class Robot extends SampleRobot {
     		robot.intake.intakeForward();
     		
     		delay();
-    		robot.shooter.setGoal(robot.shooter.getShooterSpeedForRange(dist.getYInches()));
+    		robot.shooter.setGoal(2660);
     		robot.shooter.setState(Shooter.Status.STARTED);
     		System.out.println("Final Shooting Speed: " + Double.toString(robot.shooter.getShooterSpeedForRange(dist.getYInches())))   ;
     		//Step 4

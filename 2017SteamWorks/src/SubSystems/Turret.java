@@ -31,7 +31,7 @@ public class Turret {
     	motor.changeControlMode(TalonControlMode.Position);
     	motor.set(0);
     	motor.setPID(Constants.TURRET_DEFAULT_P, 0.0, Constants.TURRET_DEFAULT_D, 0.0, 0, 0.0, 0);	//practice bot pid tuning
-    	motor.setPID(Constants.TURRET_SMALL_P, 0.00, Constants.TURRET_SMALL_P, 0.0, 0, 0.0, 1);
+    	motor.setPID(5.0, 0.00, Constants.TURRET_SMALL_D, 0.0, 0, 0.0, 1);
     	motor.setProfile(0);
 		motor.enableBrakeMode(true);
 		motor.setNominalClosedLoopVoltage(12);
@@ -89,11 +89,11 @@ public class Turret {
 		switch(currentState){
 		case GyroComp:
 			setAngle(lockedTurretAngle + (lockedAngle - heading));
-			System.out.println("Turret Goal: " + Double.toString(getGoal()));
+			//System.out.println("Turret Goal: " + Double.toString(getGoal()));
 			break;
 		case TeleopGyroComp:
 			setAngle(lockedTurretAngle + (lockedAngle - Util.BoundPigeonAngle(heading)));
-			System.out.println("Turret Goal: " + Double.toString(getGoal()));
+			//System.out.println("Turret Goal: " + Double.toString(getGoal()));
 		default:
 			break;
 		}
